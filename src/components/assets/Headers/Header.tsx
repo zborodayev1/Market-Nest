@@ -13,7 +13,7 @@ export const Header = () => {
           <div className="ml-[50px] flex mt-2">
             <span className="max-laptopL:w-[150x] max-laptopL:h-[30px] text-2xl font-bold bg-gradient-to-r from-[#173f35] to-[#14594c] hover:from-[#2f6f62] hover:to-[#267e6b] bg-clip-text text-transparent duration-300 transition-all ease-in-out ">Market Nest</span>
           </div>
-          <img src="/Logo.png" className="w-[50px]"/>
+          <img src="/Logo.png" className=""/>
         </Link>
         <div className="flex">
           {/* <div className="mr-5">
@@ -31,7 +31,6 @@ export const Header = () => {
           </Link>
         </div>
       </div>
-      
     </div>
   )
 }

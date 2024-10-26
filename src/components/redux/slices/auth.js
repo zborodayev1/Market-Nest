@@ -10,7 +10,7 @@ export const fethRegister = createAsyncThunk(
 );
 
 const initialState = {
-    user: null,
+     user: null,
     status: "loading",
 };
 
