@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom'
-import { selectIsAuth, logout } from '../../redux/slices/auth'
-import { useDispatch, useSelector } from 'react-redux'
+import { logout } from '../../redux/slices/auth'
+import { useDispatch } from 'react-redux'
 import { persistor } from '../../redux/store'
 
 export const Header = () => {
-  const isAuth = useSelector(selectIsAuth)
   const isAuthTest = false
   const dispatch = useDispatch()
 

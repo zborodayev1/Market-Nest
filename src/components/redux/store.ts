@@ -12,7 +12,6 @@ import {
   REGISTER,
 } from 'redux-persist'
 import { persistConfig } from './persist'
-import { DevTools } from 'redux-devtools-extension'
 
 const rootReducer = combineReducers({
   // posts: postsReducer,
@@ -27,18 +26,8 @@ const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-
-  devTools:
-    typeof window !== 'undefined' &&
-    window.REDUX_DEVTOOLS_EXTENSION &&
-    (window.REDUX_DEVTOOLS_EXTENSION as () => DevTools)(),
+  devTools: process.env.NODE_ENV !== 'production'
 })
-
-declare global {
-  interface Window {
-    REDUX_DEVTOOLS_EXTENSION?: () => any
-  }
-}
 
 const persistor = persistStore(store)
 
