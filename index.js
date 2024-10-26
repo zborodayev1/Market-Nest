@@ -21,6 +21,7 @@ const app = express()
 
 app.use(express.json());
 app.use(cors());
+
 // post
 app.post('/auth/login',loginValidation, handleValidErr, UserController.login)
 app.post('/auth/register',registerValidation, handleValidErr, UserController.register)
