@@ -16,6 +16,18 @@ export default {
         'max-laptopL': {max: '1560px'}
       },
     },
+    animation: {
+      'fade-in': 'fadeIn 300ms ease-in-out'
+    },
+    keyframes: {
+      fadeIn: {
+        '0%': { opacity: 0, filter: 'blur(30px)' },
+        '100%': { opacity: 1, filter: 'blur(0px)' },
+      },
+    },
+    filter: {
+      'blur': 'blur(5px)',
+    },
   },
   plugins: [],
 }

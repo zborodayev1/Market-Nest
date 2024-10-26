@@ -12,6 +12,7 @@ import {
   REGISTER,
 } from "redux-persist";
 import { persistConfig } from "./persist";
+import { DevTools } from 'redux-devtools-extension';
 
 const rootReducer = combineReducers({
   // posts: postsReducer,
@@ -26,10 +27,15 @@ const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-  devTools:
-    window.__REDUX_DEVTOOLS_EXTENSION__ &&
-    window.__REDUX_DEVTOOLS_EXTENSION__(),
+  
+devTools: typeof window !== 'undefined' && window.REDUX_DEVTOOLS_EXTENSION && (window.REDUX_DEVTOOLS_EXTENSION as () => DevTools)()
 });
+
+declare global {
+  interface Window {
+    REDUX_DEVTOOLS_EXTENSION?: () => any;
+  }
+}
 
 const persistor = persistStore(store);
 
