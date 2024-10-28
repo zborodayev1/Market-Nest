@@ -15,6 +15,18 @@ const UserShema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    phone: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    city: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
     avatarUrl: String,
     _id: mongoose.Schema.Types.ObjectId,
   },

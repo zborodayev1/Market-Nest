@@ -8,6 +8,7 @@ import { CreateProduct } from './components/pages/CreateProduct'
 import { useSelector } from 'react-redux'
 import { selectIsAuth } from './components/redux/slices/auth'
 import { AboutMarket } from './components/pages/AboutMarket'
+import { Profile } from './components/pages/Profile'
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)
@@ -30,6 +31,14 @@ export const App = () => {
           path="/create-product"
         />
         <Route element={<AboutMarket />} path="/about" />
+        <Route
+          element={!isAuth ? <Navigate to="/" /> : <Profile />}
+          path="/profile"
+        />
+        <Route
+          element={!isAuth ? <Navigate to="/" /> : <Profile />}
+          path="/profile/edit/password"
+        />
       </Routes>
     </div>
   )

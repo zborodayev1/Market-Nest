@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
-import { logout } from '../../redux/slices/auth'
-import { useDispatch } from 'react-redux'
+import { logout, selectIsAuth } from '../../redux/slices/auth'
+import { useDispatch, useSelector } from 'react-redux'
 import { persistor } from '../../redux/store'
+import { Avatar } from '@mui/material'
 
 export const Header = () => {
-  const isAuthTest = false
+  const isAuth = useSelector(selectIsAuth)
   const dispatch = useDispatch()
 
   const onClickLogout = async () => {
@@ -27,7 +28,7 @@ export const Header = () => {
           <img src="/Logo.png" className="w-[50px] h-[50px]" />
         </Link>
         <div>
-          {isAuthTest ? (
+          {isAuth ? (
             <div className="flex">
               <div>
                 <button
@@ -37,10 +38,13 @@ export const Header = () => {
                   Log out
                 </button>
               </div>
-              <Link to="/create-product" className="mx-3">
+              <Link to="/create-product" className="mx-2">
                 <button className="w-32 h-10 bg-gradient-to-r from-[#173f35] to-[#14594c] text-white rounded-lg shadow-inner hover:from-[#14594c] hover:to-[#1a574a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14594c] focus:from-[#14594c] focus:to-[#1a574a] dark:from-[#0e2b26] dark:to-[#113c34] dark:hover:from-[#113c34] dark:hover:to-[#14594c] dark:focus:from-[#113c34] dark:focus:to-[#14594c] transition-all ease-in-out duration-300 ">
                   Add Product
                 </button>
+              </Link>
+              <Link to="/profile" className="">
+                <Avatar />
               </Link>
             </div>
           ) : (
