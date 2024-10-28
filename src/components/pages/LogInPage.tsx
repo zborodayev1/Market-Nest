@@ -34,7 +34,7 @@ export const LogInPage: React.FC = (): JSX.Element => {
   })
 
   const [err, setErr] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false) // Состояние загрузки
+  const [loading, setLoading] = useState(false)
   const isAuth = useSelector(selectIsAuth)
   const dispatch = useDispatch()
   const {
