@@ -12,9 +12,9 @@ import {
   REGISTER,
 } from 'redux-persist'
 import { persistConfig } from './persist'
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 
 const rootReducer = combineReducers({
-  // posts: postsReducer,
   auth: authReducer,
 })
 
@@ -26,9 +26,13 @@ const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-  devTools: process.env.NODE_ENV !== 'production'
+  devTools: process.env.NODE_ENV !== 'production',
 })
 
 const persistor = persistStore(store)
-
 export { store, persistor }
+
+export const useAppDispatch = () => useDispatch<AppDispatch>()
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch

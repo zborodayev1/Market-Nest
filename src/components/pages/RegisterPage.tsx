@@ -1,12 +1,11 @@
 import { Avatar } from '@mui/material'
 import TextField from '@mui/material/TextField'
 import { useSpring, animated } from '@react-spring/web'
-import { useSelector } from 'react-redux'
-// import { useState } from "react";
-// import { useForm } from "react-hook-form";
-import { selectIsAuth } from '../../components/redux/slices/auth'
+import { useDispatch, useSelector } from 'react-redux'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { fetchRegister, selectIsAuth } from '../../components/redux/slices/auth'
 import { Navigate } from 'react-router-dom'
-// import { Register } from '../redux/store';
 
 export const RegisterPage = () => {
   const text = useSpring({
@@ -45,42 +44,47 @@ export const RegisterPage = () => {
     delay: 100,
   })
 
-  // const [err, setErr] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null)
   const isAuth = useSelector(selectIsAuth)
-  // const dispatch = useDispatch();
-  // const {
-  //     register,
-  //     handleSubmit,
-  //     formState: { errors, isValid },
-  // } = useForm({
-  //     defaultValues: {
-  //         fullName: "",
-  //         email: "",
-  //         password: "",
-  //     },
-  //     mode: "all",
-  // });
+  const [loading, setLoading] = useState(false)
+  const dispatch = useDispatch()
+  const {
+    register,
+    handleSubmit,
+    formState: { isValid, errors },
+  } = useForm({
+    defaultValues: {
+      fullName: '',
+      email: '',
+      password: '',
+    },
+    mode: 'all',
+  })
 
-  // const onSubmit = async (values: {
-  //     fullName: string;
-  //     password: string | number;
-  //     email: string;
-  // }) => {
-  //     try {
-  //       const data = await dispatch(fetсhRegister(values));
+  const onSubmit = async (values: {
+    fullName: string
+    email: string
+    password: string
+  }) => {
+    setLoading(true)
+    try {
+      const data = await dispatch(fetchRegister(values))
+      setLoading(false)
 
-  //       if (!data.payload) {
-  //         return setErr("Uncorrect data");
-  //       }
-
-  //       if ("token" in data.payload) {
-  //         window.localStorage.setItem("token", data.payload.token);
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //       setErr("Error registration");
-  //     }
-  //   };
+      if (fetchRegister.fulfilled.match(data)) {
+        const { token } = data.payload
+        if (token) {
+          window.localStorage.setItem('token', token)
+        }
+      } else {
+        setErr('Register failed!')
+      }
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
+      setErr('Something went wrong!')
+    }
+  }
 
   if (isAuth) {
     return <Navigate to="/" />
@@ -105,40 +109,66 @@ export const RegisterPage = () => {
             >
               <Avatar sx={{ width: 70, height: 70 }} src="/broken-image.jpg" />
             </animated.div>
-            <div>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <animated.div
                 style={{ ...textField1 }}
                 className="flex justify-center mb-5"
               >
                 <TextField
-                  id="outlined-basic"
                   label="FullName"
                   variant="outlined"
+                  {...register('fullName', {
+                    required: 'This field is required!',
+                  })}
+                  helperText={errors.fullName?.message}
+                  error={Boolean(errors.fullName?.message)}
                 />
               </animated.div>
               <animated.div
                 style={{ ...textField2 }}
                 className="flex justify-center mb-5"
               >
-                <TextField label="E-mail" />
+                <TextField
+                  label="E-mail"
+                  {...register('email', {
+                    required: 'This field is required!',
+                  })}
+                  helperText={errors.email?.message}
+                  error={Boolean(errors.email?.message)}
+                />
               </animated.div>
               <animated.div
                 style={{ ...textField3 }}
                 className="flex justify-center mb-5"
               >
-                <TextField label="Password" />
+                <TextField
+                  label="Password"
+                  {...register('password', {
+                    required: 'This field is required!',
+                  })}
+                  error={Boolean(errors.password?.message)}
+                  helperText={errors.password?.message}
+                />
               </animated.div>
               <animated.div
                 style={{ ...button }}
                 className="flex justify-center"
               >
-                <button className="w-[200px] h-10 bg-gradient-to-r from-[#173f35] to-[#14594c] text-white rounded-lg shadow-inner hover:from-[#14594c] hover:to-[#1a574a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14594c] focus:from-[#14594c] focus:to-[#1a574a] transition-all ease-in-out duration-300 ">
-                  Create Account
+                <button
+                  disabled={!isValid || loading}
+                  type="submit"
+                  className="w-[200px] h-10 bg-gradient-to-r from-[#173f35] to-[#14594c] text-white rounded-lg shadow-inner hover:from-[#14594c] hover:to-[#1a574a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14594c] focus:from-[#14594c] focus:to-[#1a574a] transition-all ease-in-out duration-300 "
+                >
+                  {loading ? 'Creating account...' : 'Create Account'}{' '}
                 </button>
               </animated.div>
-            </div>
-            {/* <h1 className="text-[#D3312F] mt-2 text-sm ml-3">err</h1> */}
+            </form>
           </div>
+          {err && (
+            <h1 className="text-[#D3312F] mt-2 text-sm ml-3 flex justify-center mr-2">
+              {err}
+            </h1>
+          )}
         </animated.div>
       </div>
     </div>

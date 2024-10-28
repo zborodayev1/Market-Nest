@@ -35,9 +35,9 @@ app.get('/profile/:id', checkAuth, UserController.getUserProfile)
 app.get('/products', ProductController.getAllProducts)
 
 // patch
-app.patch('/auth/password', checkAuth, UserController.patchPassword)
 app.patch('/profile', checkAuth, UserController.patchProfile)
 app.patch('/product/:id', checkAuth, ProductController.patchProduct)
+
 // delete
 app.delete('/product/:id', checkAuth, ProductController.deleteProduct)
 app.delete('/profile', checkAuth, UserController.deleteProfile)

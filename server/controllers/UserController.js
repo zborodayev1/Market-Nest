@@ -62,8 +62,6 @@ export const login = async (req, res) => {
           });
 
           const { passwordHash, ...userData } = user._doc;
-
-
         res.json({
             ...userData,
             token,
@@ -79,8 +77,11 @@ export const login = async (req, res) => {
 export const getProfile = async (req, res) => {
     try {
         const user = await UserModel.findById(req.userId);
+
         const { passwordHash, ...userData } = user._doc;
-        res.json(userData);
+         res.json({
+            ...userData,
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({
@@ -89,52 +90,44 @@ export const getProfile = async (req, res) => {
     }
 }
 
-export const patchPassword = async (req, res) => {
-    try {
-        const user = await UserModel.findById(req.userId);
-        const isValidPass = await bcrypt.compare(
-            req.body.oldPassword,
-            user._doc.passwordHash,
-          );
-      
-          if (!isValidPass) {
-            return res.status(400).json({
-              message: "Wrong password",
-            });
-          }
-
-          const salt = await bcrypt.genSalt(15);
-          const hash = await bcrypt.hash(req.body.newPassword, salt);
-
-          await UserModel.updateOne(
-            { _id: req.userId },
-            { passwordHash: hash },
-          );
-          res.json({ message: "Password changed" });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({
-            message: "Failed to change password",
-        });
-    }
-}
 export const patchProfile = async (req, res) => {
-    try {
-        await UserModel.updateOne(
-            { _id: req.userId },
-            {
-                fullName: req.body.fullName,
-                avatarUrl: req.body.avatarUrl,
-            },
-          );
-          res.json({ message: "Profile changed" });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({
-            message: "Failed to change profile",
-        });
+  try {
+    const updateData = {
+      fullName: req.body.fullName,
+      avatarUrl: req.body.avatarUrl,
+      phone: req.body.phone,
+      address: req.body.address,
+      city: req.body.city,
+      country: req.body.country,
+    };
+    if (req.body.oldPassword && req.body.newPassword) {
+      const user = await UserModel.findById(req.userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const isValidPass = await bcrypt.compare(req.body.oldPassword, user.passwordHash);
+
+      if (!isValidPass) {
+        return res.status(400).json({ message: "Wrong password" });
+      }
+
+     
+      const salt = await bcrypt.genSalt(15);
+      const hash = await bcrypt.hash(req.body.newPassword, salt);
+      
+      updateData.passwordHash = hash;
     }
-}
+
+    await UserModel.updateOne({ _id: req.userId }, updateData);
+    res.json({ message: "Profile changed" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Failed to change profile" });
+  }
+};
+
 export const deleteProfile = async (req, res) => {
     try {
         await UserModel.deleteOne({ _id: req.userId });
