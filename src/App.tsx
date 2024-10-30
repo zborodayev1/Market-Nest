@@ -8,7 +8,7 @@ import { CreateProduct } from './components/pages/CreateProduct'
 import { useSelector } from 'react-redux'
 import { selectIsAuth } from './components/redux/slices/auth'
 import { AboutMarket } from './components/pages/AboutMarket'
-import { Profile } from './components/pages/Profile'
+import { Profile } from './components/pages/Profile/Profile'
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)

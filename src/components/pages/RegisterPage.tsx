@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { fetchRegister, selectIsAuth } from '../../components/redux/slices/auth'
 import { Navigate } from 'react-router-dom'
+import LinearProgress from '@mui/material/LinearProgress'
 
 export const RegisterPage = () => {
   const text = useSpring({
@@ -92,7 +93,7 @@ export const RegisterPage = () => {
 
   return (
     <div>
-      <div className="bg-[#fafafa] h-screen flex flex-wrap justify-center">
+      <div className="bg-[#fafafa] h-[687px] flex flex-wrap justify-center">
         <animated.div
           style={{ ...div }}
           className="bg-[#ffff] shadow-lg px-16 mt-5 pt-8 w-[400px] h-[500px] phone:max-w-90 phone-md:max-w-96 rounded-md"
@@ -164,13 +165,14 @@ export const RegisterPage = () => {
               </animated.div>
             </form>
           </div>
-          {err && (
-            <h1 className="text-[#D3312F] mt-2 text-sm ml-3 flex justify-center mr-2">
+          {err && !loading && (
+            <h1 className="text-[#D3312F] font-bold mt-2 text-md ml-3 flex justify-center mr-2">
               {err}
             </h1>
           )}
         </animated.div>
       </div>
+      {loading && <LinearProgress />}
     </div>
   )
 }

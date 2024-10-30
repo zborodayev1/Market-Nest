@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { fetchLogin, selectIsAuth } from '../../components/redux/slices/auth'
 import { Navigate } from 'react-router-dom'
+import LinearProgress from '@mui/material/LinearProgress'
 
 export const LogInPage: React.FC = (): JSX.Element => {
   const text = useSpring({
@@ -79,7 +80,7 @@ export const LogInPage: React.FC = (): JSX.Element => {
 
   return (
     <div>
-      <div className="bg-[#fafafa] h-screen flex flex-wrap justify-center">
+      <div className="bg-[#fafafa] h-[687px] flex flex-wrap justify-center">
         <animated.div
           style={{ ...main }}
           className="bg-[#ffff] shadow-lg px-16 mt-5 pt-8 w-[400px] h-[400px] items-center phone:max-w-90 phone-md:max-w-96 rounded-md"
@@ -130,14 +131,15 @@ export const LogInPage: React.FC = (): JSX.Element => {
                 </button>
               </animated.div>
             </form>
-            {err && (
-              <h1 className="text-[#D3312F] mt-2 text-sm ml-3 flex justify-center mr-2">
+            {err && !loading && (
+              <h1 className="text-[#D3312F] font-bold mt-2 text-md ml-3 flex justify-center mr-2">
                 {err}
               </h1>
             )}
           </div>
         </animated.div>
       </div>
+      {loading && <LinearProgress />}
     </div>
   )
 }
