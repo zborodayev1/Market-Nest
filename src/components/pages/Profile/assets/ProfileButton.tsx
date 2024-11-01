@@ -4,19 +4,19 @@ import { animated } from '@react-spring/web'
 interface ProfileFieldButtonProps {
   title: string
   value: string
-  animationStyle: React.CSSProperties
   onClick?: () => void
+  style?: React.CSSProperties
 }
 
 export const ProfileButton: React.FC<ProfileFieldButtonProps> = ({
-  animationStyle,
   title,
   value,
   onClick,
+  style,
 }) => {
   return (
     <animated.button
-      style={animationStyle}
+      style={style}
       className="flex flex-col w-full focus:bg-[#DEE4EC] pt-2 pl-2 pr-2 duration-300"
       onClick={onClick}
     >

@@ -2,8 +2,8 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { HomePage } from './components/pages/HomePage'
 import { Header } from './components/assets/Headers/Header'
 import { NotFound } from './components/assets/errors/NotFound'
-import { RegisterPage } from './components/pages/RegisterPage'
-import { LogInPage } from './components/pages/LogInPage'
+import { RegisterPage } from './components/pages/Register/RegisterPage'
+import { LogInPage } from './components/pages/LogIn/LogInPage'
 import { CreateProduct } from './components/pages/CreateProduct'
 import { useSelector } from 'react-redux'
 import { selectIsAuth } from './components/redux/slices/auth'
@@ -34,10 +34,6 @@ export const App = () => {
         <Route
           element={!isAuth ? <Navigate to="/" /> : <Profile />}
           path="/profile"
-        />
-        <Route
-          element={!isAuth ? <Navigate to="/" /> : <Profile />}
-          path="/profile/edit/password"
         />
       </Routes>
     </div>

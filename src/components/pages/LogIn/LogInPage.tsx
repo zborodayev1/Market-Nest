@@ -3,7 +3,7 @@ import { animated, useSpring } from '@react-spring/web'
 import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { fetchLogin, selectIsAuth } from '../../components/redux/slices/auth'
+import { fetchLogin, selectIsAuth } from '../../../components/redux/slices/auth'
 import { Navigate } from 'react-router-dom'
 import LinearProgress from '@mui/material/LinearProgress'
 
@@ -80,7 +80,7 @@ export const LogInPage: React.FC = (): JSX.Element => {
 
   return (
     <div>
-      <div className="bg-[#fafafa] h-[687px] flex flex-wrap justify-center">
+      <div className="bg-[#fafafa] h-screen flex flex-wrap justify-center">
         <animated.div
           style={{ ...main }}
           className="bg-[#ffff] shadow-lg px-16 mt-5 pt-8 w-[400px] h-[400px] items-center phone:max-w-90 phone-md:max-w-96 rounded-md"
@@ -139,7 +139,17 @@ export const LogInPage: React.FC = (): JSX.Element => {
           </div>
         </animated.div>
       </div>
-      {loading && <LinearProgress />}
+      {loading && (
+        <LinearProgress
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+          }}
+        />
+      )}
     </div>
   )
 }

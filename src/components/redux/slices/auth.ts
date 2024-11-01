@@ -12,7 +12,7 @@ interface UpdateProfileResponse {
 }
 
 interface UserProfile {
-  fullName?: string
+  fullName: string
   avatarUrl?: string
   phone?: string
   address?: string
@@ -22,12 +22,12 @@ interface UserProfile {
   password: string
 }
 
-interface UserAddress {
+interface UserData {
   fullName: string
-  phone: string
-  address: string
-  city: string
-  country: string
+  phone?: string
+  address?: string
+  city?: string
+  country?: string
 }
 
 interface UserPassword {
@@ -73,7 +73,7 @@ export const fetchProfileData = createAsyncThunk<UserProfile>(
 
 export const updateProfileData = createAsyncThunk<
   UpdateProfileResponse,
-  UserAddress,
+  UserData,
   { rejectValue: string }
 >('auth/updateProfile', async (params, { rejectWithValue }) => {
   try {
@@ -149,9 +149,11 @@ const authSlice = createSlice({
     }
     const handleRejected = (state: AuthState, action: any) => {
       state.status = 'failed'
-      state.user = null
       state.error = action.payload || 'Error occurred'
       state.loading = false
+      if (state.isAuth && state.user) {
+        state.user = { ...state.user }
+      }
     }
 
     builder
