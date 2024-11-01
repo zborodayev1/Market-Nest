@@ -134,7 +134,7 @@ export const patchProfileEmail = async (req, res) => {
         };
         
         await UserModel.updateOne({ _id: req.userId }, updateData);
-        res.json({email: updateData.email});
+        res.json({user: updateData});
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Failed to change profile" });
