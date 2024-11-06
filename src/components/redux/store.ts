@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { combineReducers } from 'redux'
 import { authReducer } from './slices/auth'
+import { settingsReducer } from './slices/main'
 import {
   persistStore,
   persistReducer,
@@ -13,9 +14,12 @@ import {
 } from 'redux-persist'
 import { persistConfig } from './persist'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+import { productReducer } from './slices/products'
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  settings: settingsReducer,
+  product: productReducer,
 })
 
 const store = configureStore({

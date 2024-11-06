@@ -1,27 +1,22 @@
-import { Avatar } from '@mui/material'
-import TextField from '@mui/material/TextField'
-import { useSpring, animated } from '@react-spring/web'
+import { TextField } from '@mui/material'
+import { animated, useSpring } from '@react-spring/web'
 import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { fetchRegister, selectIsAuth } from '../../components/redux/slices/auth'
+import { fetchLogin, selectIsAuth } from '../../../components/redux/slices/auth'
 import { Navigate } from 'react-router-dom'
+import LinearProgress from '@mui/material/LinearProgress'
 
-export const RegisterPage = () => {
+export const LogInPage: React.FC = (): JSX.Element => {
   const text = useSpring({
     from: { opacity: 0 },
     to: { opacity: 1 },
     delay: 200,
   })
-  const div = useSpring({
+  const main = useSpring({
     from: { y: 100, width: '0px', height: '0px' },
-    to: { y: 0, width: '400px', height: '500px' },
+    to: { y: 0, width: '400px', height: '400px' },
     delay: 10,
-  })
-  const img = useSpring({
-    from: { y: 100, opacity: 0 },
-    to: { y: 0, opacity: 1 },
-    delay: 50,
   })
   const textField1 = useSpring({
     from: { y: 100, opacity: 0 },
@@ -33,11 +28,6 @@ export const RegisterPage = () => {
     to: { y: 0, opacity: 1 },
     delay: 100,
   })
-  const textField3 = useSpring({
-    from: { y: 100, opacity: 0 },
-    to: { y: 0, opacity: 1 },
-    delay: 100,
-  })
   const button = useSpring({
     from: { y: 100, opacity: 0 },
     to: { y: 0, opacity: 1 },
@@ -45,16 +35,15 @@ export const RegisterPage = () => {
   })
 
   const [err, setErr] = useState<string | null>(null)
-  const isAuth = useSelector(selectIsAuth)
   const [loading, setLoading] = useState(false)
+  const isAuth = useSelector(selectIsAuth)
   const dispatch = useDispatch()
   const {
     register,
     handleSubmit,
     formState: { isValid, errors },
-  } = useForm({
+  } = useForm<{ email: string; password: string }>({
     defaultValues: {
-      fullName: '',
       email: '',
       password: '',
     },
@@ -62,22 +51,21 @@ export const RegisterPage = () => {
   })
 
   const onSubmit = async (values: {
-    fullName: string
     email: string
     password: string
-  }) => {
+  }): Promise<void> => {
     setLoading(true)
     try {
-      const data = await dispatch(fetchRegister(values))
+      const resultAction = await dispatch(fetchLogin(values))
       setLoading(false)
 
-      if (fetchRegister.fulfilled.match(data)) {
-        const { token } = data.payload
+      if (fetchLogin.fulfilled.match(resultAction)) {
+        const { token } = resultAction.payload
         if (token) {
           window.localStorage.setItem('token', token)
         }
       } else {
-        setErr('Register failed!')
+        setErr('Login failed!')
       }
     } catch (error) {
       console.error(error)
@@ -94,38 +82,18 @@ export const RegisterPage = () => {
     <div>
       <div className="bg-[#fafafa] h-screen flex flex-wrap justify-center">
         <animated.div
-          style={{ ...div }}
-          className="bg-[#ffff] shadow-lg px-16 mt-5 pt-8 w-[400px] h-[500px] phone:max-w-90 phone-md:max-w-96 rounded-md"
+          style={{ ...main }}
+          className="bg-[#ffff] shadow-lg px-16 mt-5 pt-8 w-[400px] h-[400px] items-center phone:max-w-90 phone-md:max-w-96 rounded-md"
         >
           <div>
             <animated.div style={{ ...text }} className="flex justify-center">
-              <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#173f35] to-[#14594c]">
-                Register
+              <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#173f35] to-[#14594c] mb-10">
+                Log In
               </h1>
-            </animated.div>
-            <animated.div
-              style={{ ...img }}
-              className="flex justify-center mt-3 mb-3"
-            >
-              <Avatar sx={{ width: 70, height: 70 }} src="/broken-image.jpg" />
             </animated.div>
             <form onSubmit={handleSubmit(onSubmit)}>
               <animated.div
                 style={{ ...textField1 }}
-                className="flex justify-center mb-5"
-              >
-                <TextField
-                  label="FullName"
-                  variant="outlined"
-                  {...register('fullName', {
-                    required: 'This field is required!',
-                  })}
-                  helperText={errors.fullName?.message}
-                  error={Boolean(errors.fullName?.message)}
-                />
-              </animated.div>
-              <animated.div
-                style={{ ...textField2 }}
                 className="flex justify-center mb-5"
               >
                 <TextField
@@ -138,7 +106,7 @@ export const RegisterPage = () => {
                 />
               </animated.div>
               <animated.div
-                style={{ ...textField3 }}
+                style={{ ...textField2 }}
                 className="flex justify-center mb-5"
               >
                 <TextField
@@ -159,18 +127,29 @@ export const RegisterPage = () => {
                   type="submit"
                   className="w-[200px] h-10 bg-gradient-to-r from-[#173f35] to-[#14594c] text-white rounded-lg shadow-inner hover:from-[#14594c] hover:to-[#1a574a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14594c] focus:from-[#14594c] focus:to-[#1a574a] transition-all ease-in-out duration-300 "
                 >
-                  {loading ? 'Creating account...' : 'Create Account'}{' '}
+                  {loading ? 'Logging in...' : 'Log in'}{' '}
                 </button>
               </animated.div>
             </form>
+            {err && !loading && (
+              <h1 className="text-[#D3312F] font-bold mt-2 text-md ml-3 flex justify-center mr-2">
+                {err}
+              </h1>
+            )}
           </div>
-          {err && (
-            <h1 className="text-[#D3312F] mt-2 text-sm ml-3 flex justify-center mr-2">
-              {err}
-            </h1>
-          )}
         </animated.div>
       </div>
+      {loading && (
+        <LinearProgress
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+          }}
+        />
+      )}
     </div>
   )
 }
