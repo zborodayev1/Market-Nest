@@ -29,7 +29,7 @@ export const ProfileButton: React.FC<ProfileFieldButtonProps> = ({
           </div>
         </div>
       </div>
-      <div className="h-[2px] w-full mt-2 bg-[#DEE4EC]"></div>
+      <hr className="h-[1px] w-full mt-2 bg-[#DEE4EC]" />
     </animated.button>
   )
 }

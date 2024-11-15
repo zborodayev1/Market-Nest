@@ -1,65 +1,79 @@
-import { animated, useSpring } from '@react-spring/web'
-import { Link } from 'react-router-dom'
+// import { animated, useSpring } from '@react-spring/web'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  fetchProducts,
+  Product,
+  selectProducts,
+} from '../redux/slices/products'
+import { ProductForm } from '../assets/Product/ProductForm'
+import { motion } from 'framer-motion'
+import { CircularProgress } from '@mui/material'
+import { green } from '@mui/material/colors'
 
 export const HomePage = () => {
-  const h1 = useSpring({
-    from: { opacity: 0, y: 100 },
-    to: { opacity: 1, y: 0 },
-    delay: 300,
-    duration: 400,
-  })
-  const button = useSpring({
-    from: { opacity: 0, y: 100 },
-    to: { opacity: 1, y: 0 },
-    delay: 1000,
-    duration: 400,
-  })
-  const span = useSpring({
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-    delay: 700,
-    duration: 400,
-  })
-  const image = useSpring({
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-    delay: 700,
-    duration: 400,
-  })
+  const dispatch = useDispatch()
+  const { products, status } = useSelector(selectProducts)
+  const [showLoading, setShowLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    dispatch(fetchProducts())
+  }, [dispatch])
+
+  useEffect(() => {
+    if (status === 'succeeded') {
+      const timer = setTimeout(() => {
+        setShowLoading(false)
+      }, 1500)
+      return () => clearTimeout(timer)
+    } else if (status === 'loading') {
+      setShowLoading(true)
+    }
+  }, [status])
 
   return (
-    <div className="h-screen  bg-[#fafafa]">
-      <div className="flex justify-center">
-        <div className="flex">
-          <div className="ml-[50px] flex mt-2">
-            <animated.h1
-              style={{ ...h1 }}
-              className="text-4xl max-laptopL:h-[50px] mr-2"
-            >
-              Welcome to
-            </animated.h1>
-            <animated.span
-              style={{ ...span }}
-              className="text-4xl max-laptopL:h-[50px] font-bold bg-gradient-to-r from-[#173f35] to-[#14594c] bg-clip-text text-transparent"
-            >
-              Market Nest
-            </animated.span>
-          </div>
-          <animated.img
-            style={{ ...image }}
-            src="/Logo.png"
-            className="w-[50px] h-[50px]"
-          />
+    <div className="h-screen bg-[#fafafa] pt-5">
+      <div className="m-3 mt-[30px]">
+        <div className="flex flex-wrap gap-4">
+          {status === 'succeeded' &&
+            !showLoading &&
+            products.length > 0 &&
+            products.map((product: Product, index: number) => (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                key={product._id}
+                className="flex justify-between"
+              >
+                <ProductForm product={product} />
+              </motion.div>
+            ))}
+          {(status === 'loading' || showLoading) && (
+            <div className="w-screen flex justify-center">
+              <CircularProgress
+                size={50}
+                sx={{
+                  color: green[900],
+                  position: 'absolute',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
-      <Link to="/about" className="flex justify-center">
-        <animated.button
-          style={{ ...button }}
-          className="bg-gradient-to-r from-[#173f35] to-[#14594c] bg-clip-text text-transparent hover:underline"
-        >
-          About this project
-        </animated.button>
-      </Link>
+      {status === 'failed' && (
+        <span className="mt-[50px] flex justify-center text-2xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent duration-300 transition-all ease-in-out ">
+          Something went wrong
+        </span>
+      )}
+      {status === 'succeeded' && !showLoading && products.length === 0 && (
+        <span className="flex justify-center text-2xl font-bold bg-gradient-to-r from-[#173f35] to-[#14594c] bg-clip-text text-transparent duration-300 transition-all ease-in-out ">
+          No products available
+        </span>
+      )}
     </div>
   )
 }

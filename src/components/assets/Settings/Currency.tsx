@@ -7,9 +7,9 @@ import {
   selectCurrency,
   selectLanguage,
   setCurrency,
-} from '../../../redux/slices/main'
+} from '../../redux/slices/main'
 
-const currencies = [
+export const currencies = [
   {
     value: 'USD',
     label: '$',

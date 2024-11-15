@@ -23,6 +23,7 @@ interface Props {
 export const UpdateDataForm = (props: Props) => {
   const dispatch = useDispatch<AppDispatch>()
   const userData = useSelector(selectUserProfile)
+  const error = useSelector((state: RootState) => state.auth.error)
   const { onSuccess } = props
   const language = useSelector(selectLanguage)
   const {
@@ -143,6 +144,7 @@ export const UpdateDataForm = (props: Props) => {
           </div>
         </div>
       </form>
+      <div className="flex justify-center text-red-600 font-bold">{error}</div>
     </div>
   )
 }
