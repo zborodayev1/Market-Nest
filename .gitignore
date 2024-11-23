@@ -28,3 +28,4 @@ dist-ssr
 *.tsbuildinfo
 .env
 lessons.tsx
+App.tsx

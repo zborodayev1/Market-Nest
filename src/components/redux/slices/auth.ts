@@ -12,18 +12,18 @@ interface UpdateProfileResponse {
 }
 
 interface UserProfile {
-  fullName: string
+  fullName?: string
   avatarUrl?: string
   phone?: string
   address?: string
   city?: string
   country?: string
-  email: string
-  password: string
+  email?: string
+  password?: string
 }
 
 interface UserData {
-  fullName: string
+  fullName?: string
   phone?: string
   address?: string
   city?: string
@@ -56,6 +56,28 @@ export const fetchRegister = createAsyncThunk<
   return data
 })
 
+export const uploadImage = createAsyncThunk<
+  { avatarUrl: string },
+  FormData,
+  { rejectValue: string }
+>('user/uploadImage', async (formData, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.post('/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return data
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message || // Сообщение, возвращённое сервером
+      error.message || // Общая ошибка, если нет сообщения от сервера
+      'An unknown error occurred' // Дефолтное сообщение
+
+    return rejectWithValue(errorMessage)
+  }
+})
+
 export const fetchLogin = createAsyncThunk<
   AuthResponse,
   { email: string; password: string }
@@ -63,10 +85,11 @@ export const fetchLogin = createAsyncThunk<
   const { data } = await axios.post('/auth/login', params)
   return data
 })
+
 export const fetchProfileData = createAsyncThunk<UserProfile>(
   'auth/fetchProfileData',
   async () => {
-    const { data } = await axios.get('/profile')
+    const { data } = await axios.get('/auth/profile')
     return data
   }
 )
@@ -77,11 +100,15 @@ export const updateProfileData = createAsyncThunk<
   { rejectValue: string }
 >('auth/updateProfile', async (params, { rejectWithValue }) => {
   try {
-    const { data } = await axios.patch('/profile/data', params)
+    const { data } = await axios.patch('/auth/profile/data', params)
     return data
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
-    return rejectWithValue('Error while updating profile')
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message || // Сообщение, возвращённое сервером
+      error.message || // Общая ошибка, если нет сообщения от сервера
+      'An unknown error occurred' // Дефолтное сообщение
+
+    return rejectWithValue(errorMessage)
   }
 })
 
@@ -91,11 +118,15 @@ export const updateProfileEmail = createAsyncThunk<
   { rejectValue: string }
 >('auth/updateProfileEmail', async (params, { rejectWithValue }) => {
   try {
-    const { data } = await axios.patch('/profile/email', params)
+    const { data } = await axios.patch('/auth/profile/email', params)
     return data
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
-    return rejectWithValue('Error while updating profile')
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message || // Сообщение, возвращённое сервером
+      error.message || // Общая ошибка, если нет сообщения от сервера
+      'An unknown error occurred' // Дефолтное сообщение
+
+    return rejectWithValue(errorMessage)
   }
 })
 
@@ -105,11 +136,15 @@ export const updateProfilePassword = createAsyncThunk<
   { rejectValue: string }
 >('auth/updateProfilePassword', async (params, { rejectWithValue }) => {
   try {
-    const { data } = await axios.patch('/profile/password', params)
+    const { data } = await axios.patch('/auth/profile/password', params)
     return data
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
-    return rejectWithValue('Error while updating profile')
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message || // Сообщение, возвращённое сервером
+      error.message || // Общая ошибка, если нет сообщения от сервера
+      'An unknown error occurred' // Дефолтное сообщение
+
+    return rejectWithValue(errorMessage)
   }
 })
 const initialState: AuthState = {
@@ -194,6 +229,23 @@ const authSlice = createSlice({
         state.loading = false
       })
       .addCase(updateProfilePassword.rejected, handleRejected)
+    builder
+      .addCase(uploadImage.pending, (state) => {
+        state.loading = true
+        state.status = 'loading'
+      })
+      .addCase(uploadImage.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.avatarUrl = action.payload.avatarUrl
+        }
+        state.loading = false
+        state.status = 'succeeded'
+      })
+      .addCase(uploadImage.rejected, (state, action) => {
+        state.loading = false
+        state.status = 'failed'
+        state.error = action.payload || 'Error while update avatar'
+      })
   },
 })
 

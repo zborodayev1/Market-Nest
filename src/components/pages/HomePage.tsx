@@ -7,10 +7,8 @@ import {
   selectProducts,
 } from '../redux/slices/products'
 import { ProductForm } from '../assets/Product/ProductForm'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { CircularProgress } from '@mui/material'
-import { green } from '@mui/material/colors'
-
 export const HomePage = () => {
   const dispatch = useDispatch()
   const { products, status } = useSelector(selectProducts)
@@ -32,7 +30,7 @@ export const HomePage = () => {
   }, [status])
 
   return (
-    <div className="h-screen bg-[#fafafa] pt-5">
+    <div className="h-screen bg-[#16151A] pt-5">
       <div className="m-3 mt-[30px]">
         <div className="flex flex-wrap gap-4">
           {status === 'succeeded' &&
@@ -49,12 +47,12 @@ export const HomePage = () => {
                 <ProductForm product={product} />
               </motion.div>
             ))}
-          {(status === 'loading' || showLoading) && (
+          {((status === 'loading' && status !== 'failed') || showLoading) && (
             <div className="w-screen flex justify-center">
               <CircularProgress
                 size={50}
                 sx={{
-                  color: green[900],
+                  color: '#7e2dff',
                   position: 'absolute',
                   marginTop: '-12px',
                   marginLeft: '-12px',
@@ -65,7 +63,13 @@ export const HomePage = () => {
         </div>
       </div>
       {status === 'failed' && (
-        <span className="mt-[50px] flex justify-center text-2xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent duration-300 transition-all ease-in-out ">
+        <span
+          style={{
+            textShadow:
+              '2px 2px 6px rgba(220, 38, 38, 0.6), -2px -2px 6px rgba(220, 38, 38, 0.6)',
+          }}
+          className="mt-[50px] flex justify-center text-2xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent duration-300 transition-all ease-in-out"
+        >
           Something went wrong
         </span>
       )}

@@ -28,7 +28,17 @@ export default {
     filter: {
       'blur': 'blur(5px)',
     },
+    txSh: {
+      sm: '1px 1px 2px rgba(0, 0, 0, 0.5)', // Маленькая тень
+     '-sm': '-1px -1px 2px rgba(0, 0, 0, 0.5)',
+      df: '2px 2px 4px rgba(0, 0, 0, 0.6)', // Стандартная тень
+      '-df': '-2px -2px 4px rgba(0, 0, 0, 0.6)',
+      lg: '3px 3px 6px rgba(0, 0, 0, 0.6)', // Большая тень
+      '-lg': '-3px -3px 6px rgba(0, 0, 0, 0.6)',
+      xl: '4px 4px 8px rgba(0, 0, 0, 0.6)', // Очень большая тень
+      '-xl': '-4px -4px 8px rgba(0, 0, 0, 0.6)',
+    },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-textshadow')],
 }
 
