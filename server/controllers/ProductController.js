@@ -1,16 +1,17 @@
 import mongoose from "mongoose";
 import ProductModel from "../models/product.js";
-import CommentsModel from "../models/coments.js";
+import UserModel from "../models/user.js";
 
 export const createProduct = async (req, res) => {
     try {
         const doc = new ProductModel({
             _id: new mongoose.Types.ObjectId(),
-            text: req.body.text,
+            name: req.body.name,
             tags: req.body.tags,
             user: req.userId,
             image: req.body.image,
-            price: req.body.price
+            price: req.body.price,
+            description: req.body.description
         });
         if(!doc){
             return res.status(400).json({
@@ -64,16 +65,21 @@ export const getOneProduct = (req, res) => {
 };
 export const patchProduct = async (req, res) => {
     try {
-        const product = await ProductModel.updateOne(
-            { _id: req.params.id },
-            {
-                text: req.body.text,
-                tags: req.body.tags,
-                image: req.body.image,
-                price: req.body.price
-            },
-          );
-          res.json({ message: "Product changed" });
+        const UpdateProductData = {
+            name: req.body.name,
+            tags: req.body.tags,
+            image: req.body.image,
+            price: req.body.price,
+            description: req.body.description,
+            updatedAt: Date.now(),
+        };
+        const updatedProduct = await ProductModel.findByIdAndUpdate(id, UpdateProductData, { new: true })
+
+        if (!updatedProduct) {
+            return res.status(404).json({ message: 'Product not found' });
+          }
+
+        res.json(updatedProduct);
     } catch (err) {
         console.log(err);
         res.status(500).json({

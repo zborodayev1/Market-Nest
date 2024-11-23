@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import axios from '../../../axios'
+import { RootState } from '../store'
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
@@ -8,19 +9,24 @@ export const fetchProducts = createAsyncThunk(
     return data
   }
 )
+
 interface User {
   id: string
+  fullName: string
 }
 
-interface Product {
+export interface Product {
   _id: string
-  text: string
-  tags: Array<string>
-  price: string
+  name: string
+  tags: string[]
+  price: number
+  description?: string
   viewsCount: number
   createdAt: string
   image: any
   user: User
+  commentsCount: number
+  favorite: boolean
 }
 
 interface ProductsState {
@@ -61,3 +67,5 @@ const productSlice = createSlice({
 })
 
 export const productReducer = productSlice.reducer
+
+export const selectProducts = (state: RootState) => state.products

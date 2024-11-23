@@ -7,35 +7,80 @@ import { LogInPage } from './components/pages/LogIn/LogInPage'
 import { CreateProduct } from './components/pages/CreateProduct'
 import { useSelector } from 'react-redux'
 import { selectIsAuth } from './components/redux/slices/auth'
-import { AboutMarket } from './components/pages/AboutMarket'
-import { Profile } from './components/pages/Profile/Profile'
+import { useEffect, useRef, useState } from 'react'
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)
+  const [open, setOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
   return (
     <div>
-      <Header />
-      <Routes>
-        <Route element={<NotFound />} path="*" />
-        <Route element={<HomePage />} path="/" />
-        <Route
-          element={isAuth ? <Navigate to="/" /> : <LogInPage />}
-          path="/login"
-        />
-        <Route
-          element={isAuth ? <Navigate to="/" /> : <RegisterPage />}
-          path="/register"
-        />
-        <Route
-          element={!isAuth ? <Navigate to="/" /> : <CreateProduct />}
-          path="/create-product"
-        />
-        <Route element={<AboutMarket />} path="/about" />
-        <Route
-          element={!isAuth ? <Navigate to="/" /> : <Profile />}
-          path="/profile"
-        />
-      </Routes>
+      <div ref={dropdownRef}>
+        {open ? (
+          <button onClick={() => setOpen(false)}>
+            <div>
+              <Header />
+            </div>
+            <div>
+              <Routes>
+                <Route element={<NotFound />} path="*" />
+                <Route element={<HomePage />} path="/" />
+                <Route
+                  element={isAuth ? <Navigate to="/" /> : <LogInPage />}
+                  path="/signIn"
+                />
+                <Route
+                  element={isAuth ? <Navigate to="/" /> : <RegisterPage />}
+                  path="/register"
+                />
+                <Route
+                  element={!isAuth ? <Navigate to="/" /> : <CreateProduct />}
+                  path="/create-product"
+                />
+              </Routes>
+            </div>
+          </button>
+        ) : (
+          <div>
+            <div>
+              <Header />
+            </div>
+            <div>
+              <Routes>
+                <Route element={<NotFound />} path="*" />
+                <Route element={<HomePage />} path="/" />
+                <Route
+                  element={isAuth ? <Navigate to="/" /> : <LogInPage />}
+                  path="/signIn"
+                />
+                <Route
+                  element={isAuth ? <Navigate to="/" /> : <RegisterPage />}
+                  path="/register"
+                />
+                <Route
+                  element={!isAuth ? <Navigate to="/" /> : <CreateProduct />}
+                  path="/create-product"
+                />
+              </Routes>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

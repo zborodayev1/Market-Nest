@@ -3,7 +3,7 @@ import Autocomplete from '@mui/material/Autocomplete'
 import TextField from '@mui/material/TextField'
 import Box from '@mui/material/Box'
 import * as locales from '@mui/material/locale'
-import { selectLanguage, setLanguage } from '../../../redux/slices/main'
+import { selectLanguage, setLanguage } from '../../redux/slices/main'
 
 const supportedLocales = {
   enUS: locales.enUS,

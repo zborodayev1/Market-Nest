@@ -19,7 +19,7 @@ import { productReducer } from './slices/products'
 const rootReducer = combineReducers({
   auth: authReducer,
   settings: settingsReducer,
-  product: productReducer,
+  products: productReducer,
 })
 
 const store = configureStore({
