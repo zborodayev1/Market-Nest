@@ -1,29 +1,29 @@
-import { Avatar } from '@mui/material'
-import { useSpring, animated } from '@react-spring/web'
-import { selectIsAuth } from '../../../components/redux/slices/auth'
-import { Link, Navigate } from 'react-router-dom'
-import LinearProgress from '@mui/material/LinearProgress'
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import { RegisterForm } from './RegisterForm'
+import { Avatar } from "@mui/material";
+import { useSpring, animated } from "@react-spring/web";
+import { selectIsAuth } from "../../../components/redux/slices/auth";
+import { Link, Navigate } from "react-router-dom";
+import LinearProgress from "@mui/material/LinearProgress";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { RegisterForm } from "./RegisterForm";
 
 export const RegisterPage = () => {
   const html = useSpring({
     from: { opacity: 0 },
     to: { opacity: 1 },
     delay: 200,
-  })
+  });
   const main = useSpring({
-    from: { y: 100, width: '0px', height: '0px' },
-    to: { y: 0, width: '400px', height: '500px' },
+    from: { y: 100, width: "0px", height: "0px" },
+    to: { y: 0, width: "400px", height: "500px" },
     delay: 10,
-  })
+  });
 
-  const isAuth = useSelector(selectIsAuth)
-  const [err, setErr] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const isAuth = useSelector(selectIsAuth);
+  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   if (isAuth) {
-    return <Navigate to="/" />
+    return <Navigate to="/" />;
   }
 
   return (
@@ -66,7 +66,7 @@ export const RegisterPage = () => {
       {loading && (
         <LinearProgress
           style={{
-            position: 'fixed',
+            position: "fixed",
             bottom: 0,
             left: 0,
             right: 0,
@@ -75,5 +75,5 @@ export const RegisterPage = () => {
         />
       )}
     </div>
-  )
-}
+  );
+};

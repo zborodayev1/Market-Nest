@@ -8,6 +8,8 @@ import { CreateProduct } from './components/pages/CreateProduct'
 import { useSelector } from 'react-redux'
 import { selectIsAuth } from './components/redux/slices/auth'
 import { useEffect, useRef, useState } from 'react'
+import { FullProduct } from './components/pages/FullProduct/FullProduct'
+import { Bag } from './components/pages/Bag/Bag'
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)
@@ -52,6 +54,8 @@ export const App = () => {
                   element={!isAuth ? <Navigate to="/" /> : <CreateProduct />}
                   path="/create-product"
                 />
+                <Route element={<FullProduct />} path="/product/:id" />
+                <Route element={<Bag />} path="/bag" />
               </Routes>
             </div>
           </button>
@@ -76,6 +80,8 @@ export const App = () => {
                   element={!isAuth ? <Navigate to="/" /> : <CreateProduct />}
                   path="/create-product"
                 />
+                <Route element={<FullProduct />} path="/product/:id" />
+                <Route element={<Bag />} path="/bag" />
               </Routes>
             </div>
           </div>

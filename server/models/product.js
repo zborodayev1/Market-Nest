@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 const ProductShema = new mongoose.Schema(
   {
@@ -25,13 +25,13 @@ const ProductShema = new mongoose.Schema(
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     image: {
       type: String,
       required: true,
-    }, 
+    },
     description: {
       type: String,
       required: false,
@@ -39,12 +39,12 @@ const ProductShema = new mongoose.Schema(
     },
     favorite: {
       type: Boolean,
-      default: false
+      default: false,
     },
     _id: mongoose.Schema.Types.ObjectId,
   },
   {
     timestamps: true,
-  },
-);
-export default mongoose.model("Product", ProductShema);
+  }
+)
+export default mongoose.model('Product', ProductShema)

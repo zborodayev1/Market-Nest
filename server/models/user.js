@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
-const UserShema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
@@ -17,21 +17,37 @@ const UserShema = new mongoose.Schema(
     },
     phone: {
       type: String,
+      default: '',
     },
     address: {
       type: String,
+      default: '',
     },
     city: {
       type: String,
+      default: '',
     },
     country: {
       type: String,
+      default: '',
     },
-    avatarUrl: String,
-    _id: mongoose.Schema.Types.ObjectId,
+    avatarUrl: {
+      type: String,
+      default: '',
+    },
+    bag: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Product',
+          required: true,
+        },
+      },
+    ],
   },
   {
-    timestamps: true,
-  },
-);
-export default mongoose.model("User", UserShema);
+    timestamps: true, // Автоматически добавляет createdAt и updatedAt
+  }
+)
+
+export default mongoose.model('User', UserSchema)

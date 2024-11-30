@@ -1,32 +1,32 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useForm } from 'react-hook-form'
-import { useDispatch, useSelector } from 'react-redux'
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
 import {
   RootState,
   selectUserProfile,
   updateProfileData,
-} from '../../../../redux/slices/auth'
-import { User, Phone, MapPin, Building2, Globe } from 'lucide-react'
+} from "../../../../redux/slices/auth";
+import { User, Phone, MapPin, Building2, Globe } from "lucide-react";
 
 interface FormData {
-  fullName?: string
-  phone?: string
-  address?: string
-  city?: string
-  country?: string
+  fullName?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
 }
 
 interface Props {
-  onSuccess: () => void
+  onSuccess: () => void;
 }
 
 export const UserData = ({ onSuccess }: Props) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const userData = useSelector(selectUserProfile)
-  const status = useSelector((state: RootState) => state.auth.status)
-  const error = useSelector((state: RootState) => state.auth.error)
-  const dispatch = useDispatch()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const userData = useSelector(selectUserProfile);
+  const status = useSelector((state: RootState) => state.auth.status);
+  const error = useSelector((state: RootState) => state.auth.error);
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -35,36 +35,36 @@ export const UserData = ({ onSuccess }: Props) => {
     reset,
   } = useForm<FormData>({
     defaultValues: {
-      fullName: userData?.fullName || '',
-      phone: userData?.phone || '',
-      address: userData?.address || '',
-      city: userData?.city || '',
-      country: userData?.country || '',
+      fullName: userData?.fullName || "",
+      phone: userData?.phone || "",
+      address: userData?.address || "",
+      city: userData?.city || "",
+      country: userData?.country || "",
     },
-  })
+  });
 
   const onSubmit = (values: FormData) => {
     try {
-      setIsSubmitting(true)
-      dispatch(updateProfileData(values))
+      setIsSubmitting(true);
+      dispatch(updateProfileData(values));
 
-      if (status === 'succeeded') {
-        reset({ ...userData, ...values })
-        onSuccess()
+      if (status === "succeeded") {
+        reset({ ...userData, ...values });
+        onSuccess();
       }
     } catch (error) {
-      console.error('Error:', error)
+      console.error("Error:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const [isHovered, setIsHovered] = useState(false)
+  const [isHovered, setIsHovered] = useState(false);
 
   const inputClasses =
-    'w-full px-4 py-2 bg-[#16151A] dark:bg-gray-800 border border-[#7e2dff] dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7e2dff] dark:focus:ring-emerald-400 focus:border-transparent transition-all duration-200 '
+    "w-full px-4 py-2 bg-[#16151A] dark:bg-gray-800 border border-[#7e2dff] dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7e2dff] dark:focus:ring-emerald-400 focus:border-transparent transition-all duration-200 ";
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-white dark:text-gray-300 mb-1'
+    "flex items-center gap-2 text-sm font-medium text-white dark:text-gray-300 mb-1";
 
   return (
     <AnimatePresence>
@@ -81,7 +81,7 @@ export const UserData = ({ onSuccess }: Props) => {
               <User size={18} /> Full Name
             </label>
             <input
-              {...register('fullName')}
+              {...register("fullName")}
               className={inputClasses}
               placeholder="John Doe"
               spellCheck="false"
@@ -93,7 +93,7 @@ export const UserData = ({ onSuccess }: Props) => {
               <Phone size={18} /> Phone
             </label>
             <input
-              {...register('phone')}
+              {...register("phone")}
               className={inputClasses}
               spellCheck="false"
               placeholder="+1 234 567 890"
@@ -105,7 +105,7 @@ export const UserData = ({ onSuccess }: Props) => {
               <MapPin size={18} /> Address
             </label>
             <input
-              {...register('address')}
+              {...register("address")}
               className={inputClasses}
               spellCheck="false"
               placeholder="123 Main St"
@@ -117,7 +117,7 @@ export const UserData = ({ onSuccess }: Props) => {
               <Building2 size={18} /> City
             </label>
             <input
-              {...register('city')}
+              {...register("city")}
               className={inputClasses}
               spellCheck="false"
               placeholder="New York"
@@ -129,7 +129,7 @@ export const UserData = ({ onSuccess }: Props) => {
               <Globe size={18} /> Country
             </label>
             <input
-              {...register('country')}
+              {...register("country")}
               className={inputClasses}
               spellCheck="false"
               placeholder="United States"
@@ -147,17 +147,17 @@ export const UserData = ({ onSuccess }: Props) => {
           className={` w-[300px] p-2 flex justify-center items-center text-[#7e2dff] border border-[#7e2dff] hover:-translate-y-1 transition-all duration-300 ease-in-out hover:bg-gradient-to-r hover:from-[#7e2dff] hover:to-[#2124a8] hover:border-transparent group `}
         >
           <motion.span
-            initial={{ textShadow: 'none' }}
+            initial={{ textShadow: "none" }}
             animate={{
               textShadow: isHovered
-                ? '2px 2px 6px #fff, -2px -2px 6px #fff'
-                : '',
+                ? "2px 2px 6px #fff, -2px -2px 6px #fff"
+                : "",
               transition: { duration: 0.4 },
             }}
-            exit={{ textShadow: 'none' }}
+            exit={{ textShadow: "none" }}
             className="  text-[#7e2dff]  duration-300 transition-colors ease-in-out group-hover:text-white  "
           >
-            {isSubmitting ? 'Saving...' : 'Save Changes'}
+            {isSubmitting ? "Saving..." : "Save Changes"}
           </motion.span>
         </motion.button>
 
@@ -172,5 +172,5 @@ export const UserData = ({ onSuccess }: Props) => {
         )}
       </motion.form>
     </AnimatePresence>
-  )
-}
+  );
+};

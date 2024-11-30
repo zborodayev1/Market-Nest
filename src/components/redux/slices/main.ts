@@ -6,15 +6,16 @@ const availableCurrencies = ['USD', 'RUB', 'KZT', 'EUR'] as const
 
 type Language = (typeof availableLanguages)[number]
 type Currency = (typeof availableCurrencies)[number]
-
 interface Settings {
   language: Language
   currency: Currency
+  darkMode: boolean
 }
 
 const initialState: Settings = {
   language: 'enUS',
   currency: 'USD',
+  darkMode: false,
 }
 
 const settingsSlice = createSlice({
@@ -31,14 +32,20 @@ const settingsSlice = createSlice({
         state.currency = action.payload
       }
     },
+    toggleDarkMode: (state) => {
+      state.darkMode = !state.darkMode
+    },
   },
 })
 
 export const settingsReducer = settingsSlice.reducer
 
-export const { setLanguage, setCurrency } = settingsSlice.actions
+export const { setLanguage, setCurrency, toggleDarkMode } =
+  settingsSlice.actions
 
 export const selectLanguage = (state: RootState): Language =>
   state.settings.language
 export const selectCurrency = (state: RootState): Currency =>
   state.settings.currency
+export const selectDarkMode = (state: RootState): boolean =>
+  state.settings.darkMode
