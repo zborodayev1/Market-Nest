@@ -192,3 +192,31 @@ export const getUserProfile = async (req, res) => {
     })
   }
 }
+
+export const getUserProducts = async (req, res) => {
+  try {
+    // Получаем ID текущего пользователя из req.userId
+    const userId = req.userId
+
+    // Находим все продукты, принадлежащие этому пользователю
+    const products = await ProductModel.find({ user: userId })
+
+    if (!products || products.length === 0) {
+      return res
+        .status(404)
+        .json({ message: 'No products found for this user' })
+    }
+
+    // Форматируем дату и возвращаем продукты
+    const formattedProducts = products.map((product) => ({
+      ...product.toObject(),
+      createdAt: dayjs(product.createdAt).format('YY-MM-DD'),
+      updatedAt: dayjs(product.updatedAt).format('YY-MM-DD'),
+    }))
+
+    res.json(formattedProducts)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to fetch products' })
+  }
+}

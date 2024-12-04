@@ -5,7 +5,7 @@ import { ProdileHeader } from '../../pages/Profile/SideBar/ProfileHeader'
 import { SideBar } from '../../pages/Profile/SideBar/SideBar'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Heart, IdCard } from 'lucide-react'
+import { Heart, IdCard, PackagePlus } from 'lucide-react'
 import { IoBagOutline } from 'react-icons/io5'
 
 export const Header = () => {
@@ -59,6 +59,7 @@ export const Header = () => {
       },
     },
   }
+
   return (
     <div>
       <div className="">
@@ -91,7 +92,34 @@ export const Header = () => {
             {isAuth ? (
               <div>
                 <div className="flex">
-                  <div className="mr-[14px]">
+                  <Link
+                    className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
+                    to="/create"
+                  >
+                    <h1 className="text-md font-bold text-[#212121]  transition-colors duration-200 ">
+                      Create
+                    </h1>
+                    <PackagePlus className="w-9 h-9 text-[#212121] transition-colors duration-200" />
+                  </Link>
+                  <Link
+                    className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
+                    to="/bag"
+                  >
+                    <h1 className="text-md font-bold text-[#212121]  transition-colors duration-200 ">
+                      Bag
+                    </h1>
+                    <IoBagOutline className="w-9 h-9 text-[#212121] transition-colors duration-200" />
+                  </Link>
+                  <Link
+                    className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
+                    to="/favorites"
+                  >
+                    <h1 className="text-md font-bold text-[#212121]  transition-colors duration-200 ">
+                      Favorite
+                    </h1>
+                    <Heart className="w-7 h-9 text-[#212121] transition-colors duration-200" />
+                  </Link>
+                  <div className="">
                     <ProdileHeader onSuccess={() => setOpen(!open)} />
                   </div>
                 </div>
@@ -99,7 +127,7 @@ export const Header = () => {
             ) : (
               <div className="flex">
                 <Link
-                  className="mx-2 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
+                  className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                   to="/bag"
                 >
                   <h1 className="text-md font-bold text-[#212121]  transition-colors duration-200 ">
@@ -128,7 +156,7 @@ export const Header = () => {
               </div>
             )}
 
-            <div ref={dropdownRef} className="fixed right-0 top-1">
+            <div ref={dropdownRef} className="fixed right-0 top-0">
               <AnimatePresence>
                 {open && (
                   <motion.div

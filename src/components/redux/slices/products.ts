@@ -37,6 +37,10 @@ export interface CartItem {
 }
 
 export interface Product {
+  saveAmount: number
+  discount: any
+  save: number
+  oldPrice: number
   _id: string
   name: string
   tags: string[]

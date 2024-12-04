@@ -3,28 +3,41 @@ import axios from '../../../axios'
 import { useState, useEffect } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { IoBag } from 'react-icons/io5'
-import { useDispatch } from 'react-redux'
-import { addToBag } from '../../redux/slices/products'
+import { IconButton } from '@mui/material'
+import { Eye } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { BiSolidMessageSquare } from 'react-icons/bi'
+import { CiCalendarDate } from 'react-icons/ci'
+import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined'
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
 
 export const FullProduct = () => {
   const [data, setData] = useState<any>(null)
   const [err, setErr] = useState(false)
   const { id } = useParams()
-  const dispatch = useDispatch()
+  const [hovered, setHovered] = useState(false)
+  const [isFavorite, setIsFavorite] = useState<boolean>(false)
+  const [isBag, setIsBag] = useState<boolean>(false)
 
-  const handleAddToBag = () => {
-    if (data?._id) {
-      dispatch(addToBag(data._id))
+  const toggleFavorite = () => {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+
+    if (isFavorite) {
+      const newFavorites = favorites.filter((id: string) => id !== data._id)
+      localStorage.setItem('favorites', JSON.stringify(newFavorites))
+    } else {
+      favorites.push(data._id)
+      localStorage.setItem('favorites', JSON.stringify(favorites))
     }
+
+    setIsFavorite(!isFavorite)
   }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`/products/${id}`)
-        console.log('Response:', response.data) // Логируем данные, чтобы проверить структуру
 
-        // Убираем обращение к doc, так как данных нет в поле doc
         setData(response.data)
       } catch (err) {
         console.warn('Error fetching product:', err)
@@ -34,6 +47,30 @@ export const FullProduct = () => {
 
     fetchData()
   }, [id])
+
+  const toggleBag = () => {
+    const bag = JSON.parse(localStorage.getItem('bag') || '[]')
+
+    if (isBag) {
+      const newBag = bag.filter((id: string) => id !== data._id)
+      localStorage.setItem('bag', JSON.stringify(newBag))
+    } else {
+      bag.push(data._id)
+      localStorage.setItem('bag', JSON.stringify(bag))
+    }
+
+    setIsBag(!isBag)
+  }
+
+  useEffect(() => {
+    if (data) {
+      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+      setIsFavorite(favorites.includes(data._id))
+
+      const bag = JSON.parse(localStorage.getItem('bag') || '[]')
+      setIsBag(bag.includes(data._id))
+    }
+  }, [data])
 
   if (err) {
     return <Navigate to="/" />
@@ -56,23 +93,115 @@ export const FullProduct = () => {
   }
 
   return (
-    <div className=" ">
-      <div>
-        <h1 className="">{data.price}</h1>
-        <h1>{data.name}</h1>
-        <img
-          src={data.image}
-          className=" min-h-[100px] min-w-[100px]  max-h-[600px] max-w-[600px]"
-          alt={data.name} // Добавлен alt для доступности
-        />
-        <h1>{data.viewsCount}</h1>
-        <h1>{data.tags}</h1>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1, transition: { duration: 0.5 } }}
+      exit={{ opacity: 0 }}
+      className="flex ml-[140px] mt-5"
+    >
+      <div className="text-2xl flex flex-col text-start">
+        <div className="font-bold flex gap-2">
+          <h1 className={`text-3xl ${data.saveAmount && 'text-[#ff3535]'}`}>
+            {data.price}$
+          </h1>
+          {data.saveAmount && (
+            <div className="text-xl flex gap-2 items-center">
+              <h1 className="bg-[#3C8737] text-white px-3 rounded-md p-1">
+                save {data.saveAmount}$
+              </h1>
+              <h1 className="text-gray-400 text-sm">was {data.oldPrice}$</h1>
+              <h1 className="text-lg pb-3 text-[#fd3939]">-{data.discount}%</h1>
+            </div>
+          )}
+        </div>
+        <div className=" ml-2">
+          <div className="flex items-center gap-1">
+            <h1 className="mr-2">{data.name}</h1>
+            <div className="mt-1 flex gap-1">
+              {data.tags &&
+                data.tags.map((tag: string, index: number) => (
+                  <div key={index} className="">
+                    <h1 className="text-base text-[#a7a7a7]">{tag}</h1>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          <div className="flex text-[#a7a7a7] text-sm gap-2 items-start mt-1 mb-3">
+            <div className="flex gap-1">
+              {data.viewsCount} <Eye className="w-5 h-5 " />
+            </div>
+            <div className="flex gap-1">
+              {data.commentsCount} <BiSolidMessageSquare className="w-5 h-5" />
+            </div>
+            <div className="flex gap-1">
+              {data.createdAt} <CiCalendarDate className="w-5 h-5 " />
+            </div>
+          </div>
+        </div>
+        <div
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          className="relative group"
+        >
+          <img
+            src={data.image}
+            className="max-w-[500px] bg-[#f5f5f5] rounded-md border"
+          />
+
+          <button
+            onClick={toggleFavorite}
+            className={`absolute top-5 right-5 text-2xl text-[#fd3939] transition-opacity duration-300 ease-in-out ${
+              hovered || isFavorite ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <IconButton color="error">
+              {isFavorite ? (
+                <FavoriteOutlinedIcon />
+              ) : (
+                <FavoriteBorderOutlinedIcon />
+              )}
+            </IconButton>
+          </button>
+        </div>
       </div>
-      <div className="flex items-end mb-2">
-        <button onClick={handleAddToBag} className="flex gap-2">
-          add to <IoBag style={{ marginTop: '5px' }} />
-        </button>
+      <div className="flex ml-10 items-end">
+        <div className="">
+          <button
+            onClick={toggleBag}
+            className="font-bold flex gap-2 w-[450px] bg-[#3C8737] rounded-xl py-3 text-white text-lg hover:bg-[#2b6128] transition-colors duration-150 ease-in-out justify-center"
+          >
+            <motion.span
+              key={isBag ? 'add' : 'remove'}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
+              transition={{
+                type: 'spring',
+                stiffness: 300,
+                damping: 20,
+                delay: 0.2,
+              }}
+            >
+              {isBag ? 'Remove from bag' : 'Add to bag'}
+            </motion.span>
+
+            <motion.div
+              className="absolute"
+              initial={{ x: 70 }}
+              animate={{ x: isBag ? 90 : 60 }}
+              transition={{
+                type: 'spring',
+                stiffness: 300,
+                damping: 15,
+                delay: 0,
+              }}
+            >
+              <IoBag style={{ marginTop: '5px' }} />
+            </motion.div>
+          </button>
+        </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

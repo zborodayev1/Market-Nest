@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchProducts,
@@ -6,7 +6,7 @@ import {
   selectProducts,
 } from '../redux/slices/products'
 import { ProductForm } from '../assets/Product/ProductForm'
-import { motion } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
 import { CircularProgress } from '@mui/material'
 
 export const HomePage = () => {
@@ -24,15 +24,13 @@ export const HomePage = () => {
   }, [dispatch])
 
   useEffect(() => {
-    if (status === 'succeeded') {
+    if (status === 'loading') {
+      setShowLoading(true)
+    } else {
       const timer = setTimeout(() => {
         setShowLoading(false)
       }, 1500)
       return () => clearTimeout(timer)
-    } else if (status === 'loading') {
-      setShowLoading(true)
-    } else if (status === 'failed') {
-      setShowLoading(false)
     }
   }, [status])
 
@@ -93,43 +91,50 @@ export const HomePage = () => {
               filteredProducts.length > 0 &&
               filteredProducts.map((product: Product, index: number) => (
                 <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{
+                    delay: Math.min(index * 0.1, 0.6),
+                    duration: 0.5,
+                  }}
                   key={product._id}
                   className="flex justify-between"
                 >
                   <ProductForm product={product} />
                 </motion.div>
               ))}
-            {(status === 'loading' || showLoading) && (
-              <div className="w-screen flex justify-center">
-                <CircularProgress
-                  size={50}
-                  sx={{
-                    color: '#000',
-                    position: 'absolute',
-                    marginTop: '-12px',
-                    marginLeft: '-12px',
+            <AnimatePresence>
+              {(status === 'loading' || showLoading) && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    opacity: 1,
+                    transition: { duration: 0.5, delay: 0.2 },
                   }}
-                />
-              </div>
-            )}
+                  exit={{ opacity: 0 }}
+                  className="w-screen flex justify-center"
+                >
+                  <CircularProgress
+                    size={50}
+                    sx={{
+                      color: '#000',
+                      position: 'absolute',
+                      marginTop: '-12px',
+                      marginLeft: '-12px',
+                    }}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
         {status === 'failed' && (
-          <span
-            style={{
-              textShadow:
-                '2px 2px 6px rgba(220, 38, 38, 0.6), -2px -2px 6px rgba(220, 38, 38, 0.6)',
-            }}
-            className=" flex justify-center text-2xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent duration-300 transition-all ease-in-out"
-          >
+          <span className=" flex justify-center text-2xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent duration-300 transition-all ease-in-out">
             Something went wrong
           </span>
         )}
         {status === 'succeeded' && !showLoading && products.length === 0 && (
-          <span className="flex justify-center text-2xl font-bold bg-gradient-to-r from-[#173f35] to-[#14594c] bg-clip-text text-transparent duration-300 transition-all ease-in-out ">
+          <span className="flex justify-center text-2xl font-bold text-black duration-300 ">
             No products available
           </span>
         )}

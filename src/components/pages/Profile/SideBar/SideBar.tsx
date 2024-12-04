@@ -8,15 +8,12 @@ import {
   selectUserProfile,
   uploadImage,
 } from '../../../redux/slices/auth'
-import { ChevronDown, LogOut, LogIn, Heart } from 'lucide-react'
+import { ChevronDown, LogOut } from 'lucide-react'
 import CloseIcon from '@mui/icons-material/Close'
 import { Avatar } from '@mui/material'
 import { UserData } from './forms/UserData'
 import { Email } from './forms/Email'
 import { Password } from './forms/Password'
-import { Link } from 'react-router-dom'
-import { IoBagOutline } from 'react-icons/io5'
-import { GoPlusCircle } from 'react-icons/go'
 
 interface Props {
   setOpen: (value: boolean) => void
@@ -93,10 +90,10 @@ export const SideBar = (props: Props) => {
   return (
     <div>
       {open && (
-        <div className="fixed top-0 right-0 bg-[#16151A] border-l-[2px] border-[#7e2dff]  shadow-md min-w-[400px] h-screen p-3 overflow-hidden hover:overflow-auto">
+        <div className="fixed top-0 right-0 bg-[#fff] border-l-[2px] border-slate-300 shadow-md min-w-[420px] h-screen p-3 overflow-hidden">
           <div className="fixed right-6 top-6">
             <motion.button
-              className="hover:bg-[#272727] duration-300 w-[35px] h-[35px] rounded-lg"
+              className="hover:bg-[#E4E4E4] duration-300 w-[35px] h-[35px] rounded-lg"
               onClick={() => setOpen(false)}
             >
               <CloseIcon style={{ width: 20, height: 20 }} />
@@ -115,18 +112,9 @@ export const SideBar = (props: Props) => {
                   onMouseLeave={() => setIsHovered(false)}
                 >
                   <motion.div
-                    initial={{
-                      boxShadow: '4px -4px 10px #7e2dff, -4px 4px 10px #0004ff',
-                    }}
                     animate={{
-                      boxShadow: isHovered
-                        ? '-4px 4px 10px #7e2dff, 4px -4px 10px #0004ff'
-                        : '4px -4px 10px #7e2dff, -4px 4px 10px #0004ff',
                       filter: isHovered ? 'blur(2px)' : 'blur(0px)',
                       transition: { duration: 0.5 },
-                    }}
-                    exit={{
-                      boxShadow: '4px -4px 10px #7e2dff, -4px 4px 10px #0004ff',
                     }}
                     className="rounded-full "
                   >
@@ -137,7 +125,7 @@ export const SideBar = (props: Props) => {
                   </motion.div>
 
                   <div className="absolute inset-0 flex items-center justify-center rounded-full  opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <span className="text-white text-xs font-medium">
+                    <span className="text-[#f1eded] text-xs font-medium">
                       Change Avatar
                     </span>
                   </div>
@@ -155,7 +143,7 @@ export const SideBar = (props: Props) => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleUpload}
-                    className="px-3 py-1 bg-blue-50 text-violet-600 border border-violet-600 rounded-md text-sm"
+                    className="px-3 py-1 bg-blue-50 text-[#212121] border border-[#212121] rounded-md text-sm"
                   >
                     Change
                   </motion.button>
@@ -170,9 +158,9 @@ export const SideBar = (props: Props) => {
                       ChangePassword: false,
                     }))
                   }
-                  className="hover:bg-[#272727] p-2 py-3 rounded-lg flex items-center gap-1 transition-colors"
+                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-xl flex items-center gap-1 transition-colors"
                 >
-                  <div className="bg-gradient-to-r from-[#7e2dff] to-[#0004ff] bg-clip-text text-transparent duration-300 transition-colors ease-in-out">
+                  <div className="">
                     {userData?.fullName ? (
                       <span>{userData?.fullName}</span>
                     ) : (
@@ -224,9 +212,9 @@ export const SideBar = (props: Props) => {
                       ChangePassword: false,
                     }))
                   }
-                  className="hover:bg-[#272727] p-2 py-3 rounded-lg flex items-center gap-1 w-full transition-colors"
+                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-xl flex items-center gap-1 w-full transition-colors"
                 >
-                  <div className="bg-gradient-to-r from-[#7e2dff] to-[#0004ff] bg-clip-text text-transparent duration-300 transition-colors ease-in-out">
+                  <div className="">
                     {userData?.email ? (
                       <span>{userData.email}</span>
                     ) : (
@@ -277,11 +265,9 @@ export const SideBar = (props: Props) => {
                       ChangePassword: !prev.ChangePassword,
                     }))
                   }
-                  className="hover:bg-[#272727] p-2 py-3 rounded-lg flex items-center gap-1 w-full transition-colors"
+                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex items-center gap-1 w-full transition-colors"
                 >
-                  <div className="bg-gradient-to-r from-[#7e2dff] to-[#0004ff] bg-clip-text text-transparent duration-300 transition-colors ease-in-out">
-                    Change password
-                  </div>
+                  <div className="">Change password</div>
 
                   <motion.div
                     animate={{ rotate: state.ChangePassword ? 180 : 0 }}
@@ -312,60 +298,18 @@ export const SideBar = (props: Props) => {
                     />
                   </motion.div>
                 )}
-                <hr className="bg-gradient-to-r from-[#7e2dff] to-[#0004ff] h-[1px] border-0" />
-                <Link
-                  className="my-2 mx-2 flex gap-2 text-[#fb3c3c] group-hover:text-[#fb3c3c]/80 hover:-translate-y-1 duration-300 ease-in-out group"
-                  to="/favorites"
-                >
-                  <Heart className="w-7 h-7 text-[#fb3c3c] group-hover:text-[#fb3c3c]/80 transition-colors duration-200" />
-                  <h1 style={{ textShadow: '2px 2px 6px rgb(220, 38, 38)' }}>
-                    Favorites
-                  </h1>
-                </Link>
-                <Link
-                  to="/bag"
-                  className="my-2 mx-2 flex gap-2 text-[#7e2dff] group-hover:text-[#7e2dff]/80 hover:-translate-y-1 duration-300 ease-in-out group"
-                >
-                  <IoBagOutline className="w-7 h-7 text-[#7e2dff] group-hover:text-[#7e2dff]/80 transition-colors duration-200" />
-
-                  <h1 style={{ textShadow: '2px 2px 6px #7e2dff' }}>Bag</h1>
-                </Link>
-                <Link
-                  to="/create-product"
-                  className="my-2 mx-2  flex text-[#0004ff] gap-2 group-hover:text-[#0004ff]/80 hover:-translate-y-1 duration-300 ease-in-out group"
-                >
-                  <GoPlusCircle className="w-7 h-7 text-[#0004ff] group-hover:text-[#0004ff]/80 transition-colors duration-200" />
-                  <h1 style={{ textShadow: '2px 2px 6px #0004ff' }}>
-                    Add product
-                  </h1>
-                </Link>
               </AnimatePresence>
-              <hr className="bg-gradient-to-r from-[#7e2dff] to-[#0004ff] h-[1px] border-0" />
-              {!logOutState ? (
-                <motion.div variants={contentVariants} className="text-sm mt-4">
-                  <motion.button
-                    className="w-full bg-[#1c0d0d] hover:bg-[#2d1616] duration-300 text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
-                    onClick={onClickLogout}
-                    whileTap={{ scale: 0.98 }}
-                    style={{ textShadow: '2px 2px 6px rgb(220, 38, 38)' }}
-                  >
-                    <LogOut />
-                    Sign out
-                  </motion.button>
-                </motion.div>
-              ) : (
+              <hr className="bg-[#212121]" />
+              <motion.div variants={contentVariants} className="text-sm mt-4">
                 <motion.button
-                  className="w-full bg-[#1c0d0d]  hover:bg-[#2d1616] duration-300 text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                  className="w-full bg-[#f5b3b3] hover:bg-[#f8a2a2] duration-300 text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
                   onClick={onClickLogout}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <Link to="/signIn">
-                    {' '}
-                    <LogIn />
-                    Sign in
-                  </Link>
+                  <LogOut />
+                  Sign out
                 </motion.button>
-              )}
+              </motion.div>
             </div>
           </motion.div>
         </div>

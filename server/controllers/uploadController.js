@@ -1,38 +1,3 @@
-// import UserModel from "../models/user.js";
-// export const handleUpload = async (req, res) => {
-//     try {
-//       if (!req.file) {
-//         return res.status(400).json({
-//           success: false,
-//           message: 'No file uploaded'
-//         });
-//       }
-
-//       const filePath = `/uploads/${req.file.filename}`;
-//       const updatedUser = await UserModel.findByIdAndUpdate(
-//         req.userId,
-//         { avatarUrl: filePath },
-//         { new: true }
-//       );
-//       if (!updatedUser) {
-//         return res.status(404).json({
-//           success: false,
-//           message: 'User not found',
-//         });
-//       }
-//       res.json({
-//         success: true,
-//         message: 'Файл успешно загружен',
-//         user: updatedUser,
-//       });
-//     } catch (error) {
-//       res.status(500).json({
-//         success: false,
-//         message: 'Failed to upload file',
-//         error: error.message
-//       });
-//     }
-//   };
 
 import fs from 'fs/promises'
 import path from 'path'

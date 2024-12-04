@@ -1,11 +1,10 @@
 import mongoose from 'mongoose'
 import ProductModel from '../models/product.js'
-import UserModel from '../models/user.js'
 import dayjs from 'dayjs'
 
 export const createProduct = async (req, res) => {
   try {
-    const doc = new ProductModel({
+    const product = await ProductModel.create({
       _id: new mongoose.Types.ObjectId(),
       name: req.body.name,
       tags: req.body.tags,
@@ -15,52 +14,66 @@ export const createProduct = async (req, res) => {
       description: req.body.description,
     })
 
-    const product = await doc.save()
-
     res.status(201).json({
       ...product.toObject(),
       createdAt: dayjs(product.createdAt).format('YY-MM-DD'),
       updatedAt: dayjs(product.updatedAt).format('YY-MM-DD'),
     })
   } catch (err) {
-    console.log(err)
+    console.error(err)
     res.status(500).json({ message: 'Failed to create product' })
   }
 }
 
 export const getOneProduct = async (req, res) => {
+  const session = await mongoose.startSession() // Инициализация транзакции
+
   try {
     const productId = req.params.id
+    const userId = req.userId
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
       return res.status(400).json({ message: 'Invalid product ID' })
     }
 
-    // Поиск продукта и увеличение счетчика просмотров
-    const product = await ProductModel.findOneAndUpdate(
-      { _id: productId },
-      { $inc: { viewsCount: 1 } },
-      { returnDocument: 'after', lean: true } // возвращаем обычный объект, а не Mongoose document
-    )
+    session.startTransaction()
 
-    // Проверяем, если продукт не найден
+    let product = await ProductModel.findById(productId).session(session).lean()
+
     if (!product) {
       return res.status(404).json({ message: 'Product not found' })
     }
 
-    // Успешный ответ с данными продукта
+    if (!product.viewedBy.includes(userId)) {
+      product = await ProductModel.findOneAndUpdate(
+        { _id: productId },
+        {
+          $inc: { viewsCount: 1 },
+          $push: { viewedBy: userId },
+        },
+        { new: true, session, lean: true }
+      )
+    }
+
+    await session.commitTransaction()
+
     res.json({
-      ...product, // Спредим данные из продукта
-      createdAt: dayjs(product.createdAt).format('YY-MM-DD'), // Форматируем даты
+      ...product,
+      createdAt: dayjs(product.createdAt).format('YY-MM-DD'),
       updatedAt: dayjs(product.updatedAt).format('YY-MM-DD'),
     })
   } catch (err) {
+    await session.abortTransaction()
     console.error(err)
     res.status(500).json({ message: 'Failed to get product' })
+  } finally {
+    session.endSession()
   }
 }
 
 export const patchProduct = async (req, res) => {
+  const session = await mongoose.startSession()
+
   try {
     const productId = req.params.id
     const updateData = {
@@ -72,15 +85,20 @@ export const patchProduct = async (req, res) => {
       updatedAt: new Date(),
     }
 
+    session.startTransaction()
+
+    const product = await ProductModel.findById(productId).session(session)
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' })
+    }
+
     const updatedProduct = await ProductModel.findByIdAndUpdate(
       productId,
       updateData,
-      { new: true }
+      { new: true, session }
     )
 
-    if (!updatedProduct) {
-      return res.status(404).json({ message: 'Product not found' })
-    }
+    await session.commitTransaction()
 
     res.json({
       ...updatedProduct.toObject(),
@@ -88,8 +106,11 @@ export const patchProduct = async (req, res) => {
       updatedAt: dayjs(updatedProduct.updatedAt).format('YY-MM-DD'),
     })
   } catch (err) {
+    await session.abortTransaction()
     console.error(err)
     res.status(500).json({ message: 'Failed to update product' })
+  } finally {
+    session.endSession()
   }
 }
 
@@ -124,79 +145,62 @@ export const getAllProducts = async (req, res) => {
   }
 }
 
-export const addProductToBag = async (req, res) => {
+export const addDiscount = async (req, res) => {
+  const session = await mongoose.startSession()
+
   try {
-    const userId = req.userId
     const productId = req.params.id
 
-    // Проверка на валидность ObjectId
     if (!mongoose.Types.ObjectId.isValid(productId)) {
       return res.status(400).json({ message: 'Invalid product ID' })
     }
 
-    const user = await UserModel.findById(userId)
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' })
+    const { discount } = req.body
+
+    if (typeof discount !== 'number' || discount < 0 || discount > 100) {
+      return res
+        .status(400)
+        .json({ message: 'Discount must be a number between 0 and 100' })
     }
 
-    // Проверяем, есть ли уже продукт в корзине
-    const existingProductIndex = user.bag.findIndex(
-      (item) => item.product.toString() === productId
+    session.startTransaction()
+
+    const product = await ProductModel.findById(productId).session(session)
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' })
+    }
+
+    const discountAmount = (discount / 100) * product.price
+    const newPrice = product.price - discountAmount
+
+    const oldPrice = product.price
+    const price = Math.round(newPrice * 100) / 100
+    const saveAmount = Math.round(discountAmount * 100) / 100
+
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+      productId,
+      {
+        discount,
+        price,
+        oldPrice,
+        saveAmount,
+        updatedAt: new Date(),
+      },
+      { new: true, session }
     )
 
-    // Если продукта нет в корзине, добавляем его
-    if (existingProductIndex === -1) {
-      user.bag.push({
-        product: new mongoose.Types.ObjectId(productId), // Используем new для создания ObjectId
-      })
-    }
+    await session.commitTransaction()
 
-    await user.save()
-
-    // Популяция корзины с продуктами, чтобы вернуть подробную информацию
-    const populatedUser =
-      await UserModel.findById(userId).populate('bag.product')
-
-    res.status(200).json({
-      message: 'Product added to bag',
-      bag: populatedUser.bag, // Возвращаем корзину с полными данными о продуктах
+    res.json({
+      ...updatedProduct.toObject(),
+      createdAt: dayjs(updatedProduct.createdAt).format('YY-MM-DD'),
+      updatedAt: dayjs(updatedProduct.updatedAt).format('YY-MM-DD'),
     })
   } catch (err) {
+    await session.abortTransaction()
     console.error(err)
-    res.status(500).json({ message: 'Failed to add product to bag' })
-  }
-}
-
-export const fetchBag = async (req, res) => {
-  try {
-    const userId = req.userId
-    console.log('Fetching bag for user:', userId)
-
-    const user = await UserModel.findById(userId).populate({
-      path: 'bag.product',
-      model: 'Product',
-    })
-
-    if (!user) {
-      console.log('User not found')
-      return res.status(404).json({ message: 'User not found' })
-    }
-
-    console.log('User bag:', user.bag)
-
-    if (!user.bag || user.bag.length === 0) {
-      return res.status(200).json({
-        message: 'Bag is empty',
-        bag: [],
-      })
-    }
-
-    res.status(200).json({
-      message: 'Bag successfully loaded',
-      bag: user.bag,
-    })
-  } catch (err) {
-    console.error('Error fetching bag:', err)
-    res.status(500).json({ message: 'Failed to load bag' })
+    res.status(500).json({ message: 'Failed to update product' })
+  } finally {
+    session.endSession()
   }
 }

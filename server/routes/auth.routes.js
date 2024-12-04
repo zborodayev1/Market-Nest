@@ -15,6 +15,7 @@ router.post(
 )
 router.get('/profile', checkAuth, UserController.getProfile)
 router.get('/user/:id', checkAuth, UserController.getUserProfile)
+router.get('/profile/products', checkAuth, UserController.getUserProducts)
 router.patch('/profile/data', checkAuth, UserController.patchProfileData)
 router.patch('/profile/email', checkAuth, UserController.patchProfileEmail)
 router.patch(

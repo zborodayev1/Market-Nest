@@ -22,8 +22,9 @@ router.patch(
   handleValidErr,
   ProductController.patchProduct
 )
-router.post('/bag/:id', checkAuth, ProductController.addProductToBag)
-router.get('/bag', checkAuth, ProductController.fetchBag)
+
+router.post('/:id/discount', checkAuth, ProductController.addDiscount)
+
 router.delete('/:id', checkAuth, ProductController.deleteProduct)
 
 export default router
