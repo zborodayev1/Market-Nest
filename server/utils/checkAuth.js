@@ -10,12 +10,9 @@ export const checkAuth = (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, JWT_SECRET)
-      const test = jwt.decode(
-        '$2b$15$G85AN9smyK8qyvFDt3tMOO2PYOtz/TzofBoxYiJ4wY9FJt1zPs12C',
-        JWT_SECRET
-      )
-      console.log(test)
-      req.userId = decoded._id // Убедитесь, что _id присутствует в токене
+
+      req.userId = decoded._id
+      req.role = decoded.role
       next()
     } catch (err) {
       if (err.name === 'TokenExpiredError') {

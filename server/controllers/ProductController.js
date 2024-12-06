@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import ProductModel from '../models/product.js'
+import UserModel from '../models/user.js'
 import dayjs from 'dayjs'
 
 export const createProduct = async (req, res) => {
@@ -26,7 +27,7 @@ export const createProduct = async (req, res) => {
 }
 
 export const getOneProduct = async (req, res) => {
-  const session = await mongoose.startSession() // Инициализация транзакции
+  const session = await mongoose.startSession()
 
   try {
     const productId = req.params.id
@@ -116,16 +117,43 @@ export const patchProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
-    const result = await ProductModel.deleteOne({ _id: req.params.id })
+    const productId = req.params.id
+    const userId = req.userId
 
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ message: 'Product not found' })
+    const product = await ProductModel.findById(productId)
+
+    if (!product) {
+      return res.status(404).json({
+        message: 'Product not found',
+      })
     }
 
-    res.json({ message: 'Product deleted' })
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found',
+      })
+    }
+
+    if (
+      user.role === 'admin' ||
+      product.user.toString() === userId.toString()
+    ) {
+      await ProductModel.findByIdAndDelete(productId)
+      return res.status(200).json({
+        message: 'Product deleted successfully',
+      })
+    } else {
+      return res.status(403).json({
+        message: 'You do not have permission to delete this product',
+      })
+    }
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ message: 'Failed to delete product' })
+    console.log(err)
+    res.status(500).json({
+      message: 'Failed to delete product',
+    })
   }
 }
 
@@ -202,5 +230,39 @@ export const addDiscount = async (req, res) => {
     res.status(500).json({ message: 'Failed to update product' })
   } finally {
     session.endSession()
+  }
+}
+
+export const getProductsByTags = async (req, res) => {
+  try {
+    const tags = req.body.tags
+
+    if (!tags || tags.length === 0) {
+      return res.status(400).json({ message: 'Tags are required' })
+    }
+
+    const products = await ProductModel.find({ tags: { $in: tags } })
+
+    res.json(products)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to get products by tags' })
+  }
+}
+
+export const getProductsBySearch = async (req, res) => {
+  try {
+    const search = req.body.search
+    if (!search) {
+      return res.status(400).json({ message: 'Search parameter is required' })
+    }
+
+    const products = await ProductModel.find({
+      name: { $regex: search, $options: 'i' },
+    })
+    res.json(products)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to get products by search' })
   }
 }

@@ -43,10 +43,9 @@ export const ProdileHeader = (props: Props) => {
           ) : (
             <div>
               <CgProfile
-                className="w-10 h-10 text-[#7e2dff] group-hover:text-[#7e2dff]/80 transition-colors duration-200"
+                className="rounded-full hover:shadow-xl transition-shadow duration-300 ease-in-out"
                 style={{ width: 35, height: 40 }}
               />
-              <div className="fixed top-[20px] rounded-full right-[20px] w-10 h-10 bg-black/50 opacity-0 group-hover:opacity-70 transition-all duration-300"></div>
             </div>
           )}
         </div>
