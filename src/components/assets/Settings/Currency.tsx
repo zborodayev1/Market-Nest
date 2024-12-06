@@ -1,41 +1,41 @@
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
-import MenuItem from '@mui/material/MenuItem'
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 import {
   selectCurrency,
   selectLanguage,
   setCurrency,
-} from '../../redux/slices/main'
+} from "../../redux/slices/main";
 
 export const currencies = [
   {
-    value: 'USD',
-    label: '$',
+    value: "USD",
+    label: "$",
   },
   {
-    value: 'RUB',
-    label: '₽',
+    value: "RUB",
+    label: "₽",
   },
   {
-    value: 'KZT',
-    label: '₸',
+    value: "KZT",
+    label: "₸",
   },
   {
-    value: 'EUR',
-    label: '€',
+    value: "EUR",
+    label: "€",
   },
-]
+];
 
 export const Currency = () => {
-  const dispatch = useDispatch()
-  const currency = useSelector(selectCurrency)
-  const language = useSelector(selectLanguage)
+  const dispatch = useDispatch();
+  const currency = useSelector(selectCurrency);
+  const language = useSelector(selectLanguage);
 
   const handleCurrencyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setCurrency(event.target.value))
-  }
+    dispatch(setCurrency(event.target.value));
+  };
 
   return (
     <Box>
@@ -44,20 +44,20 @@ export const Currency = () => {
         select
         fullWidth
         label={
-          language === 'ruRU'
-            ? 'Валюта'
-            : language === 'kkKZ'
-              ? 'Валюта'
-              : 'Currency'
+          language === "ruRU"
+            ? "Валюта"
+            : language === "kkKZ"
+              ? "Валюта"
+              : "Currency"
         }
         value={currency}
         onChange={handleCurrencyChange}
         helperText={
-          language === 'ruRU'
-            ? 'Выберите валюту'
-            : language === 'kkKZ'
-              ? 'Тақырыпты таңдаңыз'
-              : 'Choose currency'
+          language === "ruRU"
+            ? "Выберите валюту"
+            : language === "kkKZ"
+              ? "Тақырыпты таңдаңыз"
+              : "Choose currency"
         }
         variant="outlined"
       >
@@ -68,5 +68,5 @@ export const Currency = () => {
         ))}
       </TextField>
     </Box>
-  )
-}
+  );
+};

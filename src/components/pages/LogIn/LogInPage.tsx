@@ -10,18 +10,16 @@ import { motion } from 'motion/react'
 import { Eye, EyeOff, Mail, RectangleEllipsis } from 'lucide-react'
 
 export const LogInPage: React.FC = (): JSX.Element => {
-  const [isHovered, setIsHovered] = useState(false)
-  const [isHovered2, setIsHovered2] = useState(false)
-
   const text = useSpring({
     from: { opacity: 0 },
     to: { opacity: 1 },
     delay: 200,
   })
   const main = useSpring({
-    from: { y: 100, width: '0px', height: '0px', spin: 0 },
-    to: { y: 0, width: '400px', height: '400px', spin: isHovered2 ? 180 : 0 },
-    delay: 10,
+    from: { y: 100, width: '0px', height: '0px', opacity: 0 },
+    to: { y: 0, width: '400px', height: '400px', opacity: 1 },
+    delay: 150,
+    duration: 500,
   })
   const textField1 = useSpring({
     from: { y: 100, opacity: 0 },
@@ -58,16 +56,16 @@ export const LogInPage: React.FC = (): JSX.Element => {
   const [showPassword, setShowPassword] = useState(false)
 
   const inputClasses =
-    'w-full px-5 py-2 w-[200px] h-[50px] bg-[#16151A] dark:bg-gray-800 border border-[#7e2dff] dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7e2dff] dark:focus:ring-emerald-400 focus:border-transparent transition-all duration-200 '
+    'w-full px-5 py-2 w-[200px] h-[50px] bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 '
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-white dark:text-gray-300 mb-1'
+    'flex items-center gap-2 text-sm font-medium text-[#212121]  mb-1'
 
   const onSubmit = async (values: {
     email: string
     password: string
   }): Promise<void> => {
     setLoading(true)
-    setIsHovered2(true)
+
     try {
       const resultAction = await dispatch(fetchLogin(values))
       setLoading(false)
@@ -94,10 +92,10 @@ export const LogInPage: React.FC = (): JSX.Element => {
   return (
     <div>
       <div className=" ">
-        <div className="bg-[#16151A] h-screen flex flex-wrap justify-center ">
+        <div className="bg-[#FFFFFF] h-screen flex flex-wrap justify-center ">
           <animated.div
             style={{ ...main }}
-            className="border-x-[#7e2dff] border-y-[#0004ff] border-2 shadow-lg px-16 mt-5 pt-8 w-[400px] h-[400px] items-center  rounded-lg bg-[#16151A]"
+            className="shadow-lg border px-16 mt-5 pt-8 w-[400px] h-[400px] items-center rounded-lg bg-[#FFFFFF]"
           >
             <div>
               <div>
@@ -105,7 +103,7 @@ export const LogInPage: React.FC = (): JSX.Element => {
                   style={{ ...text }}
                   className="flex justify-center"
                 >
-                  <h1 className="text-xl font-bold  bg-gradient-to-r from-[#7e2dff] to-[#0004ff] bg-clip-text text-transparent duration-300 transition-colors ease-in-out mb-10">
+                  <h1 className="text-xl font-bold text-[#212121] mb-10">
                     Sign In
                   </h1>
                 </animated.div>
@@ -168,25 +166,14 @@ export const LogInPage: React.FC = (): JSX.Element => {
                   <animated.div
                     style={{ ...button }}
                     className="flex justify-center"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
                   >
                     <motion.button
                       type="submit"
                       disabled={!isValid || loading}
-                      initial={{ borderRadius: 10 }}
-                      whileHover={{ scale: 1.02, borderRadius: 12 }}
                       whileTap={{ scale: 0.99 }}
-                      className={` w-[215px] p-2 flex rounded-md justify-center items-center  border border-[#7e2dff] hover:-translate-y-1 transition-all duration-300 ease-in-out hover:bg-gradient-to-r hover:from-[#7e2dff] hover:to-[#2124a8] hover:border-transparent group `}
+                      className={` w-[220px] p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128] hover:-translate-y-1 transition-all duration-300 ease-in-out    `}
                     >
-                      <span
-                        style={{
-                          textShadow: isHovered
-                            ? '2px 2px 6px #fff, -2px -2px 6px #fff'
-                            : 'none',
-                        }}
-                        className="  text-[#7e2dff]  duration-300 transition-colors ease-in-out group-hover:text-white  "
-                      >
+                      <span className="  text-[#fff] font-bold  duration-300 transition-colors ease-in-out group-hover:text-white  ">
                         {loading ? 'Signing in...' : 'Sign in'}
                       </span>
                     </motion.button>
@@ -199,7 +186,7 @@ export const LogInPage: React.FC = (): JSX.Element => {
                 )}
               </div>
               <div className="flex justify-center mt-2">
-                <h1 className="">No accaunt?</h1>
+                <h1 className="">Don't have an account?</h1>
                 <Link to="/register">
                   <div className="w-full">
                     <h1 className="ml-2 text-blue-500 hover:underline rounded-lg duration-300">

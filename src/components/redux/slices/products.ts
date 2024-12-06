@@ -10,12 +10,37 @@ export const fetchProducts = createAsyncThunk(
   }
 )
 
+export const addToBag = createAsyncThunk(
+  'products/addToBag',
+  async (productId: string, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.post(`/products/bag/${productId}`)
+      return data
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'An unknown error occurred'
+
+      return rejectWithValue(errorMessage)
+    }
+  }
+)
+
 interface User {
   id: string
   fullName: string
 }
+export interface CartItem {
+  product: Product
+  quantity: number
+}
 
 export interface Product {
+  saveAmount: number
+  discount: any
+  save: number
+  oldPrice: number
   _id: string
   name: string
   tags: string[]
@@ -33,12 +58,14 @@ interface ProductsState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
   error: string | null
   products: Product[]
+  cart: CartItem[]
 }
 
 const initialState: ProductsState = {
   products: [],
   status: 'idle',
   error: null,
+  cart: [],
 }
 
 const productSlice = createSlice({
@@ -62,6 +89,12 @@ const productSlice = createSlice({
       .addCase(fetchProducts.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message ?? 'Something went wrong'
+      })
+      .addCase(addToBag.fulfilled, (state, action) => {
+        state.cart = action.payload.bag
+      })
+      .addCase(addToBag.rejected, (state, action) => {
+        state.error = action.payload as string
       })
   },
 })

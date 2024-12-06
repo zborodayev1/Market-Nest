@@ -28,14 +28,14 @@ export const RegisterPage = () => {
 
   return (
     <div>
-      <div className="bg-[#16151A] h-screen flex flex-wrap justify-center">
+      <div className="bg-[#fff] h-screen flex flex-wrap justify-center">
         <animated.div
           style={{ ...main }}
-          className="bg-[#16151A] border-x-[#7e2dff] border-y-[#0004ff] border-2  shadow-lg px-16 mt-5 pt-8 w-[400px] h-[500px] phone:max-w-90 phone-md:max-w-96 rounded-md"
+          className="bg-[#fff] border shadow-lg px-16 my-5 pt-8 w-[400px] h-[500px] phone:max-w-90 phone-md:max-w-96 rounded-md"
         >
           <div>
             <animated.div style={{ ...html }} className="flex justify-center">
-              <h1 className="text-xl font-bold  bg-gradient-to-r from-[#7e2dff] to-[#0004ff] bg-clip-text text-transparent duration-300 transition-colors ease-in-out">
+              <h1 className="text-xl font-bold text-[#212121] mb-5">
                 Register
               </h1>
             </animated.div>
@@ -52,7 +52,7 @@ export const RegisterPage = () => {
             </h1>
           )}
           <div className="flex justify-center mt-2">
-            <h1 className="">have an account?</h1>
+            <h1>Already have an account?</h1>
             <Link to="/signIn">
               <div className="w-full">
                 <h1 className="ml-2 text-blue-500 hover:underline rounded-lg duration-300">
