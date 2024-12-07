@@ -1,12 +1,19 @@
 import { Link } from 'react-router-dom'
 import { selectIsAuth } from '../../redux/slices/auth'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { ProdileHeader } from '../../pages/Profile/SideBar/ProfileHeader'
 import { SideBar } from '../../pages/Profile/SideBar/SideBar'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Heart, IdCard, PackagePlus } from 'lucide-react'
+import {
+  Heart,
+  IdCard,
+  PackagePlus,
+  PackageSearch,
+  PackageMinus,
+} from 'lucide-react'
 import { IoBagOutline } from 'react-icons/io5'
+import { getProductsBySearch, fetchProducts } from '../../redux/slices/products'
 
 export const Header = () => {
   const isAuth = useSelector(selectIsAuth)
@@ -60,10 +67,85 @@ export const Header = () => {
     },
   }
 
+  const dispatch = useDispatch()
+  const [search, setSearch] = useState(false)
+  const [animation, setAnimation] = useState('')
+
+  useEffect(() => {
+    if (search) {
+      setAnimation('search')
+    } else {
+      setAnimation('notSearch')
+    }
+  }, [search])
+
+  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = e.target.value
+    if (searchTerm.trim() === '') {
+      dispatch(fetchProducts())
+    } else {
+      dispatch(getProductsBySearch(searchTerm))
+    }
+  }
+
   return (
     <div>
       <div className="">
         <div className="relative items-center  flex bg-[#F5F5F5] z-30 w-screen h-[100px]">
+          <div className="absolute left-[120px] transform -translate-x-1/2 flex justify-center items-center z-10">
+            <AnimatePresence mode="wait">
+              {search ? (
+                <motion.div
+                  key="searchBar"
+                  initial={{
+                    opacity: 0,
+                    x: -40,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    x: 40,
+                  }}
+                  exit={{ opacity: 0, x: -40 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="flex items-center justify-center group py-4 px-4 w-full gap-2 "
+                >
+                  <div className="flex group-hover:bg-[#e4e4e4] p-[5px] rounded-xl transition-colors duration-300 ease-in-out">
+                    <input
+                      type="text"
+                      onChange={handleSearch}
+                      placeholder="Search"
+                      className="w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:border-transparent transition-all duration-200"
+                    />
+                    <button
+                      className="flex items-center font-bold mx-1"
+                      onClick={() => setSearch(false)}
+                    >
+                      Close
+                      <PackageMinus className="ml-1 w-9 h-9 text-[#212121] transition-colors duration-200" />
+                    </button>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="searchButton"
+                  initial={{
+                    opacity: 0,
+                    y: animation === 'notSearch' ? 20 : -20,
+                  }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2, ease: 'easeInOut' }}
+                  onClick={() => setSearch(true)}
+                  className="flex  justify-center py-4 px-4 w-full cursor-pointer "
+                >
+                  <div className="hover:bg-[#e4e4e4] transition-colors duration-300 rounded-full ease-in-out flex items-center p-2 px-3">
+                    <h1 className="font-bold mr-2">Search</h1>
+                    <PackageSearch className="w-9 h-9 text-[#212121] transition-colors duration-200" />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           <div className="absolute inset-x-0 flex justify-center items-center">
             <Link to="/">
               <div className="flex justify-center  group">

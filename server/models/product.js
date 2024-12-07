@@ -7,24 +7,24 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
     tags: {
-      type: [String], // Четко указываем, что это массив строк
+      type: [String],
       required: true,
       default: [],
     },
     price: {
       type: Number,
       required: true,
-      min: 0, // Цена должна быть положительной
+      min: 0,
     },
     oldPrice: {
       type: Number,
-      min: 0, // Старая цена тоже должна быть положительной
+      min: 0,
     },
     discount: {
       type: Number,
       default: 0,
       min: 0,
-      max: 100, // Указываем допустимый диапазон скидок
+      max: 100,
     },
     viewsCount: {
       type: Number,
@@ -36,6 +36,24 @@ const ProductSchema = new mongoose.Schema(
       ref: 'User',
       default: [],
     },
+    comment: [
+      {
+        text: {
+          type: String,
+          required: true,
+        },
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Product',
+          required: true,
+        },
+      },
+    ],
     commentsCount: {
       type: Number,
       default: 0,
@@ -52,7 +70,7 @@ const ProductSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      maxlength: 500, // Ограничиваем длину описания
+      maxlength: 500,
     },
   },
   {

@@ -37,17 +37,27 @@ export const FavoritesPage = () => {
     const updatedFavorites = favorites.filter((favoriteId) => favoriteId !== id)
     setFavorites(updatedFavorites)
 
-    // Update localStorage after removal
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites))
 
-    // Remove product from favoriteProducts
     setFavoriteProducts((prevFavorites) =>
       prevFavorites.filter((product: Product) => product._id !== id)
     )
+    setTimeout(() => {
+      setFavorites(updatedFavorites)
+    }, 500)
   }
 
+  const totalCount = favoriteProducts.length
+
   return (
-    <div className="w-screen">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{
+        opacity: 1,
+        transition: { duration: 0.5, delay: 0.5 },
+      }}
+      className="w-screen"
+    >
       <div className="flex w-full text-center items-center justify-center mt-5">
         <motion.span
           layout
@@ -61,6 +71,12 @@ export const FavoritesPage = () => {
           Favorites
         </motion.span>
       </div>
+      <div className="flex justify-center">
+        <span className="text-2xl text-[#212121]">
+          <span className="font-bold">Count: </span>
+          <span>{totalCount} items</span>
+        </span>
+      </div>
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, y: -55 }}
@@ -73,24 +89,27 @@ export const FavoritesPage = () => {
         >
           <div className="flex flex-wrap justify-center mt-5 gap-4 min-h-[300px]">
             {status === 'succeeded' && favoriteProducts.length > 0 ? (
-              favoriteProducts.map((product: Product, index: number) => (
-                <motion.div
-                  key={product._id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{
-                    opacity: 0,
-                    transition: { duration: 0.5 },
-                  }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
-                  className="flex justify-between"
-                >
-                  <ProductForm
-                    product={product}
-                    onRemoveFavorite={handleRemoveFromFavorites}
-                  />
-                </motion.div>
-              ))
+              <AnimatePresence>
+                {favoriteProducts.map((product: Product, index: number) => (
+                  <motion.div
+                    layout
+                    key={product._id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{
+                      opacity: 0,
+                      transition: { duration: 0.5 },
+                    }}
+                    transition={{ delay: index * 0.1, duration: 0.5 }}
+                    className="flex justify-between"
+                  >
+                    <ProductForm
+                      product={product}
+                      onRemoveFavorite={handleRemoveFromFavorites}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             ) : (
               <div className="text-center">
                 <p>You have no favorite products</p>
@@ -99,6 +118,6 @@ export const FavoritesPage = () => {
           </div>
         </motion.div>
       </AnimatePresence>
-    </div>
+    </motion.div>
   )
 }

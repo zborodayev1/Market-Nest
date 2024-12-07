@@ -1,18 +1,24 @@
-import { Product } from '../../redux/slices/products'
+import { deleteProduct, Product } from '../../redux/slices/products'
 import { Link } from 'react-router-dom'
 import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
 import { useEffect, useState } from 'react'
 import { IconButton } from '@mui/material'
-import { Eye } from 'lucide-react'
+import { Eye, X } from 'lucide-react'
 import { BiSolidMessageSquare } from 'react-icons/bi'
 import { IoBag } from 'react-icons/io5'
 import { motion } from 'motion/react'
+import { jwtDecode } from 'jwt-decode'
+import { useDispatch } from 'react-redux'
 
 interface ProductFormProps {
   product: Product
   onRemoveFavorite?: (id: string) => void
   onRemoveBag?: (id: string) => void
+}
+
+interface DecodedToken {
+  role: string
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -21,7 +27,26 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   onRemoveBag,
 }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false)
+  const dispatch = useDispatch()
+
   const [isBag, setIsBag] = useState<boolean>(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+
+    if (token) {
+      try {
+        const decoded = jwtDecode<DecodedToken>(token)
+        if (decoded.role === 'admin') {
+          setIsAdmin(true)
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (err) {
+        console.error('Failed to decode token')
+      }
+    }
+  }, [])
 
   const toggleFavorite = () => {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
@@ -54,6 +79,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     setIsBag(!isBag)
   }
 
+  const handleDelete = async (productId: string) => {
+    dispatch(deleteProduct(productId))
+  }
+
   useEffect(() => {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
     setIsFavorite(favorites.includes(product._id))
@@ -77,6 +106,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               ) : (
                 <FavoriteBorderOutlinedIcon />
               )}
+            </IconButton>
+
+            <IconButton
+              className="absolute top-0 left-[120px] ease-in-out duration-300"
+              color="error"
+              onClick={() => handleDelete(product._id)}
+            >
+              {isAdmin && <X />}
             </IconButton>
           </div>
 

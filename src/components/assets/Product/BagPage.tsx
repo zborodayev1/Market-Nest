@@ -70,7 +70,7 @@ export const BagPage = () => {
         </div>
         <div>
           <span className="text-2xl text-[#212121]">
-            <span className="font-bold">Count:</span>
+            <span className="font-bold">Count: </span>
             <span>{totalCount} items</span>
           </span>
         </div>
@@ -89,6 +89,7 @@ export const BagPage = () => {
               <AnimatePresence>
                 {bagProducts.map((product: Product, index: number) => (
                   <motion.div
+                    layout
                     key={product._id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}

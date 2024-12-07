@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { HomePage } from './components/pages/HomePage'
+import { HomePage } from './components/pages/Home/HomePage'
 import { Header } from './components/assets/Headers/Header'
 import { NotFound } from './components/assets/errors/NotFound'
 import { RegisterPage } from './components/pages/Register/RegisterPage'
@@ -56,7 +56,7 @@ export const App = () => {
                   path="/create-product"
                 />
                 <Route element={<FullProduct />} path="/product/:id" />
-                <Route element={<Bag />} path="/bag" />
+                <Route element={<BagPage />} path="/bag" />
                 <Route element={<FavoritesPage />} path="/favorites" />
               </Routes>
             </div>
