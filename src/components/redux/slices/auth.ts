@@ -12,6 +12,7 @@ interface UpdateProfileResponse {
 }
 
 interface UserProfile {
+  _id: string
   fullName?: string
   avatarUrl?: string
   phone?: string

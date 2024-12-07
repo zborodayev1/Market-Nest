@@ -176,7 +176,7 @@ export const Header = () => {
                 <div className="flex">
                   <Link
                     className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
-                    to="/create"
+                    to="/create-product"
                   >
                     <h1 className="text-md font-bold text-[#212121]  transition-colors duration-200 ">
                       Create

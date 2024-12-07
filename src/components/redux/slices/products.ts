@@ -10,6 +10,22 @@ export const fetchProducts = createAsyncThunk(
   }
 )
 
+export const createProduct = createAsyncThunk(
+  'products/createProduct',
+  async (productData: FormData, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.post('/products', productData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      return data
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Failed to create product')
+    }
+  }
+)
+
 export const getProductsBySearch = createAsyncThunk(
   'products/getProductsBySearch',
   async (search: string) => {
@@ -149,7 +165,22 @@ const productSlice = createSlice({
       })
       .addCase(deleteProduct.rejected, (state, action) => {
         state.status = 'failed'
-        state.error = action.payload || 'Failed to delete product'
+        state.error = action.error.message ?? 'Failed to delete product'
+      })
+      .addCase(createProduct.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(
+        createProduct.fulfilled,
+        (state, action: PayloadAction<Product>) => {
+          state.status = 'succeeded'
+          state.products.push(action.payload)
+        }
+      )
+      .addCase(createProduct.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message ?? 'Failed to create product'
       })
   },
 })

@@ -4,13 +4,13 @@ import { Header } from './components/assets/Headers/Header'
 import { NotFound } from './components/assets/errors/NotFound'
 import { RegisterPage } from './components/pages/Register/RegisterPage'
 import { LogInPage } from './components/pages/LogIn/LogInPage'
-import { CreateProduct } from './components/pages/CreateProduct'
 import { useSelector } from 'react-redux'
 import { selectIsAuth } from './components/redux/slices/auth'
 import { useEffect, useRef, useState } from 'react'
 import { FullProduct } from './components/pages/FullProduct/FullProduct'
 import { FavoritesPage } from './components/assets/Product/FavoritesPage'
 import { BagPage } from './components/assets/Product/BagPage'
+import { CreatePage } from './components/pages/CreateProduct/CreatePage'
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)
@@ -52,7 +52,7 @@ export const App = () => {
                   path="/register"
                 />
                 <Route
-                  element={!isAuth ? <Navigate to="/" /> : <CreateProduct />}
+                  element={!isAuth ? <Navigate to="/" /> : <CreatePage />}
                   path="/create-product"
                 />
                 <Route element={<FullProduct />} path="/product/:id" />
@@ -79,7 +79,7 @@ export const App = () => {
                   path="/register"
                 />
                 <Route
-                  element={!isAuth ? <Navigate to="/" /> : <CreateProduct />}
+                  element={!isAuth ? <Navigate to="/" /> : <CreatePage />}
                   path="/create-product"
                 />
                 <Route element={<FullProduct />} path="/product/:id" />

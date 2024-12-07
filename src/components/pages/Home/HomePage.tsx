@@ -8,11 +8,12 @@ import {
 } from '../../redux/slices/products'
 import { ProductForm } from '../../assets/Product/ProductForm'
 import { motion } from 'motion/react'
+import { selectUserProfile } from '../../redux/slices/auth'
 
 export const HomePage = () => {
   const dispatch = useDispatch()
   const { products, status } = useSelector(selectProducts)
-
+  const userData = useSelector(selectUserProfile)
   const [state, setState] = useState({
     new: true,
     popular: false,
@@ -67,7 +68,12 @@ export const HomePage = () => {
     })
   }
 
-  const filteredProducts = getFilteredProducts()
+  const filteredProducts =
+    selectedTags.length === 0
+      ? getFilteredProducts()
+      : products.filter((product: any) =>
+          selectedTags.every((tag) => product.tags.includes(tag))
+        )
 
   return (
     <motion.div
@@ -84,10 +90,10 @@ export const HomePage = () => {
       >
         <div className="flex mt-7 relative overflow-hidden">
           <motion.div
-            className="flex gap-4 whitespace-nowrap"
+            className="flex gap-4 whitespace-nowrap px-4"
             style={{
-              scrollbarWidth: 'none', // Для Firefox
-              msOverflowStyle: 'none', // Для IE/Edge
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
               display: 'flex',
               overflowX: 'auto',
             }}

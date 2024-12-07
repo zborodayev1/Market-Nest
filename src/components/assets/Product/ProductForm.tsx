@@ -4,7 +4,7 @@ import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
 import { useEffect, useState } from 'react'
 import { IconButton } from '@mui/material'
-import { Eye, X } from 'lucide-react'
+import { Eye, X, Pencil } from 'lucide-react'
 import { BiSolidMessageSquare } from 'react-icons/bi'
 import { IoBag } from 'react-icons/io5'
 import { motion } from 'motion/react'
@@ -15,6 +15,7 @@ interface ProductFormProps {
   product: Product
   onRemoveFavorite?: (id: string) => void
   onRemoveBag?: (id: string) => void
+  Edit?: boolean
 }
 
 interface DecodedToken {
@@ -25,6 +26,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   product,
   onRemoveFavorite,
   onRemoveBag,
+  Edit,
 }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false)
   const dispatch = useDispatch()
@@ -93,9 +95,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   return (
     <div className="p-[2px] text-base shadow-xl border border-gray-950 rounded-lg hover:-translate-y-1 duration-300 bg-transparent">
-      <div className="shadow-sm p-2 rounded-md min-w-[260px] max-w-[264px] min-h-[100px] max-h-[350px] bg-[#f5f5f5] bg-clip-padding">
+      <div className="shadow-sm p-2 rounded-md min-w-[260px] max-w-[264px] min-h-[100px] max-h-[450px] bg-[#f5f5f5] bg-clip-padding">
         <div className="ml-1 min-h-[200px]">
-          <div className="relative  transition-all  duration-300 ease-in-out">
+          <div className=" absolute  transition-all  duration-300 ease-in-out">
             <IconButton
               onClick={toggleFavorite}
               className="absolute top-0 left-[200px] ease-in-out duration-300"
@@ -115,18 +117,30 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             >
               {isAdmin && <X />}
             </IconButton>
+            {Edit ||
+              (isAdmin && (
+                <Link to={`/edit/${product._id}`}>
+                  <IconButton
+                    className="absolute top-0 left-[-80px] ease-in-out duration-300"
+                    color="primary"
+                    onClick={() => handleDelete(product._id)}
+                  >
+                    <Pencil />
+                  </IconButton>
+                </Link>
+              ))}
           </div>
 
           <div className="flex justify-center items-center">
             <Link
               to={`/product/${product._id}`}
-              className="min-w-[100px] min-h-[100px] bg-cover bg-center rounded-md "
+              className="min-w-[100px] min-h-[100px] bg-cover bg-center rounded-md mb-2"
               style={{
                 backgroundImage: `url(${product.image})`,
                 backgroundSize: 'cover',
-                minWidth: '150px',
-                minHeight: '150px',
-                maxWidth: '250px',
+                minWidth: '250px',
+                minHeight: '250px',
+                maxWidth: '350px',
                 maxHeight: '350px',
               }}
             />

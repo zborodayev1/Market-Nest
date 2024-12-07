@@ -9,8 +9,7 @@ const router = express.Router()
 router.post(
   '/',
   checkAuth,
-  productValidation,
-  handleValidErr,
+  ProductController.handleUploadProductImage,
   ProductController.createProduct
 )
 router.get('/:id', ProductController.getOneProduct)
@@ -24,8 +23,6 @@ router.patch(
   handleValidErr,
   ProductController.patchProduct
 )
-
-router.post('/:id/discount', checkAuth, ProductController.addDiscount)
 
 router.delete('/:id', checkAuth, ProductController.deleteProduct)
 
