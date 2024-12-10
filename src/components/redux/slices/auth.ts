@@ -12,6 +12,7 @@ interface UpdateProfileResponse {
 }
 
 interface UserProfile {
+  _id: string
   fullName?: string
   avatarUrl?: string
   phone?: string
@@ -70,9 +71,9 @@ export const uploadImage = createAsyncThunk<
     return data
   } catch (error: any) {
     const errorMessage =
-      error.response?.data?.message || // Сообщение, возвращённое сервером
-      error.message || // Общая ошибка, если нет сообщения от сервера
-      'An unknown error occurred' // Дефолтное сообщение
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
 
     return rejectWithValue(errorMessage)
   }
@@ -104,9 +105,9 @@ export const updateProfileData = createAsyncThunk<
     return data
   } catch (error: any) {
     const errorMessage =
-      error.response?.data?.message || // Сообщение, возвращённое сервером
-      error.message || // Общая ошибка, если нет сообщения от сервера
-      'An unknown error occurred' // Дефолтное сообщение
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
 
     return rejectWithValue(errorMessage)
   }
@@ -122,9 +123,9 @@ export const updateProfileEmail = createAsyncThunk<
     return data
   } catch (error: any) {
     const errorMessage =
-      error.response?.data?.message || // Сообщение, возвращённое сервером
-      error.message || // Общая ошибка, если нет сообщения от сервера
-      'An unknown error occurred' // Дефолтное сообщение
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
 
     return rejectWithValue(errorMessage)
   }
@@ -140,9 +141,9 @@ export const updateProfilePassword = createAsyncThunk<
     return data
   } catch (error: any) {
     const errorMessage =
-      error.response?.data?.message || // Сообщение, возвращённое сервером
-      error.message || // Общая ошибка, если нет сообщения от сервера
-      'An unknown error occurred' // Дефолтное сообщение
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
 
     return rejectWithValue(errorMessage)
   }

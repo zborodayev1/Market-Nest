@@ -9,12 +9,13 @@ const router = express.Router()
 router.post(
   '/',
   checkAuth,
-  productValidation,
-  handleValidErr,
+  ProductController.handleUploadProductImage,
   ProductController.createProduct
 )
 router.get('/:id', ProductController.getOneProduct)
 router.get('/', ProductController.getAllProducts)
+router.post('/products-by-tags', ProductController.getProductsByTags)
+router.post('/products-by-search', ProductController.getProductsBySearch)
 router.patch(
   '/:id',
   checkAuth,
@@ -22,8 +23,6 @@ router.patch(
   handleValidErr,
   ProductController.patchProduct
 )
-
-router.post('/:id/discount', checkAuth, ProductController.addDiscount)
 
 router.delete('/:id', checkAuth, ProductController.deleteProduct)
 
