@@ -1,4 +1,3 @@
-import { Avatar } from '@mui/material'
 import { useSpring, animated } from '@react-spring/web'
 import { selectIsAuth } from '../../../components/redux/slices/auth'
 import { Link, Navigate } from 'react-router-dom'

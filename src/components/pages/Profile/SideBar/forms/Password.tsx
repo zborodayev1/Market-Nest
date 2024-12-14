@@ -112,7 +112,7 @@ export const Password = (props: Props) => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 spellCheck="false"
-                placeholder="12345678Test"
+                placeholder="12345678Abc"
                 id="password"
                 {...register('newPassword', {
                   required: 'Password is required',

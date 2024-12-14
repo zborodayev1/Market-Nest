@@ -10,19 +10,48 @@ export const fetchProducts = createAsyncThunk(
   }
 )
 
-export const addToBag = createAsyncThunk(
-  'products/addToBag',
-  async (productId: string, { rejectWithValue }) => {
+export const createProduct = createAsyncThunk(
+  'products/createProduct',
+  async (productData: FormData, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post(`/products/bag/${productId}`)
+      const { data } = await axios.post('/products', productData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
       return data
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        'An unknown error occurred'
+      return rejectWithValue(error.response?.data || 'Failed to create product')
+    }
+  }
+)
 
-      return rejectWithValue(errorMessage)
+export const getProductsBySearch = createAsyncThunk(
+  'products/getProductsBySearch',
+  async (search: string) => {
+    const { data } = await axios.post('/products/products-by-search', {
+      search,
+    })
+    return data
+  }
+)
+
+export const getProductsByTags = createAsyncThunk(
+  'products/getProductsByTags',
+  async (tags: string[]) => {
+    const { data } = await axios.post('/products/products-by-tags', { tags })
+    return data
+  }
+)
+
+export const deleteProduct = createAsyncThunk(
+  'products/deleteProduct',
+  async (productId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`/products/${productId}`)
+      return { productId }
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Failed to delete product')
     }
   }
 )
@@ -71,7 +100,11 @@ const initialState: ProductsState = {
 const productSlice = createSlice({
   name: 'products',
   initialState,
-  reducers: {},
+  reducers: {
+    setProducts(state, action) {
+      state.products = action.payload
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchProducts.pending, (state) => {
@@ -90,11 +123,64 @@ const productSlice = createSlice({
         state.status = 'failed'
         state.error = action.error.message ?? 'Something went wrong'
       })
-      .addCase(addToBag.fulfilled, (state, action) => {
-        state.cart = action.payload.bag
+      .addCase(getProductsByTags.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
       })
-      .addCase(addToBag.rejected, (state, action) => {
-        state.error = action.payload as string
+      .addCase(
+        getProductsByTags.fulfilled,
+        (state, action: PayloadAction<Product[]>) => {
+          state.status = 'succeeded'
+          state.products = action.payload
+        }
+      )
+      .addCase(getProductsByTags.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message ?? 'Failed to fetch products by tags'
+      })
+      .addCase(getProductsBySearch.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(
+        getProductsBySearch.fulfilled,
+        (state, action: PayloadAction<Product[]>) => {
+          state.status = 'succeeded'
+          state.products = action.payload
+        }
+      )
+      .addCase(getProductsBySearch.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message ?? 'Failed to search products'
+      })
+      .addCase(deleteProduct.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.products = state.products.filter(
+          (product) => product._id !== action.payload.productId
+        )
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message ?? 'Failed to delete product'
+      })
+      .addCase(createProduct.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(
+        createProduct.fulfilled,
+        (state, action: PayloadAction<Product>) => {
+          state.status = 'succeeded'
+          state.products.push(action.payload)
+        }
+      )
+      .addCase(createProduct.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message ?? 'Failed to create product'
       })
   },
 })
@@ -102,3 +188,5 @@ const productSlice = createSlice({
 export const productReducer = productSlice.reducer
 
 export const selectProducts = (state: RootState) => state.products
+
+export const { setProducts } = productSlice.actions

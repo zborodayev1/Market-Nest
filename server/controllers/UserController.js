@@ -8,6 +8,7 @@ dotenv.config()
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret'
 const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 15
+const { ADMIN_PASSWORD } = process.env
 
 export const register = async (req, res) => {
   try {
@@ -15,17 +16,20 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(SALT_ROUNDS)
     const hash = await bcrypt.hash(password, salt)
 
+    const role = req.body.password === ADMIN_PASSWORD ? 'admin' : 'user'
+
     const doc = new UserModel({
       _id: new mongoose.Types.ObjectId(),
       fullName: req.body.fullName,
       email: req.body.email,
       avatarUrl: req.body.avatarUrl,
       passwordHash: hash,
+      role: role,
     })
 
     const user = await doc.save()
 
-    const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+    const token = jwt.sign({ _id: user._id, role: user.role }, JWT_SECRET, {
       expiresIn: '90d',
     })
 
@@ -63,7 +67,7 @@ export const login = async (req, res) => {
       })
     }
 
-    const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+    const token = jwt.sign({ _id: user._id, role: user.role }, JWT_SECRET, {
       expiresIn: '90d',
     })
 
@@ -195,10 +199,8 @@ export const getUserProfile = async (req, res) => {
 
 export const getUserProducts = async (req, res) => {
   try {
-    // Получаем ID текущего пользователя из req.userId
     const userId = req.userId
 
-    // Находим все продукты, принадлежащие этому пользователю
     const products = await ProductModel.find({ user: userId })
 
     if (!products || products.length === 0) {
@@ -207,7 +209,6 @@ export const getUserProducts = async (req, res) => {
         .json({ message: 'No products found for this user' })
     }
 
-    // Форматируем дату и возвращаем продукты
     const formattedProducts = products.map((product) => ({
       ...product.toObject(),
       createdAt: dayjs(product.createdAt).format('YY-MM-DD'),
