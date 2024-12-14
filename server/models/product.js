@@ -72,6 +72,12 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       maxlength: 500,
     },
+    status: {
+      type: String,
+
+      enum: ['pending', 'verified', 'rejected'],
+      default: 'pending',
+    },
   },
   {
     timestamps: true,

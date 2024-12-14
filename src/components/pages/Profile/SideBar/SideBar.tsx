@@ -8,12 +8,13 @@ import {
   selectUserProfile,
   uploadImage,
 } from '../../../redux/slices/auth'
-import { ChevronDown, LogOut } from 'lucide-react'
+import { ChevronDown, LogOut, PackageCheck } from 'lucide-react'
 import CloseIcon from '@mui/icons-material/Close'
 import { Avatar } from '@mui/material'
 import { UserData } from './forms/UserData'
 import { Email } from './forms/Email'
 import { Password } from './forms/Password'
+import { Link } from 'react-router-dom'
 
 interface Props {
   setOpen: (value: boolean) => void
@@ -158,7 +159,7 @@ export const SideBar = (props: Props) => {
                       ChangePassword: false,
                     }))
                   }
-                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-xl flex items-center gap-1 transition-colors"
+                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-xl flex items-center gap-1 transition-colors duration-300 ease-in-out"
                 >
                   <div className="">
                     {userData?.fullName ? (
@@ -212,7 +213,7 @@ export const SideBar = (props: Props) => {
                       ChangePassword: false,
                     }))
                   }
-                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-xl flex items-center gap-1 w-full transition-colors"
+                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-xl flex items-center gap-1 w-full transition-colors duration-300 ease-in-out"
                 >
                   <div className="">
                     {userData?.email ? (
@@ -265,7 +266,7 @@ export const SideBar = (props: Props) => {
                       ChangePassword: !prev.ChangePassword,
                     }))
                   }
-                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex items-center gap-1 w-full transition-colors"
+                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex items-center gap-1 w-full transition-colors duration-300 ease-in-out"
                 >
                   <div className="">Change password</div>
 
@@ -300,6 +301,21 @@ export const SideBar = (props: Props) => {
                 )}
               </AnimatePresence>
               <hr className="bg-[#212121]" />
+              {userData?.role === 'admin' && (
+                <div>
+                  <div className=" hover:bg-[#e4e4e4] z-10  p-2  transition-colors duration-300 rounded-lg ease-in-out flex items-center mb-2">
+                    <Link
+                      className="mx-1 flex gap-2 items-center "
+                      to="/products-pending"
+                    >
+                      <h1 className="text-sm font-bold text-[#212121]  transition-colors duration-200 ">
+                        Pending Products
+                      </h1>
+                      <PackageCheck className="w-7 h-7 text-[#212121] transition-colors duration-200" />
+                    </Link>
+                  </div>
+                </div>
+              )}
               <motion.div variants={contentVariants} className="text-sm mt-4">
                 <motion.button
                   className="w-full bg-[#f5b3b3] hover:bg-[#f8a2a2] duration-300 text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"

@@ -7,12 +7,13 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ProductForm } from './ProductForm'
+import { AppDispatch } from '../../redux/store'
 
 export const FavoritesPage = () => {
   const { products, status } = useSelector(selectProducts)
   const [favorites, setFavorites] = useState<string[]>([])
   const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([])
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
 
   useEffect(() => {
     const storedFavorites = JSON.parse(

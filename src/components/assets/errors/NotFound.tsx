@@ -12,7 +12,7 @@ export const NotFound = () => {
           to="/"
           className="flex justify-center p-5 text-3xl text-black font-bold"
         >
-          Not Found
+          The page you are looking for does not exist or is under construction!
         </Link>
       </motion.div>
     </div>

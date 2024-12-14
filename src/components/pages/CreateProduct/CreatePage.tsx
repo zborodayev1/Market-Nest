@@ -3,7 +3,7 @@ import { useState, useRef } from 'react'
 import { Package, Coins, Tags, ImagePlus, X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { createProduct } from '../../redux/slices/products'
-import { RootState } from '../../redux/store'
+import { AppDispatch, RootState } from '../../redux/store'
 import { AnimatePresence, motion } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 
@@ -15,13 +15,13 @@ interface FormData {
 }
 
 export const CreatePage = () => {
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [selectedTags, setSelectedTags] = useState<string[]>([]) // Состояние для выбранных тегов
   const error = useSelector((state: RootState) => state.products.error)
-  const { register, handleSubmit, setValue, getValues } = useForm<FormData>({
+  const { register, handleSubmit, setValue } = useForm<FormData>({
     defaultValues: {
       name: '',
       price: 0,
@@ -54,19 +54,29 @@ export const CreatePage = () => {
   const onSubmit = async (values: FormData) => {
     try {
       setIsSubmitting(true)
-      const updatedValues = { ...values, tags: selectedTags } // Передаем выбранные теги
-      const resultAction = await dispatch(createProduct(updatedValues))
+
+      const formData = new FormData()
+      formData.append('name', values.name)
+      formData.append('price', values.price.toString())
+      formData.append('tags', JSON.stringify(selectedTags))
+
+      if (values.image instanceof File) {
+        formData.append('image', values.image)
+      } else {
+        formData.append('image', '')
+      }
+
+      const resultAction = await dispatch(createProduct(formData))
 
       if (resultAction.type === 'products/createProduct/fulfilled') {
         navigate('/')
       }
     } catch (error) {
-      console.error('Error:', error)
+      console.error('Ошибка:', error)
     } finally {
       setIsSubmitting(false)
     }
   }
-
   const handleTagClick = (tag: string) => {
     setSelectedTags((prevTags) => {
       if (prevTags.includes(tag)) {

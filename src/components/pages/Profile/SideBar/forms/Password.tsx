@@ -8,6 +8,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { Eye, EyeOff, RectangleEllipsis } from 'lucide-react'
 import { useState } from 'react'
+import { AppDispatch } from '../../../../redux/store'
 
 interface Formdata {
   password?: string
@@ -23,7 +24,7 @@ export const Password = (props: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const { onSuccess } = props
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
   const { reset, register, handleSubmit } = useForm<Formdata>({
     mode: 'onSubmit',
   })

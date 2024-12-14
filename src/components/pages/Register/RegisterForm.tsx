@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import { fetchRegister } from '../../redux/slices/auth'
 import { Eye, EyeOff, Mail, RectangleEllipsis, User } from 'lucide-react'
 import { motion } from 'motion/react'
+import { AppDispatch } from '../../redux/store'
 
 interface Props {
   setLoading: (loading: boolean) => void
@@ -39,7 +40,7 @@ export const RegisterForm = (props: Props) => {
   })
 
   const { setLoading, setErr, loading } = props
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
   const {
     register,
     handleSubmit,

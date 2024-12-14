@@ -8,6 +8,7 @@ import {
   updateProfileData,
 } from '../../../../redux/slices/auth'
 import { User, Phone, MapPin, Building2, Globe } from 'lucide-react'
+import { AppDispatch } from '../../../../redux/store'
 
 interface FormData {
   fullName?: string
@@ -26,7 +27,7 @@ export const UserData = ({ onSuccess }: Props) => {
   const userData = useSelector(selectUserProfile)
   const status = useSelector((state: RootState) => state.auth.status)
   const error = useSelector((state: RootState) => state.auth.error)
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
 
   const {
     register,

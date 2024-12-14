@@ -60,12 +60,13 @@ export const createProduct = async (req, res) => {
         description,
         image: filePath,
         user: req.userId,
+        status: 'pending',
       })
 
       return res.status(201).json({
         success: true,
         product,
-        message: 'Product created successfully with image',
+        message: 'Product created successfully and awaiting admin verification',
       })
     } catch (err) {
       console.error('Error during file access:', err)
@@ -283,5 +284,236 @@ export const getProductsBySearch = async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Failed to get products by search' })
+  }
+}
+export const updateProductStatus = async (req, res) => {
+  const { status } = req.body
+  const productId = req.params.id
+
+  if (!['verified', 'rejected'].includes(status)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid status value',
+    })
+  }
+
+  try {
+    const product = await ProductModel.findById(productId)
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      })
+    }
+
+    product.status = status
+    await product.save()
+
+    return res.status(200).json({
+      success: true,
+      message: `Product status updated to ${status}`,
+      product,
+    })
+  } catch (error) {
+    console.error('Error updating product status:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update product status',
+    })
+  }
+}
+
+export const createNotification = async (req, res) => {
+  const { message, actionType, productImageUrl, title, productId } = req.body
+  const userId = req.userId
+  let type = 'info'
+
+  switch (actionType) {
+    case 'created':
+      type = 'success'
+      break
+    case 'approved':
+      type = 'success'
+      break
+    case 'rejected':
+      type = 'warning'
+      break
+    default:
+      type = 'info'
+      break
+  }
+
+  try {
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const notification = {
+      type: type,
+      title: title,
+      message: message,
+      actionType: actionType,
+      productImageUrl: productImageUrl,
+      productId: productId,
+    }
+
+    user.noti.unshift(notification)
+
+    await user.save()
+
+    res.status(201).json(notification)
+  } catch (error) {
+    console.error('Error creating notification:', error)
+    res.status(500).json({ message: 'Failed to create notification' })
+  }
+}
+
+export const getNotifications = async (req, res) => {
+  const userId = req.userId
+  const { page = 1, limit = 10 } = req.query
+
+  try {
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const pageNumber = Math.max(Number(page), 1)
+    const pageSize = Math.max(Number(limit), 1)
+
+    const notifications = user.noti.slice(
+      (pageNumber - 1) * pageSize,
+      pageNumber * pageSize
+    )
+
+    const total = user.noti.length
+    const totalPages = Math.ceil(total / pageSize)
+
+    res.json({
+      page: pageNumber,
+      limit: pageSize,
+      total,
+      totalPages,
+      notifications,
+    })
+  } catch (error) {
+    console.error('Error getting notifications:', error)
+    res.status(500).json({ message: 'Failed to get notifications' })
+  }
+}
+
+export const getNotificationById = async (req, res) => {
+  const userId = req.userId
+  const { id } = req.params
+
+  try {
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const notificationIndex = user.noti.findIndex(
+      (n) => n._id.toString() === id
+    )
+
+    if (notificationIndex === -1) {
+      return res.status(404).json({ message: 'Notification not found' })
+    }
+
+    user.noti[notificationIndex].isRead = true
+
+    await user.save()
+
+    res.json(user.noti[notificationIndex])
+  } catch (error) {
+    console.error('Error getting notification:', error)
+    res.status(500).json({ message: 'Failed to get notification' })
+  }
+}
+
+export const deleteNotificationById = async (req, res) => {
+  const userId = req.userId
+  const { id } = req.params
+
+  try {
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const result = await UserModel.updateOne(
+      { _id: userId },
+      { $pull: { noti: { _id: id } } }
+    )
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: 'Notification not found' })
+    }
+
+    res.json({ message: 'Notification deleted successfully' })
+  } catch (error) {
+    console.error('Error deleting notification:', error)
+    res.status(500).json({ message: 'Failed to delete notification' })
+  }
+}
+
+export const deleteAllNotifications = async (req, res) => {
+  const userId = req.userId
+
+  try {
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const result = await UserModel.updateOne(
+      { _id: userId },
+      { $set: { noti: [] } }
+    )
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: 'No notifications to delete' })
+    }
+
+    res.json({ message: 'All notifications deleted successfully' })
+  } catch (error) {
+    console.error('Error deleting all notifications:', error)
+    res.status(500).json({ message: 'Failed to delete all notifications' })
+  }
+}
+
+export const markNotificationAsRead = async (req, res) => {
+  const userId = req.userId
+  const { id } = req.params
+
+  try {
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    // Проверяем, что уведомление существует для пользователя
+    const notification = user.noti.find((n) => n._id.toString() === id)
+
+    if (!notification) {
+      return res.status(404).json({ message: 'Notification not found' })
+    }
+
+    // Обновляем поле isRead на true
+    notification.isRead = true
+    await user.save()
+
+    res.json({ message: 'Notification marked as read' })
+  } catch (error) {
+    console.error('Error marking notification as read:', error)
+    res.status(500).json({ message: 'Failed to mark notification as read' })
   }
 }

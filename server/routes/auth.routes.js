@@ -13,6 +13,7 @@ router.post(
   handleValidErr,
   UserController.register
 )
+
 router.get('/profile', checkAuth, UserController.getProfile)
 router.get('/user/:id', checkAuth, UserController.getUserProfile)
 router.get('/profile/products', checkAuth, UserController.getUserProducts)

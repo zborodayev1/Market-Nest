@@ -10,9 +10,10 @@ import { BiSolidMessageSquare } from 'react-icons/bi'
 import { CiCalendarDate } from 'react-icons/ci'
 import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
+import { Product } from '../../redux/slices/products'
 
 export const FullProduct = () => {
-  const [data, setData] = useState<any>(null)
+  const [data, setData] = useState<Product>()
   const [err, setErr] = useState(false)
   const { id } = useParams()
   const [hovered, setHovered] = useState(false)
@@ -20,6 +21,7 @@ export const FullProduct = () => {
   const [isBag, setIsBag] = useState<boolean>(false)
 
   const toggleFavorite = () => {
+    if (!data) return
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
 
     if (isFavorite) {
@@ -49,6 +51,7 @@ export const FullProduct = () => {
   }, [id])
 
   const toggleBag = () => {
+    if (!data) return
     const bag = JSON.parse(localStorage.getItem('bag') || '[]')
 
     if (isBag) {
@@ -120,7 +123,7 @@ export const FullProduct = () => {
           <div className=" ml-2">
             <div className="flex items-center gap-1">
               <h1 className="mr-2">{data.name}</h1>
-              <div className="mt-1 flex gap-1">
+              <div className="mt-1 flex gap-1 absolute ml-[70px]">
                 {data.tags &&
                   data.tags.map((tag: string, index: number) => (
                     <div key={index} className="">
@@ -146,16 +149,22 @@ export const FullProduct = () => {
           <div
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
-            className="relative group"
+            className="group flex"
           >
             <img
-              src={data.image}
+              src={
+                data.image
+                  ? typeof data.image === 'string'
+                    ? data.image
+                    : URL.createObjectURL(data.image)
+                  : ''
+              }
               className="max-w-[500px] bg-[#f5f5f5] rounded-md border"
             />
 
             <button
               onClick={toggleFavorite}
-              className={`absolute top-5 right-5 text-2xl text-[#fd3939] transition-opacity duration-300 ease-in-out ${
+              className={`flex  text-2xl text-[#fd3939] transition-opacity duration-300 ease-in-out ${
                 hovered || isFavorite ? 'opacity-100' : 'opacity-0'
               }`}
             >
@@ -207,7 +216,6 @@ export const FullProduct = () => {
           </div>
         </div>
       </div>
-      <div className="mt-5">commentsmfkmr</div>
     </motion.div>
   )
 }

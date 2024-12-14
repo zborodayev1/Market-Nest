@@ -11,15 +11,16 @@ import {
   PackagePlus,
   PackageSearch,
   PackageMinus,
+  Bell,
 } from 'lucide-react'
 import { IoBagOutline } from 'react-icons/io5'
 import { getProductsBySearch, fetchProducts } from '../../redux/slices/products'
+import { AppDispatch } from '../../redux/store'
 
 export const Header = () => {
   const isAuth = useSelector(selectIsAuth)
   const [open, setOpen] = useState(false)
-
-  const dropdownRef = useRef(null)
+  const dropdownRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -67,7 +68,7 @@ export const Header = () => {
     },
   }
 
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
   const [search, setSearch] = useState(false)
   const [animation, setAnimation] = useState('')
 
@@ -121,7 +122,7 @@ export const Header = () => {
                       onClick={() => setSearch(false)}
                     >
                       Close
-                      <PackageMinus className="ml-1 w-9 h-9 text-[#212121] transition-colors duration-200" />
+                      <PackageMinus className="ml-1 w-9 h-9 text-[#212121] " />
                     </button>
                   </div>
                 </motion.div>
@@ -140,12 +141,21 @@ export const Header = () => {
                 >
                   <div className="hover:bg-[#e4e4e4] transition-colors duration-300 rounded-full ease-in-out flex items-center p-2 px-3">
                     <h1 className="font-bold mr-2">Search</h1>
-                    <PackageSearch className="w-9 h-9 text-[#212121] transition-colors duration-200" />
+                    <PackageSearch className="w-9 h-9 text-[#212121] " />
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
+
+          <Link
+            className={`${search ? 'ml-[340px]' : 'ml-[200px]'} z-10 mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-500 ease-in-out group`}
+            to="/notifications"
+          >
+            <h1 className="text-md font-bold text-[#212121] ">Notifications</h1>
+            <Bell className="w-8 h-8 stroke-2 text-[#212121] " />
+          </Link>
+
           <div className="absolute inset-x-0 flex justify-center items-center">
             <Link to="/">
               <div className="flex justify-center  group">
@@ -178,28 +188,26 @@ export const Header = () => {
                     className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                     to="/create-product"
                   >
-                    <h1 className="text-md font-bold text-[#212121]  transition-colors duration-200 ">
+                    <h1 className="text-md font-bold text-[#212121]   ">
                       Create
                     </h1>
-                    <PackagePlus className="w-9 h-9 text-[#212121] transition-colors duration-200" />
+                    <PackagePlus className="w-9 h-9 text-[#212121] " />
                   </Link>
                   <Link
                     className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                     to="/bag"
                   >
-                    <h1 className="text-md font-bold text-[#212121]  transition-colors duration-200 ">
-                      Bag
-                    </h1>
-                    <IoBagOutline className="w-9 h-9 text-[#212121] transition-colors duration-200" />
+                    <h1 className="text-md font-bold text-[#212121]   ">Bag</h1>
+                    <IoBagOutline className="w-9 h-9 text-[#212121] " />
                   </Link>
                   <Link
                     className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                     to="/favorites"
                   >
-                    <h1 className="text-md font-bold text-[#212121]  transition-colors duration-200 ">
+                    <h1 className="text-md font-bold text-[#212121]   ">
                       Favorite
                     </h1>
-                    <Heart className="w-7 h-9 text-[#212121] transition-colors duration-200" />
+                    <Heart className="w-7 h-9 text-[#212121] " />
                   </Link>
                   <div className="">
                     <ProdileHeader onSuccess={() => setOpen(!open)} />
@@ -212,19 +220,17 @@ export const Header = () => {
                   className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                   to="/bag"
                 >
-                  <h1 className="text-md font-bold text-[#212121]  transition-colors duration-200 ">
-                    Bag
-                  </h1>
-                  <IoBagOutline className="w-9 h-9 text-[#212121] transition-colors duration-200" />
+                  <h1 className="text-md font-bold text-[#212121]   ">Bag</h1>
+                  <IoBagOutline className="w-9 h-9 text-[#212121] " />
                 </Link>
                 <Link
                   className="mx-2 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                   to="/favorites"
                 >
-                  <h1 className="text-md font-bold text-[#212121]  transition-colors duration-200 ">
+                  <h1 className="text-md font-bold text-[#212121]   ">
                     Favorite
                   </h1>
-                  <Heart className="w-7 h-9 text-[#212121] transition-colors duration-200" />
+                  <Heart className="w-7 h-9 text-[#212121] " />
                 </Link>
                 <Link
                   to="/signIn"
