@@ -8,6 +8,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { Mail, Eye, EyeOff, RectangleEllipsis } from 'lucide-react'
 import { useState } from 'react'
+import { AppDispatch } from '../../../../redux/store'
 
 interface Formdata {
   email?: string
@@ -23,7 +24,7 @@ export const Email = (props: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState({ email: '' })
   const { onSuccess } = props
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
   const { reset, register, handleSubmit } = useForm<Formdata>({
     mode: 'onSubmit',
   })
@@ -46,7 +47,12 @@ export const Email = (props: Props) => {
         return
       }
 
-      dispatch(updateProfileEmail(values))
+      dispatch(
+        updateProfileEmail({
+          email: values.email ?? '',
+          password: values.password ?? '',
+        })
+      )
 
       if (status === 'succeeded') {
         reset({ ...userData, ...values })

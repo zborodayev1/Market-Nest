@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import axios from '../../../axios'
 import { RootState } from '../store'
+import { AxiosError } from 'axios'
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
@@ -20,8 +21,14 @@ export const createProduct = createAsyncThunk(
         },
       })
       return data
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Failed to create product')
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data || 'Failed to create product'
+        )
+      } else {
+        return rejectWithValue('An unknown error occurred')
+      }
     }
   }
 )
@@ -50,8 +57,37 @@ export const deleteProduct = createAsyncThunk(
     try {
       await axios.delete(`/products/${productId}`)
       return { productId }
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Failed to delete product')
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data || 'Failed to delete product'
+        )
+      } else {
+        return rejectWithValue('An unknown error occurred')
+      }
+    }
+  }
+)
+
+export const updateProductStatus = createAsyncThunk(
+  'products/updateProductStatus',
+  async (
+    { productId, status }: { productId: string; status: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data } = await axios.patch(`/products/${productId}/status`, {
+        status,
+      })
+      return data
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data || 'Failed to update product status'
+        )
+      } else {
+        return rejectWithValue('An unknown error occurred')
+      }
     }
   }
 )
@@ -67,7 +103,7 @@ export interface CartItem {
 
 export interface Product {
   saveAmount: number
-  discount: any
+  discount: number | null
   save: number
   oldPrice: number
   _id: string
@@ -77,10 +113,11 @@ export interface Product {
   description?: string
   viewsCount: number
   createdAt: string
-  image: any
+  image: null | File
   user: User
   commentsCount: number
   favorite: boolean
+  status: string
 }
 
 interface ProductsState {
@@ -181,6 +218,24 @@ const productSlice = createSlice({
       .addCase(createProduct.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message ?? 'Failed to create product'
+      })
+      .addCase(updateProductStatus.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(updateProductStatus.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        const updatedProduct = action.payload
+        const productIndex = state.products.findIndex(
+          (product) => product._id === updatedProduct._id
+        )
+        if (productIndex !== -1) {
+          state.products[productIndex] = updatedProduct
+        }
+      })
+      .addCase(updateProductStatus.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message ?? 'Failed to update product status'
       })
   },
 })

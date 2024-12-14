@@ -7,12 +7,13 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ProductForm } from './ProductForm'
+import { AppDispatch } from '../../redux/store'
 
 export const BagPage = () => {
   const { products, status } = useSelector(selectProducts)
   const [bag, setBag] = useState<string[]>([])
   const [bagProducts, setBagProducts] = useState<Product[]>([])
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
 
   useEffect(() => {
     const storedBag = JSON.parse(localStorage.getItem('bag') || '[]')

@@ -21,6 +21,7 @@ interface UserProfile {
   country?: string
   email?: string
   password?: string
+  role?: string
 }
 
 interface UserData {

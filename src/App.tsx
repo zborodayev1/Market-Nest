@@ -5,17 +5,21 @@ import { NotFound } from './components/assets/errors/NotFound'
 import { RegisterPage } from './components/pages/Register/RegisterPage'
 import { LogInPage } from './components/pages/LogIn/LogInPage'
 import { useSelector } from 'react-redux'
-import { selectIsAuth } from './components/redux/slices/auth'
+import { selectIsAuth, selectUserProfile } from './components/redux/slices/auth'
 import { useEffect, useRef, useState } from 'react'
 import { FullProduct } from './components/pages/FullProduct/FullProduct'
 import { FavoritesPage } from './components/assets/Product/FavoritesPage'
 import { BagPage } from './components/assets/Product/BagPage'
 import { CreatePage } from './components/pages/CreateProduct/CreatePage'
+import { PendingProducts } from './components/pages/ForAdmins/PendingProducts'
+import { Notifications } from './components/pages/Notification/Notifications'
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const userData = useSelector(selectUserProfile)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -58,6 +62,17 @@ export const App = () => {
                 <Route element={<FullProduct />} path="/product/:id" />
                 <Route element={<BagPage />} path="/bag" />
                 <Route element={<FavoritesPage />} path="/favorites" />
+                <Route
+                  element={
+                    userData?.role === 'admin' ? (
+                      <PendingProducts />
+                    ) : (
+                      <NotFound />
+                    )
+                  }
+                  path="/products-pending"
+                />
+                <Route element={<Notifications />} path="/notifications" />
               </Routes>
             </div>
           </button>
@@ -85,6 +100,17 @@ export const App = () => {
                 <Route element={<FullProduct />} path="/product/:id" />
                 <Route element={<BagPage />} path="/bag" />
                 <Route element={<FavoritesPage />} path="/favorites" />
+                <Route
+                  element={
+                    userData?.role === 'admin' ? (
+                      <PendingProducts />
+                    ) : (
+                      <NotFound />
+                    )
+                  }
+                  path="/products-pending"
+                />
+                <Route element={<Notifications />} path="/notifications" />
               </Routes>
             </div>
           </div>

@@ -8,6 +8,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 
 import { motion } from 'motion/react'
 import { Eye, EyeOff, Mail, RectangleEllipsis } from 'lucide-react'
+import { AppDispatch } from '../../redux/store'
 
 export const LogInPage: React.FC = (): JSX.Element => {
   const text = useSpring({
@@ -40,7 +41,7 @@ export const LogInPage: React.FC = (): JSX.Element => {
   const [err, setErr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const isAuth = useSelector(selectIsAuth)
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
   const {
     register,
     handleSubmit,

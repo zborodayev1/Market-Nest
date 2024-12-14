@@ -8,12 +8,11 @@ import {
 } from '../../redux/slices/products'
 import { ProductForm } from '../../assets/Product/ProductForm'
 import { motion } from 'motion/react'
-import { selectUserProfile } from '../../redux/slices/auth'
+import { AppDispatch } from '../../redux/store'
 
 export const HomePage = () => {
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
   const { products, status } = useSelector(selectProducts)
-  const userData = useSelector(selectUserProfile)
   const [state, setState] = useState({
     new: true,
     popular: false,
@@ -58,22 +57,31 @@ export const HomePage = () => {
   const getFilteredProducts = () => {
     if (!products || products.length === 0) return []
 
-    return [...products].sort((a, b) => {
-      if (state.new === true) {
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      } else if (state.popular === true) {
-        return b.viewsCount - a.viewsCount
-      }
-      return 0
-    })
+    return [...products]
+      .filter((product) => product.status !== 'pending')
+      .sort((a, b) => {
+        if (state.new === true) {
+          return (
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          )
+        } else if (state.popular === true) {
+          return b.viewsCount - a.viewsCount
+        }
+        return 0
+      })
   }
 
   const filteredProducts =
     selectedTags.length === 0
       ? getFilteredProducts()
-      : products.filter((product: any) =>
-          selectedTags.every((tag) => product.tags.includes(tag))
-        )
+      : products
+          .filter((product: unknown) =>
+            (product as { tags: string[] }).tags.some((tag) =>
+              selectedTags.includes(tag)
+            )
+          )
+          .filter((product: Product) => product.status !== 'pending')
+          .filter((product: Product) => product.status !== 'rejected')
 
   return (
     <motion.div
@@ -159,7 +167,7 @@ export const HomePage = () => {
             Something went wrong
           </span>
         )}
-        {status === 'succeeded' && products.length === 0 && (
+        {status === 'succeeded' && filteredProducts.length === 0 && (
           <span className="flex justify-center text-2xl font-bold text-black duration-300 ">
             No products available
           </span>

@@ -8,7 +8,6 @@ dotenv.config()
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret'
 const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 15
-const { ADMIN_PASSWORD } = process.env
 
 export const register = async (req, res) => {
   try {
@@ -16,15 +15,12 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(SALT_ROUNDS)
     const hash = await bcrypt.hash(password, salt)
 
-    const role = req.body.password === ADMIN_PASSWORD ? 'admin' : 'user'
-
     const doc = new UserModel({
       _id: new mongoose.Types.ObjectId(),
       fullName: req.body.fullName,
       email: req.body.email,
       avatarUrl: req.body.avatarUrl,
       passwordHash: hash,
-      role: role,
     })
 
     const user = await doc.save()

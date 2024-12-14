@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProfileData, selectUserProfile } from '../../../redux/slices/auth'
 import { Avatar } from '@mui/material'
 import { CgProfile } from 'react-icons/cg'
 import { motion } from 'motion/react'
+import { AppDispatch } from '../../../redux/store'
 
 interface Props {
   onSuccess: () => void
@@ -11,7 +12,7 @@ interface Props {
 
 export const ProdileHeader = (props: Props) => {
   const { onSuccess } = props
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
   const userData = useSelector(selectUserProfile)
 
   useEffect(() => {

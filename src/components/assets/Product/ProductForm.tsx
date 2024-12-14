@@ -7,15 +7,19 @@ import { IconButton } from '@mui/material'
 import { Eye, X, Pencil } from 'lucide-react'
 import { BiSolidMessageSquare } from 'react-icons/bi'
 import { IoBag } from 'react-icons/io5'
-import { motion } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
 import { jwtDecode } from 'jwt-decode'
 import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../../redux/store'
 
 interface ProductFormProps {
   product: Product
   onRemoveFavorite?: (id: string) => void
   onRemoveBag?: (id: string) => void
   Edit?: boolean
+  Pending?: boolean
+  Rejected?: boolean
+  onSubmit?: () => void
 }
 
 interface DecodedToken {
@@ -26,10 +30,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   product,
   onRemoveFavorite,
   onRemoveBag,
+  Pending,
+  Rejected,
   Edit,
+  onSubmit,
 }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false)
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
 
   const [isBag, setIsBag] = useState<boolean>(false)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -93,43 +100,59 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     setIsBag(bag.includes(product._id))
   }, [product._id])
 
+  const [hovered, setHovered] = useState(false)
+
   return (
-    <div className="p-[2px] text-base shadow-xl border border-gray-950 rounded-lg hover:-translate-y-1 duration-300 bg-transparent">
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="p-[2px] text-base shadow-xl border border-gray-950 rounded-lg hover:-translate-y-1 duration-300 bg-transparent"
+    >
       <div className="shadow-sm p-2 rounded-md min-w-[260px] max-w-[264px] min-h-[100px] max-h-[450px] bg-[#f5f5f5] bg-clip-padding">
         <div className="ml-1 min-h-[200px]">
-          <div className=" absolute  transition-all  duration-300 ease-in-out">
-            <IconButton
-              onClick={toggleFavorite}
-              className="absolute top-0 left-[200px] ease-in-out duration-300"
-              color="error"
-            >
-              {isFavorite ? (
-                <FavoriteOutlinedIcon />
-              ) : (
-                <FavoriteBorderOutlinedIcon />
-              )}
-            </IconButton>
+          <AnimatePresence>
+            {hovered && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute  transition-all  duration-300 ease-in-out"
+              >
+                <IconButton
+                  onClick={toggleFavorite}
+                  className="absolute top-0 left-[200px] ease-in-out duration-300"
+                  color="error"
+                >
+                  {isFavorite ? (
+                    <FavoriteOutlinedIcon />
+                  ) : (
+                    <FavoriteBorderOutlinedIcon />
+                  )}
+                </IconButton>
 
-            <IconButton
-              className="absolute top-0 left-[120px] ease-in-out duration-300"
-              color="error"
-              onClick={() => handleDelete(product._id)}
-            >
-              {isAdmin && <X />}
-            </IconButton>
-            {Edit ||
-              (isAdmin && (
-                <Link to={`/edit/${product._id}`}>
+                {isAdmin && (
                   <IconButton
-                    className="absolute top-0 left-[-80px] ease-in-out duration-300"
-                    color="primary"
+                    className="absolute top-0 left-[120px] ease-in-out duration-300"
+                    color="error"
                     onClick={() => handleDelete(product._id)}
                   >
-                    <Pencil />
+                    <X />
                   </IconButton>
-                </Link>
-              ))}
-          </div>
+                )}
+                {Edit ||
+                  (isAdmin && (
+                    <Link to={`/edit/${product._id}`}>
+                      <IconButton
+                        className="absolute top-0 left-[-80px] ease-in-out duration-300"
+                        color="primary"
+                      >
+                        <Pencil />
+                      </IconButton>
+                    </Link>
+                  ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="flex justify-center items-center">
             <Link
@@ -155,7 +178,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 <h1 className={` ${product.saveAmount && 'text-[#ff3535]'}`}>
                   {product.price}$
                 </h1>
-                {product.discount != 0 && product.save != 0 && (
+                {product.discount != 0 && product.saveAmount != 0 && (
                   <div className="text-xs flex gap-1 items-center">
                     <h1 className="bg-[#3C8737] flex text-white rounded-md p-1">
                       save {product.saveAmount}
@@ -199,42 +222,59 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </div>
             </div>
           </Link>
-          <div className="mt-1 justify-center flex">
-            <motion.button
-              onClick={toggleBag}
-              className="w-[240px] flex gap-1 bg-[#3C8737] rounded-md py-1 text-white text-base hover:bg-[#2b6128] transition-colors duration-150 ease-in-out justify-center"
-              style={{ overflow: 'hidden' }}
-            >
-              <motion.span
-                key={isBag ? 'add' : 'remove'}
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 30 }}
-                transition={{
-                  type: 'spring',
-                  stiffness: 400,
-                  damping: 30,
-                  delay: 0.2,
-                }}
+          {!Rejected && !Pending ? (
+            <div className="mt-1 justify-center flex">
+              <motion.button
+                onClick={toggleBag}
+                className="w-[240px] flex gap-1 bg-[#3C8737] rounded-md py-1 text-white text-base hover:bg-[#2b6128] transition-colors duration-150 ease-in-out justify-center"
+                style={{ overflow: 'hidden' }}
               >
-                {isBag ? 'Remove from bag' : 'Add to bag'}
-              </motion.span>
+                <motion.span
+                  key={isBag ? 'add' : 'remove'}
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 30 }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 400,
+                    damping: 30,
+                    delay: 0.2,
+                  }}
+                >
+                  {isBag ? 'Remove from bag' : 'Add to bag'}
+                </motion.span>
 
-              <motion.div
-                className="absolute"
-                initial={{ x: 55 }}
-                animate={{ x: isBag ? 80 : 55 }}
-                transition={{
-                  type: 'spring',
-                  stiffness: 400,
-                  damping: 30,
-                  delay: 0,
-                }}
+                <motion.div
+                  className="absolute"
+                  initial={{ x: 55 }}
+                  animate={{ x: isBag ? 80 : 55 }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 400,
+                    damping: 30,
+                    delay: 0,
+                  }}
+                >
+                  <IoBag style={{ marginTop: '5px' }} />
+                </motion.div>
+              </motion.button>
+            </div>
+          ) : (
+            <div className="flex justify-between mt-2">
+              <button
+                className="bg-[#3C8737] text-white w-[120px] rounded-lg py-1 px-4 hover:-translate-y-1 transition-transform ease-in-out duration-300"
+                onClick={onSubmit}
               >
-                <IoBag style={{ marginTop: '5px' }} />
-              </motion.div>
-            </motion.button>
-          </div>
+                Aprove
+              </button>
+              <button
+                className="  bg-[#932525] text-white w-[120px] rounded-lg py-1 px-4 hover:-translate-y-1 transition-transform ease-in-out duration-300"
+                onClick={() => handleDelete(product._id)}
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
