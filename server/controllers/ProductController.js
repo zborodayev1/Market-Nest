@@ -25,18 +25,23 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage })
 
+// Middleware для обработки одного изображения
 export const handleUploadProductImage = upload.single('image')
 
 export const createProduct = async (req, res) => {
   try {
     const { name, tags, price, description } = req.body
 
+    // Проверка на наличие файла
     if (!req.file) {
       return res.status(400).json({
         success: false,
         message: 'No file uploaded',
       })
     }
+
+    // Преобразуем теги в массив, если они пришли как строка
+    const parsedTags = Array.isArray(tags) ? tags : JSON.parse(tags)
 
     const filePath = `/uploads/${req.file.filename}`
     const fullPath = path.resolve(
@@ -47,15 +52,18 @@ export const createProduct = async (req, res) => {
       'uploads',
       req.file.filename
     )
+
     console.log('Full file path:', fullPath)
 
     try {
+      // Проверка существования файла
       await fs.access(fullPath)
 
+      // Создание продукта в базе данных
       const product = await ProductModel.create({
         _id: new mongoose.Types.ObjectId(),
         name,
-        tags,
+        tags: parsedTags, // Сохраняем теги как массив
         price,
         description,
         image: filePath,
@@ -290,7 +298,7 @@ export const updateProductStatus = async (req, res) => {
   const { status } = req.body
   const productId = req.params.id
 
-  if (!['verified', 'rejected'].includes(status)) {
+  if (!['approved', 'rejected'].includes(status)) {
     return res.status(400).json({
       success: false,
       message: 'Invalid status value',
@@ -325,7 +333,7 @@ export const updateProductStatus = async (req, res) => {
 }
 
 export const createNotification = async (req, res) => {
-  const { message, actionType, productImageUrl, title, productId } = req.body
+  const { actionType, title, productId } = req.body
   const userId = req.userId
   let type = 'info'
 
@@ -337,7 +345,7 @@ export const createNotification = async (req, res) => {
       type = 'success'
       break
     case 'rejected':
-      type = 'warning'
+      type = 'error'
       break
     default:
       type = 'info'
@@ -353,10 +361,8 @@ export const createNotification = async (req, res) => {
 
     const notification = {
       type: type,
-      title: title,
-      message: message,
+      title: title || 'Untitled Notification',
       actionType: actionType,
-      productImageUrl: productImageUrl,
       productId: productId,
     }
 
@@ -373,119 +379,58 @@ export const createNotification = async (req, res) => {
 
 export const getNotifications = async (req, res) => {
   const userId = req.userId
-  const { page = 1, limit = 10 } = req.query
+  const { page = 1, limit = 4, filter = 'unread' } = req.query
 
   try {
-    const user = await UserModel.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' })
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ message: 'Invalid user ID' })
     }
 
     const pageNumber = Math.max(Number(page), 1)
-    const pageSize = Math.max(Number(limit), 1)
+    const pageSize = Math.max(Number(limit), 4)
 
-    const notifications = user.noti.slice(
-      (pageNumber - 1) * pageSize,
-      pageNumber * pageSize
-    )
+    const matchFilter =
+      filter === 'read'
+        ? { 'noti.isRead': true }
+        : filter === 'unread'
+          ? { 'noti.isRead': false }
+          : {}
 
-    const total = user.noti.length
-    const totalPages = Math.ceil(total / pageSize)
+    const notifications = await UserModel.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+      { $unwind: '$noti' },
+      { $match: matchFilter },
+      { $sort: { 'noti.createdAt': -1 } },
+      { $skip: (pageNumber - 1) * pageSize },
+      { $limit: pageSize },
+      {
+        $project: {
+          _id: 0,
+          noti: 1,
+        },
+      },
+    ])
+
+    const total = await UserModel.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+      { $unwind: '$noti' },
+      { $match: matchFilter },
+      { $count: 'total' },
+    ])
+
+    const totalCount = total.length > 0 ? total[0].total : 0
+    const totalPages = Math.ceil(totalCount / pageSize)
 
     res.json({
       page: pageNumber,
       limit: pageSize,
-      total,
+      total: totalCount,
       totalPages,
-      notifications,
+      notifications: notifications.map((n) => n.noti),
     })
   } catch (error) {
     console.error('Error getting notifications:', error)
     res.status(500).json({ message: 'Failed to get notifications' })
-  }
-}
-
-export const getNotificationById = async (req, res) => {
-  const userId = req.userId
-  const { id } = req.params
-
-  try {
-    const user = await UserModel.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' })
-    }
-
-    const notificationIndex = user.noti.findIndex(
-      (n) => n._id.toString() === id
-    )
-
-    if (notificationIndex === -1) {
-      return res.status(404).json({ message: 'Notification not found' })
-    }
-
-    user.noti[notificationIndex].isRead = true
-
-    await user.save()
-
-    res.json(user.noti[notificationIndex])
-  } catch (error) {
-    console.error('Error getting notification:', error)
-    res.status(500).json({ message: 'Failed to get notification' })
-  }
-}
-
-export const deleteNotificationById = async (req, res) => {
-  const userId = req.userId
-  const { id } = req.params
-
-  try {
-    const user = await UserModel.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' })
-    }
-
-    const result = await UserModel.updateOne(
-      { _id: userId },
-      { $pull: { noti: { _id: id } } }
-    )
-
-    if (result.modifiedCount === 0) {
-      return res.status(404).json({ message: 'Notification not found' })
-    }
-
-    res.json({ message: 'Notification deleted successfully' })
-  } catch (error) {
-    console.error('Error deleting notification:', error)
-    res.status(500).json({ message: 'Failed to delete notification' })
-  }
-}
-
-export const deleteAllNotifications = async (req, res) => {
-  const userId = req.userId
-
-  try {
-    const user = await UserModel.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' })
-    }
-
-    const result = await UserModel.updateOne(
-      { _id: userId },
-      { $set: { noti: [] } }
-    )
-
-    if (result.modifiedCount === 0) {
-      return res.status(404).json({ message: 'No notifications to delete' })
-    }
-
-    res.json({ message: 'All notifications deleted successfully' })
-  } catch (error) {
-    console.error('Error deleting all notifications:', error)
-    res.status(500).json({ message: 'Failed to delete all notifications' })
   }
 }
 
@@ -500,14 +445,12 @@ export const markNotificationAsRead = async (req, res) => {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    // Проверяем, что уведомление существует для пользователя
     const notification = user.noti.find((n) => n._id.toString() === id)
 
     if (!notification) {
       return res.status(404).json({ message: 'Notification not found' })
     }
 
-    // Обновляем поле isRead на true
     notification.isRead = true
     await user.save()
 

@@ -16,10 +16,12 @@ import {
 import { IoBagOutline } from 'react-icons/io5'
 import { getProductsBySearch, fetchProducts } from '../../redux/slices/products'
 import { AppDispatch } from '../../redux/store'
+import { Notifications } from '../../pages/Notification/Notifications'
 
 export const Header = () => {
   const isAuth = useSelector(selectIsAuth)
   const [open, setOpen] = useState(false)
+  const [notiOpen, setNotiOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -148,13 +150,30 @@ export const Header = () => {
             </AnimatePresence>
           </div>
 
-          <Link
+          <button
             className={`${search ? 'ml-[340px]' : 'ml-[200px]'} z-10 mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-500 ease-in-out group`}
-            to="/notifications"
+            onClick={() => setNotiOpen(!notiOpen)}
           >
             <h1 className="text-md font-bold text-[#212121] ">Notifications</h1>
             <Bell className="w-8 h-8 stroke-2 text-[#212121] " />
-          </Link>
+          </button>
+          <div className="absolute top-[70px] left-[165px] ">
+            <AnimatePresence mode="wait">
+              {notiOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -40 }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  exit={{ opacity: 0, y: 40 }}
+                  className="flex justify-center  bg-[#fafafa] mt-3 border-slate-500  border-2 rounded-xl z-20 w-[250px] px-[50px] min-h-[340px] max-h-[1440px] "
+                >
+                  <Notifications onSuccess={() => setNotiOpen(false)} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           <div className="absolute inset-x-0 flex justify-center items-center">
             <Link to="/">

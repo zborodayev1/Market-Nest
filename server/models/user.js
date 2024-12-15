@@ -43,23 +43,10 @@ const UserSchema = new mongoose.Schema(
 
     noti: [
       {
-        type: {
-          type: String,
-          enum: ['info', 'warning', 'error', 'success'],
-          required: true,
-          default: 'info',
-        },
-        message: {
-          type: String,
-          required: true,
-        },
+        title: { type: String },
         isRead: {
           type: Boolean,
           default: false,
-        },
-        productImageUrl: {
-          type: String,
-          default: 'http://defaulturl.com/defaultimage.png',
         },
         productId: {
           type: mongoose.Schema.Types.ObjectId,
@@ -67,7 +54,7 @@ const UserSchema = new mongoose.Schema(
         },
         actionType: {
           type: String,
-          enum: ['created', 'approved', 'rejected'],
+          enum: ['created', 'approved', 'rejected', 'info'],
           required: true,
         },
         createdAt: {
@@ -83,7 +70,7 @@ const UserSchema = new mongoose.Schema(
   },
 
   {
-    timestamps: true, // Автоматически добавляет createdAt и updatedAt
+    timestamps: true,
   }
 )
 

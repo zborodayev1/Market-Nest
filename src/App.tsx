@@ -12,7 +12,7 @@ import { FavoritesPage } from './components/assets/Product/FavoritesPage'
 import { BagPage } from './components/assets/Product/BagPage'
 import { CreatePage } from './components/pages/CreateProduct/CreatePage'
 import { PendingProducts } from './components/pages/ForAdmins/PendingProducts'
-import { Notifications } from './components/pages/Notification/Notifications'
+import { NotiProduct } from './components/pages/Notification/NotiProduct'
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)
@@ -60,6 +60,7 @@ export const App = () => {
                   path="/create-product"
                 />
                 <Route element={<FullProduct />} path="/product/:id" />
+                <Route element={<NotiProduct />} path="/noti/product/:id" />
                 <Route element={<BagPage />} path="/bag" />
                 <Route element={<FavoritesPage />} path="/favorites" />
                 <Route
@@ -72,7 +73,6 @@ export const App = () => {
                   }
                   path="/products-pending"
                 />
-                <Route element={<Notifications />} path="/notifications" />
               </Routes>
             </div>
           </button>
@@ -98,6 +98,7 @@ export const App = () => {
                   path="/create-product"
                 />
                 <Route element={<FullProduct />} path="/product/:id" />
+                <Route element={<NotiProduct />} path="/noti/product/:id" />
                 <Route element={<BagPage />} path="/bag" />
                 <Route element={<FavoritesPage />} path="/favorites" />
                 <Route
@@ -110,7 +111,6 @@ export const App = () => {
                   }
                   path="/products-pending"
                 />
-                <Route element={<Notifications />} path="/notifications" />
               </Routes>
             </div>
           </div>

@@ -15,7 +15,7 @@ router.post(
 )
 router.post('/noti', checkAuth, ProductController.createNotification)
 router.get('/noti', checkAuth, ProductController.getNotifications)
-router.get('/noti/:id', checkAuth, ProductController.getNotificationById)
+
 router.get('/:id', ProductController.getOneProduct)
 router.get('/', ProductController.getAllProducts)
 router.post('/products-by-tags', ProductController.getProductsByTags)
@@ -35,8 +35,6 @@ router.patch(
 )
 router.patch('/noti/:id', checkAuth, ProductController.markNotificationAsRead)
 
-router.delete('/noti/:id', checkAuth, ProductController.deleteNotificationById)
-router.delete('/noti', checkAuth, ProductController.deleteAllNotifications)
 router.delete('/:id', checkAuth, ProductController.deleteProduct)
 
 export default router

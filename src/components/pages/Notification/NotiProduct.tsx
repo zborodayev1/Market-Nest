@@ -12,7 +12,7 @@ import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
 import { Product } from '../../redux/slices/products'
 
-export const FullProduct = () => {
+export const NotiProduct = () => {
   const [data, setData] = useState<Product>()
   const [err, setErr] = useState(false)
   const { id } = useParams()
@@ -175,8 +175,18 @@ export const FullProduct = () => {
                 )}
               </IconButton>
             </button>
+            <div className="absolute right-[600px] top-[225px]">
+              {data.status === 'approved' ? (
+                <h1 className="text-[#3C8737] font-bold">Approved</h1>
+              ) : data.status === 'rejected' ? (
+                <h1 className="text-red-600 font-bold">Rejected</h1>
+              ) : (
+                <h1 className="text-blue-600 font-bold">Pending</h1>
+              )}
+            </div>
           </div>
         </div>
+
         <div className="flex ml-10 items-end">
           <div className="">
             <button

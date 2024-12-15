@@ -9,16 +9,17 @@ import { AppDispatch } from '../../redux/store'
 import { useEffect } from 'react'
 import { ProductForm } from '../../assets/Product/ProductForm'
 import { motion } from 'motion/react'
-import { useNavigate } from 'react-router-dom'
+
+import { createNotification } from '../../redux/slices/notifications'
 
 export const PendingProducts = () => {
   const dispatch: AppDispatch = useDispatch()
   const { products } = useSelector(selectProducts)
-  const navigate = useNavigate()
 
   useEffect(() => {
     dispatch(fetchProducts())
   }, [dispatch])
+
   const filteredProducts = products.filter(
     (product: Product) => product.status === 'pending'
   )
@@ -28,7 +29,16 @@ export const PendingProducts = () => {
       await dispatch(
         updateProductStatus({ productId, status: newStatus })
       ).unwrap()
-      navigate('/')
+
+      await dispatch(
+        createNotification({
+          title:
+            newStatus === 'approved' ? 'Product Approved' : 'Product Rejected',
+          actionType: newStatus === 'approved' ? 'approved' : 'rejected',
+          message: 'Product Status Change',
+          productId,
+        })
+      ).unwrap()
     } catch (error) {
       console.log(
         'Updating product with ID:',
@@ -38,6 +48,14 @@ export const PendingProducts = () => {
       )
       console.error('Failed to update product status:', error)
     }
+  }
+
+  const onSubmit = (productId: string) => {
+    handleUpdateStatus(productId, 'approved')
+  }
+
+  const onReject = (productId: string) => {
+    handleUpdateStatus(productId, 'rejected')
   }
 
   return (
@@ -67,7 +85,8 @@ export const PendingProducts = () => {
               <ProductForm
                 product={product}
                 Pending
-                onSubmit={() => handleUpdateStatus(product._id, 'verified')}
+                onSubmit={() => onSubmit(product._id)}
+                onReject={() => onReject(product._id)}
               />
             </motion.div>
           ))}
