@@ -20,6 +20,7 @@ interface ProductFormProps {
   Pending?: boolean
   Rejected?: boolean
   onSubmit?: () => void
+  onReject?: () => void
 }
 
 interface DecodedToken {
@@ -34,6 +35,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   Rejected,
   Edit,
   onSubmit,
+  onReject,
 }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false)
   const dispatch: AppDispatch = useDispatch()
@@ -265,13 +267,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 className="bg-[#3C8737] text-white w-[120px] rounded-lg py-1 px-4 hover:-translate-y-1 transition-transform ease-in-out duration-300"
                 onClick={onSubmit}
               >
-                Aprove
+                Approve
               </button>
               <button
                 className="  bg-[#932525] text-white w-[120px] rounded-lg py-1 px-4 hover:-translate-y-1 transition-transform ease-in-out duration-300"
-                onClick={() => handleDelete(product._id)}
+                onClick={onReject}
               >
-                Delete
+                Reject
               </button>
             </div>
           )}

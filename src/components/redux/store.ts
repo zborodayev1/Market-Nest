@@ -2,7 +2,6 @@ import { notificationsReducer } from './slices/notifications'
 import { configureStore } from '@reduxjs/toolkit'
 import { combineReducers } from 'redux'
 import { authReducer } from './slices/auth'
-import { settingsReducer } from './slices/main'
 import {
   persistStore,
   persistReducer,
@@ -19,7 +18,6 @@ import { productReducer } from './slices/products'
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  settings: settingsReducer,
   products: productReducer,
   notifications: notificationsReducer,
 })

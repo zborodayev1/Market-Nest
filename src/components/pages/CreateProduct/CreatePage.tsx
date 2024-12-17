@@ -58,6 +58,7 @@ export const CreatePage = () => {
       const formData = new FormData()
       formData.append('name', values.name)
       formData.append('price', values.price.toString())
+      // Передаем теги как массив в JSON формате
       formData.append('tags', JSON.stringify(selectedTags))
 
       if (values.image instanceof File) {
@@ -77,6 +78,7 @@ export const CreatePage = () => {
       setIsSubmitting(false)
     }
   }
+
   const handleTagClick = (tag: string) => {
     setSelectedTags((prevTags) => {
       if (prevTags.includes(tag)) {
