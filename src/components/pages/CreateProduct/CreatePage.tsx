@@ -19,7 +19,7 @@ export const CreatePage = () => {
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [selectedTags, setSelectedTags] = useState<string[]>([]) // Состояние для выбранных тегов
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const error = useSelector((state: RootState) => state.products.error)
   const { register, handleSubmit, setValue } = useForm<FormData>({
     defaultValues: {
@@ -58,7 +58,7 @@ export const CreatePage = () => {
       const formData = new FormData()
       formData.append('name', values.name)
       formData.append('price', values.price.toString())
-      // Передаем теги как массив в JSON формате
+
       formData.append('tags', JSON.stringify(selectedTags))
 
       if (values.image instanceof File) {
@@ -82,9 +82,9 @@ export const CreatePage = () => {
   const handleTagClick = (tag: string) => {
     setSelectedTags((prevTags) => {
       if (prevTags.includes(tag)) {
-        return prevTags.filter((t) => t !== tag) // Удаляем тег
+        return prevTags.filter((t) => t !== tag)
       } else {
-        return [...prevTags, tag] // Добавляем тег
+        return [...prevTags, tag]
       }
     })
   }
