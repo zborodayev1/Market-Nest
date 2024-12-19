@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchProfileData, selectUserProfile } from '../../../redux/slices/auth'
+import {
+  fetchProfileData,
+  selectUserProfile,
+} from '../../../../redux/slices/auth'
 import { Avatar } from '@mui/material'
 import { CgProfile } from 'react-icons/cg'
 import { motion } from 'motion/react'
-import { AppDispatch } from '../../../redux/store'
+import { AppDispatch } from '../../../../redux/store'
 
 interface Props {
   onSuccess: () => void

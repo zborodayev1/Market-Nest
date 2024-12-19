@@ -10,11 +10,12 @@ import { useEffect } from 'react'
 import { ProductForm } from '../../assets/Product/ProductForm'
 import { motion } from 'motion/react'
 
-import { createNotification } from '../../redux/slices/notifications'
+import { useNavigate } from 'react-router-dom'
 
 export const PendingProducts = () => {
   const dispatch: AppDispatch = useDispatch()
   const { products } = useSelector(selectProducts)
+  const navigate = useNavigate()
 
   useEffect(() => {
     dispatch(fetchProducts())
@@ -30,15 +31,7 @@ export const PendingProducts = () => {
         updateProductStatus({ productId, status: newStatus })
       ).unwrap()
 
-      await dispatch(
-        createNotification({
-          title:
-            newStatus === 'approved' ? 'Product Approved' : 'Product Rejected',
-          actionType: newStatus === 'approved' ? 'approved' : 'rejected',
-          message: 'Product Status Change',
-          productId,
-        })
-      ).unwrap()
+      navigate('/')
     } catch (error) {
       console.log(
         'Updating product with ID:',

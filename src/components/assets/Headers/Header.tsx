@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { selectIsAuth } from '../../redux/slices/auth'
 import { useDispatch, useSelector } from 'react-redux'
-import { ProdileHeader } from '../../pages/Profile/SideBar/ProfileHeader'
-import { SideBar } from '../../pages/Profile/SideBar/SideBar'
+import { ProdileHeader } from '../Profile/ProfileComponent/ProfileHeaderComponents/ProfileHeader'
+import { SideBar } from '../Profile/ProfileComponent/ProfileSideBar/SideBar'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import {
@@ -157,7 +157,7 @@ export const Header = () => {
             <h1 className="text-md font-bold text-[#212121] ">Notifications</h1>
             <Bell className="w-8 h-8 stroke-2 text-[#212121] " />
           </button>
-          <div className="absolute top-[70px] left-[165px] ">
+          <div className="absolute top-[70px] left-[155px] ">
             <AnimatePresence mode="wait">
               {notiOpen && (
                 <motion.div
@@ -167,7 +167,7 @@ export const Header = () => {
                     y: 0,
                   }}
                   exit={{ opacity: 0, y: 40 }}
-                  className="flex justify-center  bg-[#fafafa] mt-3 border-slate-500  border-2 rounded-xl z-20 w-[250px] px-[50px] min-h-[340px] max-h-[1440px] "
+                  className="flex justify-center  bg-[#fafafa] mt-3 border-slate-500  border-2 rounded-xl z-20 w-[270px] px-[50px] min-h-[340px] max-h-[1440px] "
                 >
                   <Notifications onSuccess={() => setNotiOpen(false)} />
                 </motion.div>

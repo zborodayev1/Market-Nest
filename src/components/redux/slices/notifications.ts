@@ -4,7 +4,6 @@ import { AxiosError } from 'axios'
 
 export interface Notification {
   _id: string
-  type: 'success' | 'error' | 'info' | 'warning'
   message: string
   title: string
   isRead: boolean
@@ -42,7 +41,7 @@ export const fetchNotifications = createAsyncThunk(
   ) => {
     try {
       const { data } = await axios.get(
-        `/products/noti?page=${page}&limit=${limit}&filter=${filter}`
+        `/noti?page=${page}&limit=${limit}&filter=${filter}`
       )
       return data
     } catch (error: unknown) {
@@ -61,7 +60,7 @@ export const markNotificationAsRead = createAsyncThunk(
   'notifications/markNotificationAsRead',
   async (notificationId: string, { rejectWithValue }) => {
     try {
-      const { data } = await axios.patch(`/products/noti/${notificationId}`)
+      const { data } = await axios.patch(`/noti/${notificationId}`)
       return data
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -92,7 +91,7 @@ export const createNotification = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const { data } = await axios.post('/products/noti', {
+      const { data } = await axios.post('/noti', {
         message,
         actionType,
         title,
@@ -103,6 +102,43 @@ export const createNotification = createAsyncThunk(
       if (error instanceof AxiosError) {
         return rejectWithValue(
           error.response?.data || 'Failed to create notification'
+        )
+      } else {
+        return rejectWithValue('An unknown error occurred')
+      }
+    }
+  }
+)
+
+export const deleteNotifications = createAsyncThunk(
+  'notifications/deleteNotifications',
+  async (notificationIds: string[], { rejectWithValue }) => {
+    try {
+      const { data } = await axios.delete('/noti', {
+        data: { notificationIds },
+      })
+      return data
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data || 'Failed to delete notifications'
+        )
+      } else {
+        return rejectWithValue('An unknown error occurred')
+      }
+    }
+  }
+)
+export const markAllNotificationsAsRead = createAsyncThunk(
+  'notifications/markAllNotificationsAsRead',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.patch('/noti/mark-all-read')
+      return data
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data || 'Failed to mark all notifications as read'
         )
       } else {
         return rejectWithValue('An unknown error occurred')
@@ -174,6 +210,32 @@ const notificationsSlice = createSlice({
       .addCase(createNotification.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message ?? 'Failed to create notification'
+      })
+      .addCase(deleteNotifications.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(deleteNotifications.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+
+        state.notifications = state.notifications.filter(
+          (notif) => !action.payload.includes(notif._id)
+        )
+      })
+      .addCase(deleteNotifications.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message ?? 'Failed to delete notifications'
+      })
+      .addCase(markAllNotificationsAsRead.fulfilled, (state) => {
+        state.notifications = state.notifications.map((notif) => ({
+          ...notif,
+          isRead: true,
+        }))
+      })
+      .addCase(markAllNotificationsAsRead.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error =
+          action.error.message ?? 'Failed to mark notifications as read'
       })
   },
 })

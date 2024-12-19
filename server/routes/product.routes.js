@@ -13,8 +13,6 @@ router.post(
   ProductController.handleUploadProductImage,
   ProductController.createProduct
 )
-router.post('/noti', checkAuth, ProductController.createNotification)
-router.get('/noti', checkAuth, ProductController.getNotifications)
 
 router.get('/:id', ProductController.getOneProduct)
 router.get('/', ProductController.getAllProducts)
@@ -33,7 +31,6 @@ router.patch(
   checkAdmin,
   ProductController.updateProductStatus
 )
-router.patch('/noti/:id', checkAuth, ProductController.markNotificationAsRead)
 
 router.delete('/:id', checkAuth, ProductController.deleteProduct)
 

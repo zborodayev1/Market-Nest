@@ -40,35 +40,7 @@ const UserSchema = new mongoose.Schema(
       enum: ['user', 'admin'],
       default: 'user',
     },
-
-    noti: [
-      {
-        title: { type: String },
-        isRead: {
-          type: Boolean,
-          default: false,
-        },
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Product',
-        },
-        actionType: {
-          type: String,
-          enum: ['created', 'approved', 'rejected', 'info'],
-          required: true,
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-        updatedAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
   },
-
   {
     timestamps: true,
   }
