@@ -1,20 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { AppDispatch, persistor } from '../../../redux/store'
-import { useState, useEffect, useRef } from 'react'
+import { AppDispatch, persistor } from '../../../../redux/store'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  fetchProfileData,
-  logout,
-  selectUserProfile,
-  uploadImage,
-} from '../../../redux/slices/auth'
+import { logout, selectUserProfile } from '../../../../redux/slices/auth'
 import { ChevronDown, LogOut, PackageCheck } from 'lucide-react'
 import CloseIcon from '@mui/icons-material/Close'
-import { Avatar } from '@mui/material'
-import { UserData } from './forms/UserData'
-import { Email } from './forms/Email'
-import { Password } from './forms/Password'
+
+import { UserData } from '../ProfileAuthForms/UserData'
+import { Email } from '../ProfileAuthForms/Email'
+import { Password } from '../ProfileAuthForms/Password'
 import { Link } from 'react-router-dom'
+import { ChangeAvatar } from './SideBarForms/ChangeAvatar/ChangeAvatar'
 
 interface Props {
   setOpen: (value: boolean) => void
@@ -26,9 +22,6 @@ export const SideBar = (props: Props) => {
   const dispatch = useDispatch<AppDispatch>()
   const { setOpen, open } = props
   const userData = useSelector(selectUserProfile)
-  const [file, setFile] = useState<File | null>(null)
-  const inputFileRef = useRef<HTMLInputElement | null>(null)
-  const [change, setChange] = useState<boolean>(false)
 
   const [state, setState] = useState<{
     ChangeName: boolean
@@ -59,24 +52,6 @@ export const SideBar = (props: Props) => {
     setOpen(false)
   }
 
-  const handleUpload = async () => {
-    setChange(false)
-    if (file) {
-      const formData = new FormData()
-      formData.append('image', file)
-
-      const resultAction = await dispatch(uploadImage(formData))
-      if (uploadImage.fulfilled.match(resultAction)) {
-        dispatch(fetchProfileData())
-      }
-    }
-  }
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFile(event.target.files?.[0] || null)
-    setChange(true)
-  }
-
   const contentVariants = {
     initial: { opacity: 0, x: 20 },
     animate: { opacity: 1, x: 0 },
@@ -87,7 +62,6 @@ export const SideBar = (props: Props) => {
     },
   }
 
-  const [isHovered, setIsHovered] = useState(false)
   return (
     <div>
       {open && (
@@ -106,50 +80,7 @@ export const SideBar = (props: Props) => {
                 variants={contentVariants}
                 className="text-sm font-bold flex items-center gap-2"
               >
-                <button
-                  onClick={() => inputFileRef.current?.click()}
-                  className="relative group"
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                >
-                  <motion.div
-                    animate={{
-                      filter: isHovered ? 'blur(2px)' : 'blur(0px)',
-                      transition: { duration: 0.5 },
-                    }}
-                    className="rounded-full "
-                  >
-                    <Avatar
-                      style={{ width: 45, height: 45 }}
-                      src={userData?.avatarUrl}
-                    />
-                  </motion.div>
-
-                  <div className="absolute inset-0 flex items-center justify-center rounded-full  opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <span className="text-[#f1eded] text-xs font-medium">
-                      Change Avatar
-                    </span>
-                  </div>
-                </button>
-                <input
-                  ref={inputFileRef}
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-                {change && (
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleUpload}
-                    className="px-3 py-1 bg-blue-50 text-[#212121] border border-[#212121] rounded-md text-sm"
-                  >
-                    Change
-                  </motion.button>
-                )}
-
+                <ChangeAvatar />
                 <motion.button
                   onClick={() =>
                     setState((prev) => ({
@@ -318,7 +249,7 @@ export const SideBar = (props: Props) => {
               )}
               <motion.div variants={contentVariants} className="text-sm mt-4">
                 <motion.button
-                  className="w-full bg-[#f5b3b3] hover:bg-[#f8a2a2] duration-300 text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                  className="w-full bg-[#f5b3b3] transition-transform  hover:-translate-y-1  ease-in-out hover:bg-[#f8a2a2] duration-300 text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2"
                   onClick={onClickLogout}
                   whileTap={{ scale: 0.98 }}
                 >

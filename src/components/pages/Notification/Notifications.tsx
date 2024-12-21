@@ -3,6 +3,7 @@ import { AppDispatch, RootState } from '../../redux/store'
 import { useEffect, useState, useCallback } from 'react'
 import {
   fetchNotifications,
+  markAllNotificationsAsRead,
   Notification,
 } from '../../redux/slices/notifications'
 import { NotiForm } from './NotiForm'
@@ -18,15 +19,15 @@ export const Notifications = (props: Props) => {
   const [page, setPage] = useState(1)
   const [filter, setFilter] = useState<string>('unread')
   const limit = 4
-  const { onSuccess } = props
 
+  const { onSuccess } = props
   const [loadedData, setLoadedData] = useState<Record<string, Notification[]>>(
     {}
   )
-  const { status, error, totalPages } = useSelector(
+  const { status, totalPages } = useSelector(
     (state: RootState) => state.notifications
   )
-
+  const [errorState, setErr] = useState('')
   const cacheKey = `${filter}-${page}`
   const notifications = loadedData[cacheKey] || []
 
@@ -62,6 +63,20 @@ export const Notifications = (props: Props) => {
     setPage(1)
   }
 
+  const markAsRead = async () => {
+    try {
+      const response = await dispatch(markAllNotificationsAsRead()).unwrap()
+
+      if (response.success) {
+        setLoadedData({})
+        setPage(1)
+        loadNotifications()
+      }
+    } catch (err: unknown) {
+      setErr((err as { message: string }).message)
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -74,12 +89,12 @@ export const Notifications = (props: Props) => {
       </h1>
 
       {status === 'failed' && (
-        <div className="flex justify-center text-red-500">
-          {error || 'Failed to load notifications'}
-        </div>
+        <div className="flex justify-center">{errorState}</div>
       )}
 
-      <div className="flex gap-4 justify-center mt-5">
+      <div
+        className={`flex gap-4 justify-center ${status === 'failed' ? '' : 'mt-5'}`}
+      >
         {status === 'succeeded' && notifications.length > 0 ? (
           <div className="col-3">
             {notifications.map((notification: Notification) => (
@@ -88,14 +103,13 @@ export const Notifications = (props: Props) => {
               </div>
             ))}
           </div>
-        ) : status !== 'loading' ? (
-          <div>No notifications available.</div>
+        ) : status !== 'loading' && status !== 'failed' ? (
+          <div>No notifications available for this tag.</div>
         ) : (
-          <CircularProgress color="inherit" />
+          status !== 'failed' && <CircularProgress color="inherit" />
         )}
       </div>
 
-      {/* Фильтры */}
       <div className="flex justify-center gap-4 mt-4">
         <button
           onClick={() => updateFilter('read')}
@@ -118,6 +132,25 @@ export const Notifications = (props: Props) => {
           }`}
         >
           Unread
+        </button>
+      </div>
+      <div className="flex justify-center mt-2 gap-2">
+        <button
+          onClick={markAsRead}
+          className={`py-1 px-3 rounded-xl transition-colors duration-300 ease-linear 
+            focus:bg-[#3C8737] focus:text-white focus:hover:bg-[#2B6128]
+            bg-gray-200 hover:bg-gray-300 text-black mr-2
+       `}
+        >
+          Read All
+        </button>
+        <button
+          className={`py-1 px-3 rounded-xl transition-colors duration-300 ease-linear 
+               focus:bg-[#3C8737] focus:text-white focus:hover:bg-[#2B6128]
+               bg-gray-200 hover:bg-gray-300 text-black
+          `}
+        >
+          Delete
         </button>
       </div>
 
