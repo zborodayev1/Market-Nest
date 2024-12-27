@@ -5,14 +5,7 @@ import { ProdileHeader } from '../Profile/ProfileComponent/ProfileHeaderComponen
 import { SideBar } from '../Profile/ProfileComponent/ProfileSideBar/SideBar'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import {
-  Heart,
-  IdCard,
-  PackagePlus,
-  PackageSearch,
-  PackageMinus,
-  Bell,
-} from 'lucide-react'
+import { Heart, IdCard, PackagePlus, PackageSearch, Bell } from 'lucide-react'
 import { IoBagOutline } from 'react-icons/io5'
 import { getProductsBySearch, fetchProducts } from '../../redux/slices/products'
 import { AppDispatch } from '../../redux/store'
@@ -23,6 +16,9 @@ export const Header = () => {
   const [open, setOpen] = useState(false)
   const [notiOpen, setNotiOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
+  const buttonRef = useRef<HTMLButtonElement | null>(null)
+  const notificationRef = useRef<HTMLDivElement | null>(null)
+  const [searchITem, setSearchITem] = useState('')
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -40,6 +36,30 @@ export const Header = () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(target)
+      ) {
+        setNotiOpen(false)
+      }
+    }
+
+    if (notiOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [notiOpen])
 
   const sidebarVariants = {
     initial: {
@@ -71,103 +91,59 @@ export const Header = () => {
   }
 
   const dispatch: AppDispatch = useDispatch()
-  const [search, setSearch] = useState(false)
-  const [animation, setAnimation] = useState('')
 
-  useEffect(() => {
-    if (search) {
-      setAnimation('search')
+  const handleSearch = async () => {
+    if (searchITem.trim() === '') {
+      dispatch(fetchProducts({ limit: 20, page: 1 }))
     } else {
-      setAnimation('notSearch')
-    }
-  }, [search])
-
-  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = e.target.value
-    if (searchTerm.trim() === '') {
-      dispatch(fetchProducts())
-    } else {
-      dispatch(getProductsBySearch(searchTerm))
+      dispatch(getProductsBySearch(searchITem))
     }
   }
 
   return (
     <div>
       <div className="">
-        <div className="relative items-center  flex bg-[#F5F5F5] z-30 w-screen h-[100px]">
+        <div className="relative items-center flex bg-[#F5F5F5] z-30 w-screen h-[100px]">
           <div className="absolute left-[120px] transform -translate-x-1/2 flex justify-center items-center z-10">
-            <AnimatePresence mode="wait">
-              {search ? (
-                <motion.div
-                  key="searchBar"
-                  initial={{
-                    opacity: 0,
-                    x: -40,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    x: 40,
-                  }}
-                  exit={{ opacity: 0, x: -40 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="flex items-center justify-center group py-4 px-4 w-full gap-2 "
+            <motion.div className="flex justify-center py-4 px-4 w-full cursor-pointer ">
+              <div className=" hover:bg-[#e4e4e4] transition-colors duration-300 rounded-[15px] ease-in-out flex items-center p-2 px-3  ml-[80px]">
+                <input
+                  type="text"
+                  onChange={(e) => setSearchITem(e.target.value)}
+                  value={searchITem}
+                  placeholder="Search"
+                  className="w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:border-transparent transition-all duration-200"
+                />
+                <button
+                  className="items-center absolute z-20 right-[35px]"
+                  onClick={handleSearch}
                 >
-                  <div className="flex group-hover:bg-[#e4e4e4] p-[5px] rounded-xl transition-colors duration-300 ease-in-out">
-                    <input
-                      type="text"
-                      onChange={handleSearch}
-                      placeholder="Search"
-                      className="w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:border-transparent transition-all duration-200"
-                    />
-                    <button
-                      className="flex items-center font-bold mx-1"
-                      onClick={() => setSearch(false)}
-                    >
-                      Close
-                      <PackageMinus className="ml-1 w-9 h-9 text-[#212121] " />
-                    </button>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="searchButton"
-                  initial={{
-                    opacity: 0,
-                    y: animation === 'notSearch' ? 20 : -20,
-                  }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2, ease: 'easeInOut' }}
-                  onClick={() => setSearch(true)}
-                  className="flex  justify-center py-4 px-4 w-full cursor-pointer "
-                >
-                  <div className="hover:bg-[#e4e4e4] transition-colors duration-300 rounded-full ease-in-out flex items-center p-2 px-3">
-                    <h1 className="font-bold mr-2">Search</h1>
-                    <PackageSearch className="w-9 h-9 text-[#212121] " />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <PackageSearch className=" w-7 h-7 ml-2 text-[#212121]" />
+                </button>
+              </div>
+            </motion.div>
           </div>
 
           <button
-            className={`${search ? 'ml-[340px]' : 'ml-[200px]'} z-10 mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-500 ease-in-out group`}
+            ref={buttonRef}
+            className={`ml-[320px] z-10 mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-500 ease-in-out group`}
             onClick={() => setNotiOpen(!notiOpen)}
           >
-            <h1 className="text-md font-bold text-[#212121] ">Notifications</h1>
-            <Bell className="w-8 h-8 stroke-2 text-[#212121] " />
+            <h1 className="text-md font-bold text-[#212121]">Notifications</h1>
+            <Bell className="w-8 h-8 stroke-2 text-[#212121]" />
           </button>
-          <div className="absolute top-[70px] left-[155px] ">
-            <AnimatePresence mode="wait">
+          <div className="absolute top-[70px] left-[230px] ">
+            <AnimatePresence>
               {notiOpen && (
                 <motion.div
+                  ref={notificationRef}
                   initial={{ opacity: 0, y: -40 }}
                   animate={{
                     opacity: 1,
                     y: 0,
                   }}
                   exit={{ opacity: 0, y: 40 }}
-                  className="flex justify-center  bg-[#fafafa] mt-3 border-slate-500  border-2 rounded-xl z-20 w-[270px] px-[50px] min-h-[340px] max-h-[1440px] "
+                  className="flex justify-center bg-[#fafafa] mt-3 border-slate-500 border-2 rounded-xl z-20 w-[350px] px-[50px] min-h-[340px] max-h-[1440px]"
                 >
                   <Notifications onSuccess={() => setNotiOpen(false)} />
                 </motion.div>
@@ -177,14 +153,14 @@ export const Header = () => {
 
           <div className="absolute inset-x-0 flex justify-center items-center">
             <Link to="/">
-              <div className="flex justify-center  group">
+              <div className="flex justify-center group">
                 <motion.span
                   initial={{ opacity: 0 }}
                   animate={{
                     opacity: 1,
                     transition: { duration: 0.5 },
                   }}
-                  className=" text-3xl font-bold text-[#212121] "
+                  className="text-3xl font-bold text-[#212121]"
                 >
                   Market Nest
                 </motion.span>
@@ -207,28 +183,26 @@ export const Header = () => {
                     className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                     to="/create-product"
                   >
-                    <h1 className="text-md font-bold text-[#212121]   ">
-                      Create
-                    </h1>
-                    <PackagePlus className="w-9 h-9 text-[#212121] " />
+                    <h1 className="text-md font-bold text-[#212121]">Create</h1>
+                    <PackagePlus className="w-9 h-9 text-[#212121]" />
                   </Link>
                   <Link
                     className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                     to="/bag"
                   >
-                    <h1 className="text-md font-bold text-[#212121]   ">Bag</h1>
-                    <IoBagOutline className="w-9 h-9 text-[#212121] " />
+                    <h1 className="text-md font-bold text-[#212121]">Bag</h1>
+                    <IoBagOutline className="w-9 h-9 text-[#212121]" />
                   </Link>
                   <Link
                     className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                     to="/favorites"
                   >
-                    <h1 className="text-md font-bold text-[#212121]   ">
+                    <h1 className="text-md font-bold text-[#212121]">
                       Favorite
                     </h1>
-                    <Heart className="w-7 h-9 text-[#212121] " />
+                    <Heart className="w-7 h-9 text-[#212121]" />
                   </Link>
-                  <div className="">
+                  <div>
                     <ProdileHeader onSuccess={() => setOpen(!open)} />
                   </div>
                 </div>
@@ -239,26 +213,24 @@ export const Header = () => {
                   className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                   to="/bag"
                 >
-                  <h1 className="text-md font-bold text-[#212121]   ">Bag</h1>
-                  <IoBagOutline className="w-9 h-9 text-[#212121] " />
+                  <h1 className="text-md font-bold text-[#212121]">Bag</h1>
+                  <IoBagOutline className="w-9 h-9 text-[#212121]" />
                 </Link>
                 <Link
                   className="mx-2 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                   to="/favorites"
                 >
-                  <h1 className="text-md font-bold text-[#212121]   ">
-                    Favorite
-                  </h1>
-                  <Heart className="w-7 h-9 text-[#212121] " />
+                  <h1 className="text-md font-bold text-[#212121]">Favorite</h1>
+                  <Heart className="w-7 h-9 text-[#212121]" />
                 </Link>
                 <Link
                   to="/signIn"
-                  className="mx-2 flex gap-2  items-center hover:bg-[#E4E4E4] p-2 px-3 rounded-full duration-300 ease-in-out group mt-1"
+                  className="mx-2 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-3 rounded-full duration-300 ease-in-out group mt-1"
                 >
-                  <h1 className="text-md font-bold text-[#212121] transition-colors duration-300 ">
+                  <h1 className="text-md font-bold text-[#212121] transition-colors duration-300">
                     Sign in
                   </h1>
-                  <IdCard className="w-12 h-9 text-[#212121]  transition-colors duration-300" />
+                  <IdCard className="w-12 h-9 text-[#212121] transition-colors duration-300" />
                 </Link>
               </div>
             )}

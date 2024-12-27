@@ -1,4 +1,3 @@
-import { animated, useSpring } from '@react-spring/web'
 import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -11,33 +10,6 @@ import { Eye, EyeOff, Mail, RectangleEllipsis } from 'lucide-react'
 import { AppDispatch } from '../../redux/store'
 
 export const LogInPage: React.FC = (): JSX.Element => {
-  const text = useSpring({
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-    delay: 200,
-  })
-  const main = useSpring({
-    from: { y: 100, width: '0px', height: '0px', opacity: 0 },
-    to: { y: 0, width: '400px', height: '400px', opacity: 1 },
-    delay: 150,
-    duration: 500,
-  })
-  const textField1 = useSpring({
-    from: { y: 100, opacity: 0 },
-    to: { y: 0, opacity: 1 },
-    delay: 100,
-  })
-  const textField2 = useSpring({
-    from: { y: 100, opacity: 0 },
-    to: { y: 0, opacity: 1 },
-    delay: 100,
-  })
-  const button = useSpring({
-    from: { y: 100, opacity: 0 },
-    to: { y: 0, opacity: 1 },
-    delay: 100,
-  })
-
   const [err, setErr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const isAuth = useSelector(selectIsAuth)
@@ -91,28 +63,23 @@ export const LogInPage: React.FC = (): JSX.Element => {
   }
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, delay: 0.4 }}
+    >
       <div className=" ">
         <div className="bg-[#FFFFFF] h-screen flex flex-wrap justify-center ">
-          <animated.div
-            style={{ ...main }}
-            className="shadow-lg border px-16 mt-5 pt-8 w-[400px] h-[400px] items-center rounded-lg bg-[#FFFFFF]"
-          >
+          <div className="shadow-lg border px-16 mt-5 pt-8 w-[400px] h-[400px] items-center rounded-lg bg-[#FFFFFF]">
             <div>
               <div>
-                <animated.div
-                  style={{ ...text }}
-                  className="flex justify-center"
-                >
-                  <h1 className="text-xl font-bold text-[#212121] mb-10">
+                <div className="flex justify-center">
+                  <h1 className="text-xl font-bold text-[#212121] mb-5">
                     Sign In
                   </h1>
-                </animated.div>
+                </div>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                  <animated.div
-                    style={{ ...textField1 }}
-                    className="flex justify-center mb-5"
-                  >
+                  <div className="flex justify-center mb-5">
                     <div>
                       <label className={labelClasses}>
                         <Mail size={18} /> E-mail
@@ -124,12 +91,9 @@ export const LogInPage: React.FC = (): JSX.Element => {
                         spellCheck="false"
                       />
                     </div>
-                  </animated.div>
-                  <animated.div
-                    style={{ ...textField2 }}
-                    className="flex justify-center mb-5"
-                  >
-                    <div className="">
+                  </div>
+                  <div className="flex justify-center mb-5">
+                    <div>
                       <label className={labelClasses} htmlFor="password">
                         <RectangleEllipsis size={23} />
                         <h1 className="mt-[2px] ml-1">Password</h1>
@@ -163,11 +127,8 @@ export const LogInPage: React.FC = (): JSX.Element => {
                         </button>
                       </div>
                     </div>
-                  </animated.div>
-                  <animated.div
-                    style={{ ...button }}
-                    className="flex justify-center"
-                  >
+                  </div>
+                  <div className="flex justify-center">
                     <motion.button
                       type="submit"
                       disabled={!isValid || loading}
@@ -178,7 +139,7 @@ export const LogInPage: React.FC = (): JSX.Element => {
                         {loading ? 'Signing in...' : 'Sign in'}
                       </span>
                     </motion.button>
-                  </animated.div>
+                  </div>
                 </form>
                 {err && !loading && (
                   <h1 className="text-[#D3312F] font-bold mt-2 text-md ml-3 flex justify-center mr-2">
@@ -197,7 +158,7 @@ export const LogInPage: React.FC = (): JSX.Element => {
                 </Link>
               </div>
             </div>
-          </animated.div>
+          </div>
         </div>
         {loading && (
           <LinearProgress
@@ -211,6 +172,6 @@ export const LogInPage: React.FC = (): JSX.Element => {
           />
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

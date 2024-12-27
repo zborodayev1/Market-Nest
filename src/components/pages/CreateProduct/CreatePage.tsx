@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Package, Coins, Tags, ImagePlus, X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { createProduct } from '../../redux/slices/products'
-import { AppDispatch, RootState } from '../../redux/store'
+import { createProduct, selectProducts } from '../../redux/slices/products'
+import { AppDispatch } from '../../redux/store'
 import { AnimatePresence, motion } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 
@@ -20,7 +20,9 @@ export const CreatePage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const error = useSelector((state: RootState) => state.products.error)
+  const { status, error } = useSelector(selectProducts)
+  console.log(status)
+  const [message, setMessage] = useState<string>('')
   const { register, handleSubmit, setValue } = useForm<FormData>({
     defaultValues: {
       name: '',
@@ -42,6 +44,12 @@ export const CreatePage = () => {
       reader.readAsDataURL(file)
     }
   }
+
+  useEffect(() => {
+    if (status === 'succeeded') {
+      navigate('/')
+    }
+  }, [status, navigate])
 
   const handleImageRemove = () => {
     setImagePreview(null)
@@ -67,13 +75,9 @@ export const CreatePage = () => {
         formData.append('image', '')
       }
 
-      const resultAction = await dispatch(createProduct(formData))
-
-      if (resultAction.type === 'products/createProduct/fulfilled') {
-        navigate('/')
-      }
+      dispatch(createProduct(formData))
     } catch (error) {
-      console.error('Ошибка:', error)
+      setMessage((error as { message: string }).message)
     } finally {
       setIsSubmitting(false)
     }
@@ -101,9 +105,10 @@ export const CreatePage = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3, delay: 0.4 }}
+      initial={{ opacity: 0, filter: 'blur(5px)' }}
+      animate={{ opacity: 1, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, filter: 'blur(5px)' }}
+      transition={{ duration: 0.3, delay: 0.2 }}
       className="flex justify-center items-center mt-5"
     >
       <div>
@@ -154,8 +159,8 @@ export const CreatePage = () => {
                   className={`w-1/3 sm:w-1/3 md:w-1/3 lg:w-1/3 px-4 py-2 rounded-lg transition-colors ease-in-out duration-300 
                     ${
                       selectedTags.includes(tag)
-                        ? 'bg-[#3C8737] text-white'
-                        : 'bg-gray-200 text-gray-800'
+                        ? 'bg-[#2B6128] text-white hover:bg-[#3C8737]'
+                        : 'bg-gray-200 text-gray-800 hover:bg-[#1f5e1c'
                     } 
                     hover:bg-[#2B6128] hover:text-white`}
                 >
@@ -231,7 +236,7 @@ export const CreatePage = () => {
               animate={{ opacity: 1 }}
               className="text-red-500 text-sm text-center mt-2"
             >
-              Error while creating product
+              {message}
             </motion.p>
           )}
         </form>

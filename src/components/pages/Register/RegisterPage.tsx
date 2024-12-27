@@ -1,23 +1,12 @@
-import { useSpring, animated } from '@react-spring/web'
 import { selectIsAuth } from '../../../components/redux/slices/auth'
 import { Link, Navigate } from 'react-router-dom'
 import LinearProgress from '@mui/material/LinearProgress'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { RegisterForm } from './RegisterForm'
+import { motion } from 'framer-motion'
 
 export const RegisterPage = () => {
-  const html = useSpring({
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-    delay: 200,
-  })
-  const main = useSpring({
-    from: { y: 100, width: '0px', height: '0px' },
-    to: { y: 0, width: '400px', height: '500px' },
-    delay: 10,
-  })
-
   const isAuth = useSelector(selectIsAuth)
   const [err, setErr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -26,18 +15,19 @@ export const RegisterPage = () => {
   }
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, delay: 0.4 }}
+    >
       <div className="bg-[#fff] h-screen flex flex-wrap justify-center">
-        <animated.div
-          style={{ ...main }}
-          className="bg-[#fff] border shadow-lg px-16 my-5 pt-8 w-[400px] h-[500px] phone:max-w-90 phone-md:max-w-96 rounded-md"
-        >
+        <div className="bg-[#fff] border shadow-lg px-16 my-5 pt-8 w-[400px] h-[500px] phone:max-w-90 phone-md:max-w-96 rounded-md">
           <div>
-            <animated.div style={{ ...html }} className="flex justify-center">
+            <div className="flex justify-center">
               <h1 className="text-xl font-bold text-[#212121] mb-5">
                 Register
               </h1>
-            </animated.div>
+            </div>
 
             <RegisterForm
               setLoading={setLoading}
@@ -60,7 +50,7 @@ export const RegisterPage = () => {
               </div>
             </Link>
           </div>
-        </animated.div>
+        </div>
       </div>
       {loading && (
         <LinearProgress
@@ -73,6 +63,6 @@ export const RegisterPage = () => {
           }}
         />
       )}
-    </div>
+    </motion.div>
   )
 }

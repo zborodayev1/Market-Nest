@@ -21,13 +21,15 @@ export const BagPage = () => {
   }, [])
 
   useEffect(() => {
-    dispatch(fetchProducts())
+    dispatch(fetchProducts({ limit: 20, page: 1 }))
   }, [dispatch])
 
   useEffect(() => {
     if (status === 'succeeded') {
       setBagProducts(
-        products.filter((product: Product) => bag.includes(product._id))
+        products.products.filter((product: Product) =>
+          bag.includes(product._id)
+        )
       )
     }
   }, [status, products, bag])
@@ -61,20 +63,24 @@ export const BagPage = () => {
         className="flex flex-col w-full text-center items-center justify-center mt-2"
       >
         <span className="text-3xl font-bold text-[#212121] mb-2">Bag</span>
-        <div className="my-1">
-          <span className="text-2xl text-[#212121]">
-            <span className="font-bold">Total:</span>{' '}
-            <span className="bg-[#3C8737] text-white p-1 rounded-md">
-              {totalPrice}$
-            </span>
-          </span>
-        </div>
-        <div>
-          <span className="text-2xl text-[#212121]">
-            <span className="font-bold">Count: </span>
-            <span>{totalCount} items</span>
-          </span>
-        </div>
+        {bagProducts.length !== 0 && (
+          <div>
+            <div className="my-1">
+              <span className="text-2xl text-[#212121]">
+                <span className="font-bold">Total:</span>{' '}
+                <span className="bg-[#3C8737] text-white p-1 rounded-md">
+                  {totalPrice}$
+                </span>
+              </span>
+            </div>
+            <div>
+              <span className="text-2xl text-[#212121]">
+                <span className="font-bold">Count: </span>
+                <span>{totalCount} items</span>
+              </span>
+            </div>
+          </div>
+        )}
       </motion.div>
       <AnimatePresence>
         <motion.div
@@ -85,7 +91,9 @@ export const BagPage = () => {
           }}
           exit={{ opacity: 0 }}
         >
-          <div className="flex flex-wrap justify-center mt-5 gap-4">
+          <div
+            className={`flex flex-wrap justify-center ${bagProducts.length === 0 ? 'mt-1' : 'mt-5'} gap-4`}
+          >
             {status === 'succeeded' && bagProducts.length > 0 && (
               <AnimatePresence>
                 {bagProducts.map((product: Product, index: number) => (
@@ -110,7 +118,7 @@ export const BagPage = () => {
               </AnimatePresence>
             )}
             {status === 'succeeded' && bagProducts.length === 0 && (
-              <div className="text-center mt-4">
+              <div className="text-center text-xl font-bold mt-2">
                 <p>Your bag is empty</p>
               </div>
             )}

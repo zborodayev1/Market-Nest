@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import React from 'react'
 import {
   markNotificationAsRead,
   Notification,
@@ -12,9 +13,8 @@ interface Props {
   onSuccess: () => void
 }
 
-export const NotiForm = (props: Props) => {
+const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
   const dispatch: AppDispatch = useDispatch()
-  const { notification, onSuccess } = props
 
   const onClick = () => {
     if (!notification.isRead) {
@@ -22,6 +22,7 @@ export const NotiForm = (props: Props) => {
       onSuccess()
     }
   }
+
   return (
     <button
       onClick={onClick}
@@ -62,3 +63,5 @@ export const NotiForm = (props: Props) => {
     </button>
   )
 }
+
+export const NotiForm = React.memo(NotiFormMemo)

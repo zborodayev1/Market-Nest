@@ -12,7 +12,6 @@ import { FavoritesPage } from './components/assets/Product/FavoritesPage'
 import { BagPage } from './components/assets/Product/BagPage'
 import { CreatePage } from './components/pages/CreateProduct/CreatePage'
 import { PendingProducts } from './components/pages/ForAdmins/PendingProducts'
-import { NotiProduct } from './components/pages/Notification/NotiProduct'
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)
@@ -59,8 +58,14 @@ export const App = () => {
                   element={!isAuth ? <Navigate to="/" /> : <CreatePage />}
                   path="/create-product"
                 />
-                <Route element={<FullProduct />} path="/product/:id" />
-                <Route element={<NotiProduct />} path="/noti/product/:id" />
+                <Route
+                  element={<FullProduct noti={false} />}
+                  path="/product/:id"
+                />
+                <Route
+                  element={<FullProduct noti={true} />}
+                  path="/noti/product/:id"
+                />
                 <Route element={<BagPage />} path="/bag" />
                 <Route element={<FavoritesPage />} path="/favorites" />
                 <Route
@@ -97,8 +102,14 @@ export const App = () => {
                   element={!isAuth ? <Navigate to="/" /> : <CreatePage />}
                   path="/create-product"
                 />
-                <Route element={<FullProduct />} path="/product/:id" />
-                <Route element={<NotiProduct />} path="/noti/product/:id" />
+                <Route
+                  element={<FullProduct noti={false} />}
+                  path="/product/:id"
+                />
+                <Route
+                  element={<FullProduct noti={true} />}
+                  path="/noti/product/:id"
+                />
                 <Route element={<BagPage />} path="/bag" />
                 <Route element={<FavoritesPage />} path="/favorites" />
                 <Route

@@ -9,7 +9,6 @@ import { AppDispatch } from '../../redux/store'
 import { useEffect } from 'react'
 import { ProductForm } from '../../assets/Product/ProductForm'
 import { motion } from 'motion/react'
-
 import { useNavigate } from 'react-router-dom'
 
 export const PendingProducts = () => {
@@ -18,10 +17,10 @@ export const PendingProducts = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    dispatch(fetchProducts())
+    dispatch(fetchProducts({ page: 1, limit: 20 }))
   }, [dispatch])
 
-  const filteredProducts = products.filter(
+  const filteredProducts = (products.products || []).filter(
     (product: Product) => product.status === 'pending'
   )
 

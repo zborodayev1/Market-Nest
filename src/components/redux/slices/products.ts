@@ -5,9 +5,22 @@ import { AxiosError } from 'axios'
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
-  async () => {
-    const { data } = await axios.get('/products')
-    return data
+  async (
+    { page, limit }: { page: number; limit: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data } = await axios.get(`/products?page=${page}&limit=${limit}`)
+      return data
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data || 'Failed to fetch products'
+        )
+      } else {
+        return rejectWithValue('An unknown error occurred')
+      }
+    }
   }
 )
 
@@ -39,14 +52,6 @@ export const getProductsBySearch = createAsyncThunk(
     const { data } = await axios.post('/products/products-by-search', {
       search,
     })
-    return data
-  }
-)
-
-export const getProductsByTags = createAsyncThunk(
-  'products/getProductsByTags',
-  async (tags: string[]) => {
-    const { data } = await axios.post('/products/products-by-tags', { tags })
     return data
   }
 )
@@ -96,11 +101,6 @@ interface User {
   id: string
   fullName: string
 }
-export interface CartItem {
-  product: Product
-  quantity: number
-}
-
 export interface Product {
   saveAmount: number
   discount: number | null
@@ -124,14 +124,18 @@ interface ProductsState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
   error: string | null
   products: Product[]
-  cart: CartItem[]
+  total: number
+  totalPages: number
+  page: number
 }
 
 const initialState: ProductsState = {
   products: [],
   status: 'idle',
   error: null,
-  cart: [],
+  total: 0,
+  totalPages: 0,
+  page: 1,
 }
 
 const productSlice = createSlice({
@@ -153,28 +157,14 @@ const productSlice = createSlice({
         fetchProducts.fulfilled,
         (state, action: PayloadAction<Product[]>) => {
           state.status = 'succeeded'
-          state.products = action.payload
+          state.products.products = action.payload
         }
       )
       .addCase(fetchProducts.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message ?? 'Something went wrong'
       })
-      .addCase(getProductsByTags.pending, (state) => {
-        state.status = 'loading'
-        state.error = null
-      })
-      .addCase(
-        getProductsByTags.fulfilled,
-        (state, action: PayloadAction<Product[]>) => {
-          state.status = 'succeeded'
-          state.products = action.payload
-        }
-      )
-      .addCase(getProductsByTags.rejected, (state, action) => {
-        state.status = 'failed'
-        state.error = action.error.message ?? 'Failed to fetch products by tags'
-      })
+
       .addCase(getProductsBySearch.pending, (state) => {
         state.status = 'loading'
         state.error = null
@@ -210,9 +200,9 @@ const productSlice = createSlice({
       })
       .addCase(
         createProduct.fulfilled,
-        (state, action: PayloadAction<Product>) => {
+        (state, action: PayloadAction<{ product: Product }>) => {
           state.status = 'succeeded'
-          state.products.push(action.payload)
+          state.products.products.push(action.payload.product)
         }
       )
       .addCase(createProduct.rejected, (state, action) => {
