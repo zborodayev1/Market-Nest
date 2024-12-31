@@ -1,6 +1,7 @@
 import NotiModel from '../models/noti.js'
 import UserModel from '../models/user.js'
 import mongoose from 'mongoose'
+import { wss } from '../../index.js'
 
 export const createNotification = async (req, res) => {
   const { actionType, title, productId } = req.body
@@ -38,6 +39,24 @@ export const createNotification = async (req, res) => {
     })
 
     await notification.save()
+
+    const unreadCount = await NotiModel.countDocuments({
+      userId,
+      isRead: false,
+    })
+
+    wss.clients.forEach((client) => {
+      if (client.readyState === client.OPEN && client.userId === userId) {
+        client.send(
+          JSON.stringify({
+            title: notification.title,
+            productId: productId,
+            type: type,
+            unreadCount: unreadCount,
+          })
+        )
+      }
+    })
 
     res.status(201).json(notification)
   } catch (error) {
@@ -107,6 +126,21 @@ export const markNotificationAsRead = async (req, res) => {
     notification.isRead = true
     await notification.save()
 
+    const unreadCount = await NotiModel.countDocuments({
+      userId,
+      isRead: false,
+    })
+
+    wss.clients.forEach((client) => {
+      if (client.readyState === client.OPEN && client.userId === userId) {
+        client.send(
+          JSON.stringify({
+            unreadCount: unreadCount,
+          })
+        )
+      }
+    })
+
     res.json({ message: 'Notification marked as read' })
   } catch (error) {
     console.error('Error marking notification as read:', error)
@@ -129,6 +163,21 @@ export const markAllNotificationsAsRead = async (req, res) => {
         message: 'No notifications found to update',
       })
     }
+
+    const unreadCount = await NotiModel.countDocuments({
+      userId,
+      isRead: false,
+    })
+
+    wss.clients.forEach((client) => {
+      if (client.readyState === client.OPEN && client.userId === userId) {
+        client.send(
+          JSON.stringify({
+            unreadCount: unreadCount,
+          })
+        )
+      }
+    })
 
     res.status(200).json({
       success: true,

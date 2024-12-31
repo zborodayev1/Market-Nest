@@ -40,6 +40,17 @@ export const createProduct = async (req, res) => {
         message: 'No file uploaded',
       })
     }
+    if (!name || name.length <= 5 || !tags || !price || price <= 0) {
+      const errors = []
+      if (!name || name.length <= 5) errors.push('name (>= 5 characters)')
+      if (!tags) errors.push('tags (>= 1 tag)')
+      if (!price || price <= 0) errors.push('price (> 0)')
+
+      return res.status(400).json({
+        success: false,
+        message: `All fields are required: ${errors.join(', ')}`,
+      })
+    }
 
     const parsedTags = Array.isArray(tags) ? tags : JSON.parse(tags)
 
@@ -52,8 +63,6 @@ export const createProduct = async (req, res) => {
       'uploads',
       req.file.filename
     )
-
-    console.log('Full file path:', fullPath)
 
     try {
       await fs.access(fullPath)
@@ -72,7 +81,7 @@ export const createProduct = async (req, res) => {
       await NotiModel.create({
         userId: req.userId,
         actionType: 'created',
-        title: `Your product is successfully created`,
+        title: `Your product ${product.name} was created successfully`,
         productId: product._id,
       })
 
@@ -289,17 +298,19 @@ export const deleteProduct = async (req, res) => {
 
 export const getAllProducts = async (req, res) => {
   try {
-    const { page = 1, limit = 20 } = req.query
+    const { page = 1, limit = 10 } = req.query
 
     const pageNumber = Math.max(Number(page), 1)
-    const pageSize = Math.min(Number(limit), 20)
+    const pageSize = Math.min(Number(limit), 10)
 
-    const products = await ProductModel.find()
+    const filter = { status: 'approved' }
+
+    const products = await ProductModel.find(filter)
       .sort({ createdAt: -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
 
-    const total = await ProductModel.countDocuments()
+    const total = await ProductModel.countDocuments(filter)
 
     const totalPages = Math.ceil(total / pageSize)
 
@@ -312,13 +323,50 @@ export const getAllProducts = async (req, res) => {
     res.json({
       page: pageNumber,
       limit: pageSize,
-      total: total,
+      total,
       totalPages,
       products: formattedProducts,
     })
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Failed to get products' })
+  }
+}
+
+export const getPendingProducts = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query
+
+    const pageNumber = Math.max(Number(page), 1)
+    const pageSize = Math.min(Number(limit), 10)
+
+    const filter = { status: 'pending' }
+
+    const products = await ProductModel.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+
+    const total = await ProductModel.countDocuments(filter)
+
+    const totalPages = Math.ceil(total / pageSize)
+
+    const formattedProducts = products.map((product) => ({
+      ...product.toObject(),
+      createdAt: dayjs(product.createdAt).format('YY-MM-DD'),
+      updatedAt: dayjs(product.updatedAt).format('YY-MM-DD'),
+    }))
+
+    res.json({
+      page: pageNumber,
+      limit: pageSize,
+      total,
+      totalPages,
+      products: formattedProducts,
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to get pending products' })
   }
 }
 
@@ -349,16 +397,8 @@ export const getProductsBySearch = async (req, res) => {
   }
 }
 
-export const updateProductStatus = async (req, res) => {
-  const { status } = req.body
+export const approveProduct = async (req, res) => {
   const productId = req.params.id
-
-  if (!['approved', 'rejected'].includes(status)) {
-    return res.status(400).json({
-      success: false,
-      message: 'Invalid status value',
-    })
-  }
 
   try {
     const product = await ProductModel.findById(productId)
@@ -370,19 +410,29 @@ export const updateProductStatus = async (req, res) => {
       })
     }
 
-    product.status = status
+    // If the product is already approved, return a message
+    if (product.status === 'approved') {
+      return res.status(400).json({
+        success: false,
+        message: 'Product is already approved',
+      })
+    }
+
+    // Update the product status to 'approved'
+    product.status = 'approved'
     await product.save()
 
+    // Send a notification to the user
     await NotiModel.create({
       userId: product.user,
-      title: `Your product has been ${status}`,
-      actionType: `${status}`,
+      title: 'Your product has been approved',
+      actionType: 'approved',
       productId: product._id,
     })
 
     return res.status(200).json({
       success: true,
-      message: `Product status updated to ${status}`,
+      message: 'Product status updated to "approved"',
       product,
     })
   } catch (error) {
@@ -391,6 +441,22 @@ export const updateProductStatus = async (req, res) => {
       success: false,
       message: 'Failed to update product status',
     })
+  }
+}
+
+export const deleteAllProducts = async (req, res) => {
+  try {
+    const result = await ProductModel.deleteMany()
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: 'No products found to delete' })
+    }
+
+    res.status(200).json({ message: 'All products deleted successfully' })
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: 'Failed to delete products', error: error.message })
   }
 }
 

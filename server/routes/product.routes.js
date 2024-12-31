@@ -12,16 +12,23 @@ router.post(
   ProductController.createProduct
 )
 
-router.get('/:id', ProductController.getOneProduct)
+router.get('/products-pending', ProductController.getPendingProducts)
+
 router.get('/', ProductController.getAllProducts)
+
 router.post('/products-by-search', ProductController.getProductsBySearch)
+
+// router.delete('/delete/all', ProductController.deleteAllProducts)
+
 router.patch('/:id', checkAuth, ProductController.patchProduct)
+
 router.patch(
   '/:id/status',
   checkAuth,
   checkAdmin,
-  ProductController.updateProductStatus
+  ProductController.approveProduct
 )
+router.get('/:id', ProductController.getOneProduct)
 
 router.delete('/:id', checkAuth, ProductController.deleteProduct)
 

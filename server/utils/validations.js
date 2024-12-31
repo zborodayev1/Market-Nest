@@ -17,10 +17,3 @@ export const loginValidation = [
     min: 8,
   }),
 ]
-
-export const productValidation = [
-  body('price', 'Invalid price, price must be a number!').isFloat(),
-  body('tags', 'Invalid tags, tags must be an array!').isArray(),
-  body('name', 'Name must be longer than 3 characters!').isLength({ min: 5 }),
-  body('image', 'Invalid URL!').isString(),
-]

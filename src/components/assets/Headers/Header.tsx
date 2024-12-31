@@ -5,11 +5,18 @@ import { ProdileHeader } from '../Profile/ProfileComponent/ProfileHeaderComponen
 import { SideBar } from '../Profile/ProfileComponent/ProfileSideBar/SideBar'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Heart, IdCard, PackagePlus, PackageSearch, Bell } from 'lucide-react'
-import { IoBagOutline } from 'react-icons/io5'
+import {
+  Heart,
+  IdCard,
+  PackagePlus,
+  PackageSearch,
+  Bell,
+  ShoppingCart,
+} from 'lucide-react'
+
 import { getProductsBySearch, fetchProducts } from '../../redux/slices/products'
 import { AppDispatch } from '../../redux/store'
-import { Notifications } from '../../pages/Notification/Notifications'
+import { Notifications } from '../Notification/Notifications'
 
 export const Header = () => {
   const isAuth = useSelector(selectIsAuth)
@@ -18,7 +25,11 @@ export const Header = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
   const notificationRef = useRef<HTMLDivElement | null>(null)
+  const [unreadCount, setUnreadCount] = useState<number>(0)
   const [searchITem, setSearchITem] = useState('')
+  const socketRef = useRef<WebSocket | null>(null)
+
+  const dispatch: AppDispatch = useDispatch()
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -61,6 +72,45 @@ export const Header = () => {
     }
   }, [notiOpen])
 
+  useEffect(() => {
+    const connectWebSocket = () => {
+      if (!socketRef.current) {
+        console.log('Connecting to WebSocket...')
+        socketRef.current = new WebSocket('ws://localhost:3000')
+
+        socketRef.current.onopen = () => {
+          console.log('WebSocket connection established')
+        }
+
+        socketRef.current.onclose = () => {
+          console.warn('WebSocket closed. Attempting to reconnect...')
+          setTimeout(connectWebSocket, 1000)
+        }
+
+        socketRef.current.onerror = (error) => {
+          console.error('WebSocket error:', error)
+        }
+
+        socketRef.current.onmessage = (event) => {
+          const data = JSON.parse(event.data)
+          console.log('WebSocket received data:', data)
+          if (data.unreadCount !== undefined) {
+            console.log('Updating unreadCount:', data.unreadCount)
+            setUnreadCount(data.unreadCount)
+          }
+        }
+      }
+    }
+
+    connectWebSocket()
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close()
+      }
+    }
+  }, [])
+
   const sidebarVariants = {
     initial: {
       x: 250,
@@ -90,8 +140,6 @@ export const Header = () => {
     },
   }
 
-  const dispatch: AppDispatch = useDispatch()
-
   const handleSearch = async () => {
     if (searchITem.trim() === '') {
       dispatch(fetchProducts({ limit: 20, page: 1 }))
@@ -99,6 +147,8 @@ export const Header = () => {
       dispatch(getProductsBySearch(searchITem))
     }
   }
+
+  console.log(unreadCount)
 
   return (
     <div>
@@ -126,12 +176,18 @@ export const Header = () => {
 
           <button
             ref={buttonRef}
-            className={`ml-[320px] z-10 mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-500 ease-in-out group`}
+            className="relative ml-[320px] z-10 mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-500 ease-in-out group"
             onClick={() => setNotiOpen(!notiOpen)}
           >
             <h1 className="text-md font-bold text-[#212121]">Notifications</h1>
             <Bell className="w-8 h-8 stroke-2 text-[#212121]" />
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
+                {unreadCount}
+              </span>
+            )}
           </button>
+
           <div className="absolute top-[70px] left-[230px] ">
             <AnimatePresence>
               {notiOpen && (
@@ -191,7 +247,10 @@ export const Header = () => {
                     to="/bag"
                   >
                     <h1 className="text-md font-bold text-[#212121]">Bag</h1>
-                    <IoBagOutline className="w-9 h-9 text-[#212121]" />
+                    <ShoppingCart
+                      style={{ strokeWidth: 2 }}
+                      className="w-9 h-9 text-[#212121] stroke-1 "
+                    />
                   </Link>
                   <Link
                     className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
@@ -200,7 +259,10 @@ export const Header = () => {
                     <h1 className="text-md font-bold text-[#212121]">
                       Favorite
                     </h1>
-                    <Heart className="w-7 h-9 text-[#212121]" />
+                    <Heart
+                      className="w-7 h-9 text-[#212121]"
+                      style={{ strokeWidth: 2.5 }}
+                    />
                   </Link>
                   <div>
                     <ProdileHeader onSuccess={() => setOpen(!open)} />
@@ -214,7 +276,10 @@ export const Header = () => {
                   to="/bag"
                 >
                   <h1 className="text-md font-bold text-[#212121]">Bag</h1>
-                  <IoBagOutline className="w-9 h-9 text-[#212121]" />
+                  <ShoppingCart
+                    style={{ strokeWidth: 2 }}
+                    className="w-9 h-9 text-[#212121] "
+                  />
                 </Link>
                 <Link
                   className="mx-2 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"

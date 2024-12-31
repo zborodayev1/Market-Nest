@@ -15,7 +15,29 @@ export const fetchProducts = createAsyncThunk(
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         return rejectWithValue(
-          error.response?.data || 'Failed to fetch products'
+          error.response?.data || 'Failed to load products'
+        )
+      } else {
+        return rejectWithValue('An unknown error occurred')
+      }
+    }
+  }
+)
+export const fetchPendingProducts = createAsyncThunk(
+  'products/fetchPendingProducts',
+  async (
+    { page, limit }: { page: number; limit: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data } = await axios.get(
+        `/products/products-pending?page=${page}&limit=${limit}`
+      )
+      return data
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data || 'Failed to load products'
         )
       } else {
         return rejectWithValue('An unknown error occurred')
@@ -33,6 +55,7 @@ export const createProduct = createAsyncThunk(
           'Content-Type': 'multipart/form-data',
         },
       })
+
       return data
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -101,6 +124,7 @@ interface User {
   id: string
   fullName: string
 }
+
 export interface Product {
   saveAmount: number
   discount: number | null
@@ -123,19 +147,23 @@ export interface Product {
 interface ProductsState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
   error: string | null
-  products: Product[]
-  total: number
-  totalPages: number
-  page: number
+  products: {
+    products: Product[]
+    total: number
+    totalPages: number
+    page: number
+  }
 }
 
 const initialState: ProductsState = {
-  products: [],
+  products: {
+    products: [],
+    total: 0,
+    totalPages: 0,
+    page: 1,
+  },
   status: 'idle',
   error: null,
-  total: 0,
-  totalPages: 0,
-  page: 1,
 }
 
 const productSlice = createSlice({
@@ -143,7 +171,7 @@ const productSlice = createSlice({
   initialState,
   reducers: {
     setProducts(state, action) {
-      state.products = action.payload
+      state.products.products = action.payload
     },
   },
   extraReducers: (builder) => {
@@ -151,20 +179,27 @@ const productSlice = createSlice({
       .addCase(fetchProducts.pending, (state) => {
         state.status = 'loading'
         state.error = null
-        state.products = []
+        state.products.products = []
       })
       .addCase(
         fetchProducts.fulfilled,
-        (state, action: PayloadAction<Product[]>) => {
+        (
+          state,
+          action: PayloadAction<{
+            products: Product[]
+            total: number
+            totalPages: number
+            page: number
+          }>
+        ) => {
           state.status = 'succeeded'
-          state.products.products = action.payload
+          state.products = action.payload
         }
       )
       .addCase(fetchProducts.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message ?? 'Something went wrong'
       })
-
       .addCase(getProductsBySearch.pending, (state) => {
         state.status = 'loading'
         state.error = null
@@ -173,12 +208,12 @@ const productSlice = createSlice({
         getProductsBySearch.fulfilled,
         (state, action: PayloadAction<Product[]>) => {
           state.status = 'succeeded'
-          state.products = action.payload
+          state.products.products = action.payload
         }
       )
       .addCase(getProductsBySearch.rejected, (state, action) => {
         state.status = 'failed'
-        state.error = action.error.message ?? 'Failed to search products'
+        state.error = action.error.message ?? 'Failed to find products'
       })
       .addCase(deleteProduct.pending, (state) => {
         state.status = 'loading'
@@ -186,7 +221,7 @@ const productSlice = createSlice({
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        state.products = state.products.filter(
+        state.products.products = state.products.products.filter(
           (product) => product._id !== action.payload.productId
         )
       })
@@ -216,16 +251,40 @@ const productSlice = createSlice({
       .addCase(updateProductStatus.fulfilled, (state, action) => {
         state.status = 'succeeded'
         const updatedProduct = action.payload
-        const productIndex = state.products.findIndex(
+        const productIndex = state.products.products.findIndex(
           (product) => product._id === updatedProduct._id
         )
         if (productIndex !== -1) {
-          state.products[productIndex] = updatedProduct
+          state.products.products[productIndex] = updatedProduct
         }
       })
       .addCase(updateProductStatus.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message ?? 'Failed to update product status'
+      })
+      .addCase(fetchPendingProducts.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+        state.products.products = []
+      })
+      .addCase(
+        fetchPendingProducts.fulfilled,
+        (
+          state,
+          action: PayloadAction<{
+            products: Product[]
+            total: number
+            totalPages: number
+            page: number
+          }>
+        ) => {
+          state.status = 'succeeded'
+          state.products = action.payload
+        }
+      )
+      .addCase(fetchPendingProducts.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message ?? 'Failed to load pending products'
       })
   },
 })

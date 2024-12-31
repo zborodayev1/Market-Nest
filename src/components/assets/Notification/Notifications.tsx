@@ -6,6 +6,7 @@ import {
   markAllNotificationsAsRead,
   deleteAllNotifications,
   Notification,
+  createNotification,
 } from '../../redux/slices/notifications'
 import { NotiForm } from './NotiForm'
 import { CircularProgress } from '@mui/material'
@@ -103,6 +104,25 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
   const refresh = useCallback(() => {
     dispatch(fetchNotifications({ page, limit, filter }))
   }, [dispatch, page, limit, filter])
+
+  useEffect(() => {
+    const socket = new WebSocket('ws://localhost:3000')
+
+    socket.onmessage = (event) => {
+      const notification = JSON.parse(event.data)
+
+      dispatch(
+        createNotification({
+          ...notification,
+          isRead: false,
+        })
+      )
+    }
+
+    return () => {
+      socket.close()
+    }
+  }, [dispatch])
 
   return (
     <AnimatePresence>
@@ -223,12 +243,23 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
         </AnimatePresence>
 
         {notifications.length > 0 && (
-          <div className="flex justify-center gap-2 mt-3 mb-5">
+          <div
+            style={
+              {
+                overflowX: 'auto',
+                maxWidth: '200px',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch',
+              } as React.CSSProperties
+            }
+            className="flex justify-start gap-2 mt-3 mb-5"
+          >
             {[...Array(totalPages).keys()].map((number) => (
               <button
                 key={number}
                 onClick={() => updatePage(number + 1)}
-                className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors duration-300 ease-linear ${
+                className={`min-w-7 min-h-7 flex items-center justify-center rounded-full transition-colors duration-300 ease-linear ${
                   page === number + 1
                     ? 'bg-[#3C8737] hover:bg-[#2B6128] text-white'
                     : 'bg-gray-200 hover:bg-gray-300 text-black'
