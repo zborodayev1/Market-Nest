@@ -110,13 +110,11 @@ export const createNotification = createAsyncThunk(
   }
 )
 
-export const deleteNotifications = createAsyncThunk(
-  'notifications/deleteNotifications',
-  async (notificationIds: string[], { rejectWithValue }) => {
+export const deleteAllNotifications = createAsyncThunk(
+  'notifications/deleteAllNotifications',
+  async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.delete('/noti', {
-        data: { notificationIds },
-      })
+      const { data } = await axios.delete('/noti/delete-all-noti')
       return data
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -211,18 +209,15 @@ const notificationsSlice = createSlice({
         state.status = 'failed'
         state.error = action.error.message ?? 'Failed to create notification'
       })
-      .addCase(deleteNotifications.pending, (state) => {
+      .addCase(deleteAllNotifications.pending, (state) => {
         state.status = 'loading'
         state.error = null
       })
-      .addCase(deleteNotifications.fulfilled, (state, action) => {
+      .addCase(deleteAllNotifications.fulfilled, (state) => {
         state.status = 'succeeded'
-
-        state.notifications = state.notifications.filter(
-          (notif) => !action.payload.includes(notif._id)
-        )
+        state.notifications = []
       })
-      .addCase(deleteNotifications.rejected, (state, action) => {
+      .addCase(deleteAllNotifications.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message ?? 'Failed to delete notifications'
       })

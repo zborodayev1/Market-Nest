@@ -18,7 +18,6 @@ export const ChangeAvatar = () => {
   const dispatch: AppDispatch = useDispatch()
   const [file, setFile] = useState<File | null>(null)
 
-  // functions
   const handleUpload = async () => {
     setChange(false)
     if (file) {
@@ -55,8 +54,8 @@ export const ChangeAvatar = () => {
           <Avatar style={{ width: 45, height: 45 }} src={userData?.avatarUrl} />
         </motion.div>
 
-        <div className="absolute inset-0 flex items-center justify-center rounded-full  opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <span className="text-[#f1eded] text-xs font-medium">
+        <div className="absolute inset-0 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-linear">
+          <span className="text-[#212121] text-xs font-medium">
             Change Avatar
           </span>
         </div>

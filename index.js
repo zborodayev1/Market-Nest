@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { WebSocketServer } from 'ws'
 
 dotenv.config()
 
@@ -28,7 +29,7 @@ app.use('/products', productRoutes)
 app.use('/upload', uploadRoutes)
 app.use('/noti', notiRoutes)
 
-app.use((error, req, res, next) => {
+app.use((error, req, res) => {
   console.error(error)
   res.status(error.status || 500).json({
     success: false,
@@ -36,7 +37,36 @@ app.use((error, req, res, next) => {
   })
 })
 
+import http from 'http'
+const server = http.createServer(app)
+
+const wss = new WebSocketServer({ server })
+
+const clients = new Map()
+
+wss.on('connection', (ws) => {
+  console.log('WebSocket клиент подключён')
+
+  ws.on('message', (message) => {
+    const parsedMessage = JSON.parse(message)
+    if (parsedMessage.userId) {
+      ws.userId = parsedMessage.userId
+      clients.set(ws.userId, ws)
+    }
+    console.log('Получено сообщение:', message)
+  })
+
+  ws.on('close', () => {
+    console.log('Клиент отключился')
+    if (ws.userId) {
+      clients.delete(ws.userId)
+    }
+  })
+})
+
+export { wss }
+
 const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })

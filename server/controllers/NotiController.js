@@ -1,6 +1,7 @@
 import NotiModel from '../models/noti.js'
 import UserModel from '../models/user.js'
 import mongoose from 'mongoose'
+import { wss } from '../../index.js'
 
 export const createNotification = async (req, res) => {
   const { actionType, title, productId } = req.body
@@ -38,6 +39,24 @@ export const createNotification = async (req, res) => {
     })
 
     await notification.save()
+
+    const unreadCount = await NotiModel.countDocuments({
+      userId,
+      isRead: false,
+    })
+
+    wss.clients.forEach((client) => {
+      if (client.readyState === client.OPEN && client.userId === userId) {
+        client.send(
+          JSON.stringify({
+            title: notification.title,
+            productId: productId,
+            type: type,
+            unreadCount: unreadCount,
+          })
+        )
+      }
+    })
 
     res.status(201).json(notification)
   } catch (error) {
@@ -107,45 +126,25 @@ export const markNotificationAsRead = async (req, res) => {
     notification.isRead = true
     await notification.save()
 
+    const unreadCount = await NotiModel.countDocuments({
+      userId,
+      isRead: false,
+    })
+
+    wss.clients.forEach((client) => {
+      if (client.readyState === client.OPEN && client.userId === userId) {
+        client.send(
+          JSON.stringify({
+            unreadCount: unreadCount,
+          })
+        )
+      }
+    })
+
     res.json({ message: 'Notification marked as read' })
   } catch (error) {
     console.error('Error marking notification as read:', error)
     res.status(500).json({ message: 'Failed to mark notification as read' })
-  }
-}
-
-export const deleteNotifications = async (req, res) => {
-  const userId = req.userId
-  const { notificationIds } = req.body
-
-  try {
-    if (!Array.isArray(notificationIds) || notificationIds.length === 0) {
-      return res
-        .status(400)
-        .json({ message: 'Array of notification IDs is required' })
-    }
-
-    const notificationsToDelete = await NotiModel.find({
-      _id: { $in: notificationIds },
-      userId,
-    })
-
-    if (notificationsToDelete.length === 0) {
-      return res.status(404).json({ message: 'No notifications found' })
-    }
-
-    await NotiModel.deleteMany({
-      _id: { $in: notificationIds },
-      userId,
-    })
-
-    res.status(200).json({
-      message: 'Notifications deleted successfully',
-      deletedNotifications: notificationsToDelete,
-    })
-  } catch (error) {
-    console.error('Error deleting notifications:', error)
-    res.status(500).json({ message: 'Failed to delete notifications' })
   }
 }
 
@@ -165,6 +164,21 @@ export const markAllNotificationsAsRead = async (req, res) => {
       })
     }
 
+    const unreadCount = await NotiModel.countDocuments({
+      userId,
+      isRead: false,
+    })
+
+    wss.clients.forEach((client) => {
+      if (client.readyState === client.OPEN && client.userId === userId) {
+        client.send(
+          JSON.stringify({
+            unreadCount: unreadCount,
+          })
+        )
+      }
+    })
+
     res.status(200).json({
       success: true,
       message: 'All notifications marked as read',
@@ -174,6 +188,33 @@ export const markAllNotificationsAsRead = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to mark all notifications as read',
+      error: err.message,
+    })
+  }
+}
+
+export const deleteAllNotifications = async (req, res) => {
+  try {
+    const userId = req.userId
+
+    const deletedNotifications = await NotiModel.deleteMany({ userId: userId })
+
+    if (deletedNotifications.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No notifications found to delete',
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'All notifications deleted',
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete all notifications',
       error: err.message,
     })
   }

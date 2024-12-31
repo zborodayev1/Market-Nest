@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 import multer from 'multer'
 import NotiModel from '../models/noti.js'
 import cron from 'node-cron'
+import levenshtein from 'fast-levenshtein'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -39,6 +40,17 @@ export const createProduct = async (req, res) => {
         message: 'No file uploaded',
       })
     }
+    if (!name || name.length <= 5 || !tags || !price || price <= 0) {
+      const errors = []
+      if (!name || name.length <= 5) errors.push('name (>= 5 characters)')
+      if (!tags) errors.push('tags (>= 1 tag)')
+      if (!price || price <= 0) errors.push('price (> 0)')
+
+      return res.status(400).json({
+        success: false,
+        message: `All fields are required: ${errors.join(', ')}`,
+      })
+    }
 
     const parsedTags = Array.isArray(tags) ? tags : JSON.parse(tags)
 
@@ -52,12 +64,9 @@ export const createProduct = async (req, res) => {
       req.file.filename
     )
 
-    console.log('Full file path:', fullPath)
-
     try {
       await fs.access(fullPath)
 
-      // Создание продукта
       const product = await ProductModel.create({
         _id: new mongoose.Types.ObjectId(),
         name,
@@ -72,7 +81,7 @@ export const createProduct = async (req, res) => {
       await NotiModel.create({
         userId: req.userId,
         actionType: 'created',
-        title: `Your product is successfully created`,
+        title: `Your product ${product.name} was created successfully`,
         productId: product._id,
       })
 
@@ -91,7 +100,6 @@ export const createProduct = async (req, res) => {
         })
       })
 
-      // Один раз отправляем ответ
       return res.status(201).json({
         success: true,
         product,
@@ -170,14 +178,18 @@ export const patchProduct = async (req, res) => {
       return res.status(400).json({ message: 'Invalid product ID' })
     }
 
-    const { discount } = req.body
+    const { name, tags, image, price, discount } = req.body
+
+    if (!name || !tags || !image || price === undefined || !description) {
+      return res.status(400).json({ message: 'Missing required fields' })
+    }
 
     const updateData = {
-      name: req.body.name,
-      tags: req.body.tags,
-      image: req.body.image,
-      price: req.body.price,
-      description: req.body.description,
+      name,
+      tags,
+      image,
+      price,
+      description,
       updatedAt: new Date(),
     }
 
@@ -187,13 +199,15 @@ export const patchProduct = async (req, res) => {
         return res.status(404).json({ message: 'Product not found' })
       }
 
-      const discountAmount = (discount / 100) * product.price
-      const newPrice = product.price - discountAmount
+      const { newPrice, discountAmount } = calculateDiscount(
+        product.price,
+        discount
+      )
 
       updateData.discount = discount
       updateData.oldPrice = product.price
-      updateData.price = Math.round(newPrice * 100) / 100
-      updateData.saveAmount = Math.round(discountAmount * 100) / 100
+      updateData.price = newPrice
+      updateData.saveAmount = discountAmount
     }
 
     session.startTransaction()
@@ -205,10 +219,9 @@ export const patchProduct = async (req, res) => {
     )
 
     if (!updatedProduct) {
+      await session.abortTransaction()
       return res.status(404).json({ message: 'Product not found' })
     }
-
-    await session.commitTransaction()
 
     await NotiModel.create({
       userId: updatedProduct.user,
@@ -216,6 +229,8 @@ export const patchProduct = async (req, res) => {
       actionType: `approved`,
       productId: productId,
     })
+
+    await session.commitTransaction()
 
     res.json({
       ...updatedProduct.toObject(),
@@ -283,63 +298,107 @@ export const deleteProduct = async (req, res) => {
 
 export const getAllProducts = async (req, res) => {
   try {
-    const products = await ProductModel.find().sort({ createdAt: -1 })
+    const { page = 1, limit = 10 } = req.query
+
+    const pageNumber = Math.max(Number(page), 1)
+    const pageSize = Math.min(Number(limit), 10)
+
+    const filter = { status: 'approved' }
+
+    const products = await ProductModel.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+
+    const total = await ProductModel.countDocuments(filter)
+
+    const totalPages = Math.ceil(total / pageSize)
+
     const formattedProducts = products.map((product) => ({
       ...product.toObject(),
       createdAt: dayjs(product.createdAt).format('YY-MM-DD'),
       updatedAt: dayjs(product.updatedAt).format('YY-MM-DD'),
     }))
 
-    res.json(formattedProducts)
+    res.json({
+      page: pageNumber,
+      limit: pageSize,
+      total,
+      totalPages,
+      products: formattedProducts,
+    })
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Failed to get products' })
   }
 }
 
-export const getProductsByTags = async (req, res) => {
+export const getPendingProducts = async (req, res) => {
   try {
-    const tags = req.body.tags
+    const { page = 1, limit = 10 } = req.query
 
-    if (!tags || tags.length === 0) {
-      return res.status(400).json({ message: 'Tags are required' })
-    }
+    const pageNumber = Math.max(Number(page), 1)
+    const pageSize = Math.min(Number(limit), 10)
 
-    const products = await ProductModel.find({ tags: { $in: tags } })
+    const filter = { status: 'pending' }
 
-    res.json(products)
+    const products = await ProductModel.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+
+    const total = await ProductModel.countDocuments(filter)
+
+    const totalPages = Math.ceil(total / pageSize)
+
+    const formattedProducts = products.map((product) => ({
+      ...product.toObject(),
+      createdAt: dayjs(product.createdAt).format('YY-MM-DD'),
+      updatedAt: dayjs(product.updatedAt).format('YY-MM-DD'),
+    }))
+
+    res.json({
+      page: pageNumber,
+      limit: pageSize,
+      total,
+      totalPages,
+      products: formattedProducts,
+    })
   } catch (err) {
     console.error(err)
-    res.status(500).json({ message: 'Failed to get products by tags' })
+    res.status(500).json({ message: 'Failed to get pending products' })
   }
 }
 
 export const getProductsBySearch = async (req, res) => {
   try {
     const search = req.body.search
+
     if (!search) {
       return res.status(400).json({ message: 'Search parameter is required' })
     }
 
-    const products = await ProductModel.find({
-      name: { $regex: search, $options: 'i' },
+    const maxDistance = 3
+
+    const products = await ProductModel.find()
+
+    const filteredProducts = products.filter((product) => {
+      const productName = product.name.toLowerCase()
+
+      const distance = levenshtein.get(search.toLowerCase(), productName)
+
+      return distance <= maxDistance
     })
-    res.json(products)
+
+    res.json(filteredProducts)
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Failed to get products by search' })
   }
 }
-export const updateProductStatus = async (req, res) => {
-  const { status } = req.body
-  const productId = req.params.id
 
-  if (!['approved', 'rejected'].includes(status)) {
-    return res.status(400).json({
-      success: false,
-      message: 'Invalid status value',
-    })
-  }
+export const approveProduct = async (req, res) => {
+  const productId = req.params.id
 
   try {
     const product = await ProductModel.findById(productId)
@@ -351,19 +410,29 @@ export const updateProductStatus = async (req, res) => {
       })
     }
 
-    product.status = status
+    // If the product is already approved, return a message
+    if (product.status === 'approved') {
+      return res.status(400).json({
+        success: false,
+        message: 'Product is already approved',
+      })
+    }
+
+    // Update the product status to 'approved'
+    product.status = 'approved'
     await product.save()
 
+    // Send a notification to the user
     await NotiModel.create({
       userId: product.user,
-      title: `Your product has been ${status}`,
-      actionType: `${status}`,
+      title: 'Your product has been approved',
+      actionType: 'approved',
       productId: product._id,
     })
 
     return res.status(200).json({
       success: true,
-      message: `Product status updated to ${status}`,
+      message: 'Product status updated to "approved"',
       product,
     })
   } catch (error) {
@@ -372,5 +441,31 @@ export const updateProductStatus = async (req, res) => {
       success: false,
       message: 'Failed to update product status',
     })
+  }
+}
+
+export const deleteAllProducts = async (req, res) => {
+  try {
+    const result = await ProductModel.deleteMany()
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: 'No products found to delete' })
+    }
+
+    res.status(200).json({ message: 'All products deleted successfully' })
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: 'Failed to delete products', error: error.message })
+  }
+}
+
+const calculateDiscount = (originalPrice, discount) => {
+  const discountAmount = (discount / 100) * originalPrice
+  const newPrice = originalPrice - discountAmount
+
+  return {
+    newPrice: Math.round(newPrice * 100) / 100,
+    discountAmount: Math.round(discountAmount * 100) / 100,
   }
 }
