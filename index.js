@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { WebSocketServer } from 'ws'
+// import { verifyTokenForWS } from './server/utils/ws/VerifyTokenWS.js'
 
 dotenv.config()
 
@@ -48,12 +49,14 @@ wss.on('connection', (ws) => {
   console.log('WebSocket клиент подключён')
 
   ws.on('message', (message) => {
-    const parsedMessage = JSON.parse(message)
+    const messageStr = message.toString()
+    const parsedMessage = JSON.parse(messageStr)
+
     if (parsedMessage.userId) {
       ws.userId = parsedMessage.userId
       clients.set(ws.userId, ws)
     }
-    console.log('Получено сообщение:', message)
+    console.log('Получено сообщение:', parsedMessage)
   })
 
   ws.on('close', () => {

@@ -46,9 +46,10 @@ export const createNotification = async (req, res) => {
     })
 
     wss.clients.forEach((client) => {
-      if (client.readyState === client.OPEN && client.userId === userId) {
+      if (client.readyState === client.OPEN) {
         client.send(
           JSON.stringify({
+            profileId: userId,
             title: notification.title,
             productId: productId,
             type: type,

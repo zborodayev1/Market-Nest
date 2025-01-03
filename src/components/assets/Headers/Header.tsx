@@ -25,9 +25,8 @@ export const Header = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
   const notificationRef = useRef<HTMLDivElement | null>(null)
-  const [unreadCount, setUnreadCount] = useState<number>(0)
+
   const [searchITem, setSearchITem] = useState('')
-  const socketRef = useRef<WebSocket | null>(null)
 
   const dispatch: AppDispatch = useDispatch()
 
@@ -72,45 +71,6 @@ export const Header = () => {
     }
   }, [notiOpen])
 
-  useEffect(() => {
-    const connectWebSocket = () => {
-      if (!socketRef.current) {
-        console.log('Connecting to WebSocket...')
-        socketRef.current = new WebSocket('ws://localhost:3000')
-
-        socketRef.current.onopen = () => {
-          console.log('WebSocket connection established')
-        }
-
-        socketRef.current.onclose = () => {
-          console.warn('WebSocket closed. Attempting to reconnect...')
-          setTimeout(connectWebSocket, 1000)
-        }
-
-        socketRef.current.onerror = (error) => {
-          console.error('WebSocket error:', error)
-        }
-
-        socketRef.current.onmessage = (event) => {
-          const data = JSON.parse(event.data)
-          console.log('WebSocket received data:', data)
-          if (data.unreadCount !== undefined) {
-            console.log('Updating unreadCount:', data.unreadCount)
-            setUnreadCount(data.unreadCount)
-          }
-        }
-      }
-    }
-
-    connectWebSocket()
-
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.close()
-      }
-    }
-  }, [])
-
   const sidebarVariants = {
     initial: {
       x: 250,
@@ -148,8 +108,6 @@ export const Header = () => {
     }
   }
 
-  console.log(unreadCount)
-
   return (
     <div>
       <div className="">
@@ -181,11 +139,6 @@ export const Header = () => {
           >
             <h1 className="text-md font-bold text-[#212121]">Notifications</h1>
             <Bell className="w-8 h-8 stroke-2 text-[#212121]" />
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
-                {unreadCount}
-              </span>
-            )}
           </button>
 
           <div className="absolute top-[70px] left-[230px] ">

@@ -11,6 +11,7 @@ import {
 import { NotiForm } from './NotiForm'
 import { CircularProgress } from '@mui/material'
 import { AnimatePresence, motion } from 'framer-motion'
+import { selectUserProfile } from '../../redux/slices/auth'
 
 interface Props {
   onSuccess: () => void
@@ -28,6 +29,7 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
   const { status, totalPages } = useSelector(
     (state: RootState) => state.notifications
   )
+  const userData = useSelector(selectUserProfile)
   const [message, setMessage] = useState('')
   const cacheKey = useMemo(() => `${filter}-${page}`, [filter, page])
   const notifications = useMemo(
@@ -105,12 +107,22 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
     dispatch(fetchNotifications({ page, limit, filter }))
   }, [dispatch, page, limit, filter])
 
+  const socket = useMemo(() => new WebSocket('ws://localhost:3000'), [])
+
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:3000')
+    socket.onopen = () => {
+      console.log('WebSocket connection established')
+      const message = { type: 'ping', content: userData?._id }
+      socket.send(JSON.stringify(message))
+    }
 
     socket.onmessage = (event) => {
-      const notification = JSON.parse(event.data)
-
+      console.log('Message from server:', event.data)
+      const data = JSON.parse(event.data)
+      const { notification, unreadCount } = data
+      if (unreadCount !== undefined) {
+        console.log('Unread count:', unreadCount)
+      }
       dispatch(
         createNotification({
           ...notification,
@@ -119,10 +131,18 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
       )
     }
 
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error)
+    }
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed')
+    }
+
     return () => {
       socket.close()
     }
-  }, [dispatch])
+  }, [socket, dispatch, userData])
 
   return (
     <AnimatePresence>
@@ -191,6 +211,7 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
             )}
           </AnimatePresence>
         </div>
+
         <AnimatePresence>
           {status !== 'loading' && (
             <motion.div
