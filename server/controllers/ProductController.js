@@ -42,7 +42,7 @@ export const createProduct = async (req, res) => {
     }
     if (!name || name.length <= 5 || !tags || !price || price <= 0) {
       const errors = []
-      if (!name || name.length <= 5) errors.push('name (>= 5 characters)')
+      if (!name || name.length <= 5) errors.push('name (> 5 characters)')
       if (!tags) errors.push('tags (>= 1 tag)')
       if (!price || price <= 0) errors.push('price (> 0)')
 
@@ -301,7 +301,7 @@ export const getAllProducts = async (req, res) => {
     const { page = 1, limit = 10 } = req.query
 
     const pageNumber = Math.max(Number(page), 1)
-    const pageSize = Math.min(Number(limit), 10)
+    const pageSize = Math.min(Number(limit), 50)
 
     const filter = { status: 'approved' }
 
@@ -338,7 +338,7 @@ export const getPendingProducts = async (req, res) => {
     const { page = 1, limit = 10 } = req.query
 
     const pageNumber = Math.max(Number(page), 1)
-    const pageSize = Math.min(Number(limit), 10)
+    const pageSize = Math.min(Number(limit), 50)
 
     const filter = { status: 'pending' }
 
@@ -410,7 +410,6 @@ export const approveProduct = async (req, res) => {
       })
     }
 
-    // If the product is already approved, return a message
     if (product.status === 'approved') {
       return res.status(400).json({
         success: false,
@@ -418,11 +417,9 @@ export const approveProduct = async (req, res) => {
       })
     }
 
-    // Update the product status to 'approved'
     product.status = 'approved'
     await product.save()
 
-    // Send a notification to the user
     await NotiModel.create({
       userId: product.user,
       title: 'Your product has been approved',

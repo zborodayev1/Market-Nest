@@ -18,7 +18,7 @@ router.get('/', ProductController.getAllProducts)
 
 router.post('/products-by-search', ProductController.getProductsBySearch)
 
-// router.delete('/delete/all', ProductController.deleteAllProducts)
+router.delete('/delete/all', ProductController.deleteAllProducts)
 
 router.patch('/:id', checkAuth, ProductController.patchProduct)
 
