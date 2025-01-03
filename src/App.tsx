@@ -12,6 +12,7 @@ import { FavoritesPage } from './components/assets/Product/FavoritesPage'
 import { BagPage } from './components/assets/Product/BagPage'
 import { CreatePage } from './components/pages/CreateProduct/CreatePage'
 import { PendingProducts } from './components/pages/ForAdmins/PendingProducts'
+import {ToastContainer} from 'react-toastify';
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)
@@ -34,8 +35,10 @@ export const App = () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
   return (
     <div>
+      <ToastContainer />
       <div ref={dropdownRef}>
         {open ? (
           <button onClick={() => setOpen(false)}>
