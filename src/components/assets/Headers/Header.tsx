@@ -27,7 +27,9 @@ export const Header = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
   const notificationRef = useRef<HTMLDivElement | null>(null)
-  const [unreadCount, setUnreadCount] = useState<number>(unreadNotiCount.count)
+  const [unreadCount, setUnreadCount] = useState<number | null>(
+    unreadNotiCount.count
+  )
   const [searchITem, setSearchITem] = useState('')
   const userData = useSelector(selectUserProfile)
   const dispatch: AppDispatch = useDispatch()
@@ -86,9 +88,12 @@ export const Header = () => {
       const data = JSON.parse(event.data)
       if (
         data.type === 'notificationUpdate' &&
-        data.profileId === userData?._id
+        data.profileId === userData?._id &&
+        data.increment !== 0
       ) {
         setUnreadCount((unreadCount) => (unreadCount += data.increment))
+      } else if (data.increment === 0) {
+        setUnreadCount(null)
       }
     }
 
@@ -100,12 +105,6 @@ export const Header = () => {
       console.log('WebSocket соединение закрыто')
     }
   }, [socket, userData, unreadCount])
-
-  useEffect(() => {
-    if (unreadCount < 0) {
-      setUnreadCount(0)
-    }
-  }, [unreadCount])
 
   const sidebarVariants = {
     initial: {

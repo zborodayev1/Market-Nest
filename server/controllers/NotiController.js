@@ -100,7 +100,7 @@ export const markAllNotificationsAsRead = async (req, res) => {
       })
     }
 
-    await sendUnreadCountToClients(req.userId, -9999)
+    await sendUnreadCountToClients(req.userId, 0)
 
     res.status(200).json({
       success: true,
@@ -128,7 +128,7 @@ export const deleteAllNotifications = async (req, res) => {
         message: 'No notifications found to delete',
       })
     }
-    await sendUnreadCountToClients(req.userId, -9999)
+    await sendUnreadCountToClients(req.userId, 0)
 
     res.status(200).json({
       success: true,
