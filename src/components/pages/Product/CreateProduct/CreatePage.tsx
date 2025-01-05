@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { useState, useRef, useEffect } from 'react'
-import { Package, Coins, Tags, ImagePlus, X, Info, Check } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Package, Coins, Tags, ImagePlus, X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { createProduct, selectProducts } from '../../../redux/slices/products'
 import { AppDispatch } from '../../../redux/store'

@@ -11,7 +11,8 @@ import { ProductForm } from '../ProductForm/ProductForm'
 import { motion } from 'motion/react'
 import { Helmet } from 'react-helmet-async'
 import { PageSettingsForm } from '../../../forms/pageSettingsForm'
-import { CircularProgress } from '@mui/material'
+
+import { toast } from 'react-toastify'
 
 export const PendingProducts = () => {
   const dispatch: AppDispatch = useDispatch()
@@ -43,6 +44,10 @@ export const PendingProducts = () => {
         payload: filteredProducts.filter(
           (product: Product) => product._id !== productId
         ),
+      })
+      toast('Successfully update product status to success!', {
+        type: 'success',
+        position: 'top-right',
       })
     } catch (error) {
       console.error('Failed to update product status:', error)
@@ -83,41 +88,35 @@ export const PendingProducts = () => {
             setFocusPage={setFocusPage}
           />
         </div>
-        {status === 'loading' && (
-          <div className="flex justify-center">
-            <CircularProgress color="inherit" />
+
+        <div className="m-3 mt-6">
+          <div className="flex flex-wrap justify-center gap-4">
+            {filteredProducts.map((product: Product, index: number) => (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  delay: Math.min(index * 0.1, 0.6),
+                  duration: 0.5,
+                }}
+                key={product._id}
+                className="flex justify-between"
+                layout
+              >
+                <ProductForm
+                  product={product}
+                  Pending
+                  onSubmit={() => onSubmit(product._id)}
+                />
+              </motion.div>
+            ))}
+            {filteredProducts.length === 0 && status !== 'loading' && (
+              <p className="text-center text-xl text-[#000000] font-bold">
+                No pending products
+              </p>
+            )}
           </div>
-        )}
-        {status !== 'loading' && (
-          <div className="m-3 mt-6">
-            <div className="flex flex-wrap justify-center gap-4">
-              {filteredProducts.map((product: Product, index: number) => (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{
-                    delay: Math.min(index * 0.1, 0.6),
-                    duration: 0.5,
-                  }}
-                  key={product._id}
-                  className="flex justify-between"
-                  layout
-                >
-                  <ProductForm
-                    product={product}
-                    Pending
-                    onSubmit={() => onSubmit(product._id)}
-                  />
-                </motion.div>
-              ))}
-              {filteredProducts.length === 0 && status !== 'loading' && (
-                <p className="text-center text-xl text-[#000000] font-bold">
-                  No pending products
-                </p>
-              )}
-            </div>
-          </div>
-        )}
+        </div>
       </motion.div>
     </>
   )
