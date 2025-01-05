@@ -1,16 +1,15 @@
 import { Avatar } from '@mui/material'
 import { motion } from 'framer-motion'
 import { useRef, useState } from 'react'
-import { AppDispatch } from '../../../../../../redux/store'
+import { AppDispatch } from '../../../../../redux/store'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   uploadImage,
   fetchProfileData,
   selectUserProfile,
-} from '../../../../../../redux/slices/auth'
+} from '../../../../../redux/slices/auth'
 
 export const ChangeAvatar = () => {
-  // react
   const [isHovered, setIsHovered] = useState(false)
   const userData = useSelector(selectUserProfile)
   const inputFileRef = useRef<HTMLInputElement | null>(null)
@@ -40,7 +39,7 @@ export const ChangeAvatar = () => {
     <div>
       <button
         onClick={() => inputFileRef.current?.click()}
-        className="relative group"
+        className="relative group items-center"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -54,7 +53,7 @@ export const ChangeAvatar = () => {
           <Avatar style={{ width: 45, height: 45 }} src={userData?.avatarUrl} />
         </motion.div>
 
-        <div className="absolute inset-0 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-linear">
+        <div className="absolute inset-0 flex  justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-linear">
           <span className="text-[#212121] text-xs font-medium">
             Change Avatar
           </span>

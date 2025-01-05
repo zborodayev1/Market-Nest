@@ -4,13 +4,13 @@ import {
   Product,
   selectProducts,
   updateProductStatus,
-} from '../../redux/slices/products'
-import { AppDispatch } from '../../redux/store'
+} from '../../../redux/slices/products'
+import { AppDispatch } from '../../../redux/store'
 import { useEffect, useState } from 'react'
-import { ProductForm } from '../../assets/Product/ProductForm'
+import { ProductForm } from '../ProductForm/ProductForm'
 import { motion } from 'motion/react'
 import { Helmet } from 'react-helmet-async'
-import { PageSettingsForm } from '../../forms/pageSettingsForm'
+import { PageSettingsForm } from '../../../forms/pageSettingsForm'
 import { CircularProgress } from '@mui/material'
 
 export const PendingProducts = () => {

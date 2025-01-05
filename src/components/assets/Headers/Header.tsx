@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
-import { selectIsAuth } from '../../redux/slices/auth'
+import { selectIsAuth, selectUserProfile } from '../../redux/slices/auth'
 import { useDispatch, useSelector } from 'react-redux'
 import { ProdileHeader } from '../Profile/ProfileComponent/ProfileHeaderComponents/ProfileHeader'
 import { SideBar } from '../Profile/ProfileComponent/ProfileSideBar/SideBar'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import {
   Heart,
@@ -13,21 +13,23 @@ import {
   Bell,
   ShoppingCart,
 } from 'lucide-react'
-
 import { getProductsBySearch, fetchProducts } from '../../redux/slices/products'
-import { AppDispatch } from '../../redux/store'
-import { Notifications } from '../Notification/Notifications'
+import { AppDispatch, RootState } from '../../redux/store'
+import { NotiHeaderDropDown } from '../Dropdowns/NotiDropDowns/NotiHeaderDropDown'
 
 export const Header = () => {
   const isAuth = useSelector(selectIsAuth)
+  const unreadNotiCount = useSelector(
+    (state: RootState) => state.notifications.unread
+  )
   const [open, setOpen] = useState(false)
   const [notiOpen, setNotiOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
   const notificationRef = useRef<HTMLDivElement | null>(null)
-
+  const [unreadCount, setUnreadCount] = useState<number>(unreadNotiCount.count)
   const [searchITem, setSearchITem] = useState('')
-
+  const userData = useSelector(selectUserProfile)
   const dispatch: AppDispatch = useDispatch()
 
   useEffect(() => {
@@ -70,6 +72,40 @@ export const Header = () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [notiOpen])
+
+  const socket = useMemo(() => new WebSocket('ws://localhost:3000'), [])
+
+  useEffect(() => {
+    socket.onopen = () => {
+      console.log('WebSocket подключен')
+
+      socket.send(JSON.stringify({ type: 'auth', userId: userData?._id }))
+    }
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      if (
+        data.type === 'notificationUpdate' &&
+        data.profileId === userData?._id
+      ) {
+        setUnreadCount((unreadCount) => (unreadCount += data.increment))
+      }
+    }
+
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error)
+    }
+
+    socket.onclose = () => {
+      console.log('WebSocket соединение закрыто')
+    }
+  }, [socket, userData, unreadCount])
+
+  useEffect(() => {
+    if (unreadCount < 0) {
+      setUnreadCount(0)
+    }
+  }, [unreadCount])
 
   const sidebarVariants = {
     initial: {
@@ -114,7 +150,7 @@ export const Header = () => {
         <div className="relative items-center flex bg-[#F5F5F5] z-30 w-screen h-[100px]">
           <div className="absolute left-[120px] transform -translate-x-1/2 flex justify-center items-center z-10">
             <motion.div className="flex justify-center py-4 px-4 w-full cursor-pointer ">
-              <div className=" hover:bg-[#e4e4e4] transition-colors duration-300 rounded-[15px] ease-in-out flex items-center p-2 px-3  ml-[80px]">
+              <div className=" hover:bg-[#e4e4e4] transition-colors duration-300 rounded-[15px] ease-in-out flex items-center p-2 px-3 ml-[50px]">
                 <input
                   type="text"
                   onChange={(e) => setSearchITem(e.target.value)}
@@ -130,34 +166,6 @@ export const Header = () => {
                 </button>
               </div>
             </motion.div>
-          </div>
-
-          <button
-            ref={buttonRef}
-            className="relative ml-[320px] z-10 mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-500 ease-in-out group"
-            onClick={() => setNotiOpen(!notiOpen)}
-          >
-            <h1 className="text-md font-bold text-[#212121]">Notifications</h1>
-            <Bell className="w-8 h-8 stroke-2 text-[#212121]" />
-          </button>
-
-          <div className="absolute top-[70px] left-[230px] ">
-            <AnimatePresence>
-              {notiOpen && (
-                <motion.div
-                  ref={notificationRef}
-                  initial={{ opacity: 0, y: -40 }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  exit={{ opacity: 0, y: 40 }}
-                  className="flex justify-center bg-[#fafafa] mt-3 border-slate-500 border-2 rounded-xl z-20 w-[350px] px-[50px] min-h-[340px] max-h-[1440px]"
-                >
-                  <Notifications onSuccess={() => setNotiOpen(false)} />
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
 
           <div className="absolute inset-x-0 flex justify-center items-center">
@@ -188,8 +196,25 @@ export const Header = () => {
             {isAuth ? (
               <div>
                 <div className="flex">
+                  <button
+                    ref={buttonRef}
+                    className="relative z-10 mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-3 rounded-full duration-500 ease-in-out group"
+                    onClick={() => setNotiOpen(!notiOpen)}
+                  >
+                    <Bell className="w-8 h-8 stroke-2 text-[#212121]" />
+                    {unreadCount && unreadCount > 0 && unreadCount !== null && (
+                      <span className="absolute -top-1 right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+                  <NotiHeaderDropDown
+                    notiOpen={notiOpen}
+                    notificationRef={notificationRef}
+                    PropsForNoti={() => setNotiOpen}
+                  />
                   <Link
-                    className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
+                    className="mx-1 ml-3 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                     to="/create-product"
                   >
                     <h1 className="text-md font-bold text-[#212121]">Create</h1>

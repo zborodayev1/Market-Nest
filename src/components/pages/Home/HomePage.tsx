@@ -5,12 +5,13 @@ import {
   Product,
   selectProducts,
 } from '../../redux/slices/products'
-import { ProductForm } from '../../assets/Product/ProductForm'
+import { ProductForm } from '../Product/ProductForm/ProductForm'
 import { AnimatePresence, motion } from 'motion/react'
 import { AppDispatch } from '../../redux/store'
 import { CircularProgress } from '@mui/material'
 import { PageSettingsForm } from '../../forms/pageSettingsForm'
 import { Helmet } from 'react-helmet-async'
+import { fetchNotificationCount } from '../../redux/slices/notifications'
 
 export const HomePage = () => {
   const dispatch: AppDispatch = useDispatch()
@@ -43,6 +44,10 @@ export const HomePage = () => {
     )
   }
 
+  const crearFilrers = () => {
+    setSelectedTags([])
+  }
+
   useEffect(() => {
     dispatch(
       fetchProducts({
@@ -51,6 +56,10 @@ export const HomePage = () => {
       })
     )
   }, [dispatch, PGState])
+
+  useEffect(() => {
+    dispatch(fetchNotificationCount())
+  }, [dispatch])
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prevTags) =>
@@ -129,7 +138,7 @@ export const HomePage = () => {
                     initial={{ opacity: 0, x: 50, filter: 'blur(5px)' }}
                     animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
                     exit={{ opacity: 0, x: 50, filter: 'blur(5px)' }}
-                    onClick={handleRefresh}
+                    onClick={crearFilrers}
                     className=" px-4 py-1 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors ease-in-out duration-300"
                   >
                     Clear Filters

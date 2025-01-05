@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { WebSocketServer } from 'ws'
-// import { verifyTokenForWS } from './server/utils/ws/VerifyTokenWS.js'
+import http from 'http'
 
 dotenv.config()
 
@@ -30,7 +30,7 @@ app.use('/products', productRoutes)
 app.use('/upload', uploadRoutes)
 app.use('/noti', notiRoutes)
 
-app.use((error, req, res) => {
+app.use((error, req, res, next) => {
   console.error(error)
   res.status(error.status || 500).json({
     success: false,
@@ -38,7 +38,6 @@ app.use((error, req, res) => {
   })
 })
 
-import http from 'http'
 const server = http.createServer(app)
 
 const wss = new WebSocketServer({ server })
@@ -48,15 +47,25 @@ const clients = new Map()
 wss.on('connection', (ws) => {
   console.log('WebSocket клиент подключён')
 
-  ws.on('message', (message) => {
-    const messageStr = message.toString()
-    const parsedMessage = JSON.parse(messageStr)
+  ws.on('message', async (message) => {
+    try {
+      const { type, userId } = JSON.parse(message)
 
-    if (parsedMessage.userId) {
-      ws.userId = parsedMessage.userId
-      clients.set(ws.userId, ws)
+      if (type === 'auth' && userId) {
+        ws.userId = userId
+        clients.set(userId, ws)
+        console.log(`Клиент аутентифицирован с userId: ${userId}`)
+      } else {
+        ws.send(
+          JSON.stringify({ status: 'error', message: 'Unknown message type' })
+        )
+      }
+    } catch (error) {
+      console.error('Error processing message:', error)
+      ws.send(
+        JSON.stringify({ status: 'error', message: 'Invalid message format' })
+      )
     }
-    console.log('Получено сообщение:', parsedMessage)
   })
 
   ws.on('close', () => {

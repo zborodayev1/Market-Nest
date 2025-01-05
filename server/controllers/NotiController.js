@@ -1,70 +1,7 @@
 import NotiModel from '../models/noti.js'
-import UserModel from '../models/user.js'
+// import UserModel from '../models/user.js'
 import mongoose from 'mongoose'
-import { wss } from '../../index.js'
-
-export const createNotification = async (req, res) => {
-  const { actionType, title, productId } = req.body
-  const userId = req.userId
-  let type = 'info'
-
-  switch (actionType) {
-    case 'created':
-      type = 'success'
-      break
-    case 'approved':
-      type = 'success'
-      break
-    case 'rejected':
-      type = 'error'
-      break
-    default:
-      type = 'info'
-      break
-  }
-
-  try {
-    const user = await UserModel.findById(userId)
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' })
-    }
-
-    const notification = new NotiModel({
-      type: type,
-      title: title || 'Untitled Notification',
-      actionType: actionType,
-      productId: productId,
-      userId: userId,
-    })
-
-    await notification.save()
-
-    const unreadCount = await NotiModel.countDocuments({
-      userId,
-      isRead: false,
-    })
-
-    wss.clients.forEach((client) => {
-      if (client.readyState === client.OPEN) {
-        client.send(
-          JSON.stringify({
-            profileId: userId,
-            title: notification.title,
-            productId: productId,
-            type: type,
-            unreadCount: unreadCount,
-          })
-        )
-      }
-    })
-
-    res.status(201).json(notification)
-  } catch (error) {
-    console.error('Error creating notification:', error)
-    res.status(500).json({ message: 'Failed to create notification' })
-  }
-}
+import { sendUnreadCountToClients } from '../webSokets/functions/sendUnreadCountToClients/sendUnreadCountToClients.js'
 
 export const getNotifications = async (req, res) => {
   const userId = req.userId
@@ -113,6 +50,17 @@ export const getNotifications = async (req, res) => {
   }
 }
 
+export const getNotificationCount = async (req, res) => {
+  try {
+    const userId = req.userId
+    const count = await NotiModel.countDocuments({ userId, isRead: false })
+    res.status(200).json({ count: count })
+  } catch (error) {
+    console.error('Error fetching notification count:', error)
+    res.status(500).json({ message: 'Failed to fetch notification count' })
+  }
+}
+
 export const markNotificationAsRead = async (req, res) => {
   const userId = req.userId
   const { id } = req.params
@@ -127,20 +75,7 @@ export const markNotificationAsRead = async (req, res) => {
     notification.isRead = true
     await notification.save()
 
-    const unreadCount = await NotiModel.countDocuments({
-      userId,
-      isRead: false,
-    })
-
-    wss.clients.forEach((client) => {
-      if (client.readyState === client.OPEN && client.userId === userId) {
-        client.send(
-          JSON.stringify({
-            unreadCount: unreadCount,
-          })
-        )
-      }
-    })
+    await sendUnreadCountToClients(req.userId, -1)
 
     res.json({ message: 'Notification marked as read' })
   } catch (error) {
@@ -165,20 +100,7 @@ export const markAllNotificationsAsRead = async (req, res) => {
       })
     }
 
-    const unreadCount = await NotiModel.countDocuments({
-      userId,
-      isRead: false,
-    })
-
-    wss.clients.forEach((client) => {
-      if (client.readyState === client.OPEN && client.userId === userId) {
-        client.send(
-          JSON.stringify({
-            unreadCount: unreadCount,
-          })
-        )
-      }
-    })
+    await sendUnreadCountToClients(req.userId, -9999)
 
     res.status(200).json({
       success: true,
@@ -206,6 +128,7 @@ export const deleteAllNotifications = async (req, res) => {
         message: 'No notifications found to delete',
       })
     }
+    await sendUnreadCountToClients(req.userId, -9999)
 
     res.status(200).json({
       success: true,
