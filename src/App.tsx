@@ -38,6 +38,7 @@ export const App = () => {
   return (
     <div>
       <ToastContainer position="bottom-center" />
+      {/* add toast  */}
       <div ref={dropdownRef}>
         {open ? (
           <button onClick={() => setOpen(false)}>
