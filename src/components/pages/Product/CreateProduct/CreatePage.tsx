@@ -130,7 +130,7 @@ export const CreatePage = () => {
           </h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="gap-2 bg-[#f5f5f5] p-5 px-6 rounded-md shadow-xl"
+            className="gap-2 bg-[#f5f5f5] p-5 px-6 rounded-2xl shadow-xl"
           >
             <div>
               <label className="flex items-center gap-2 text-xl font-bold text-black dark:text-gray-300 mb-1">

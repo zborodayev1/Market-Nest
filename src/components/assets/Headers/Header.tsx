@@ -203,7 +203,7 @@ export const Header = () => {
                   >
                     <Bell className="w-8 h-8 stroke-2 text-[#212121]" />
                     {unreadCount && unreadCount > 0 && unreadCount !== null && (
-                      <span className="absolute -top-1 right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                      <span className="absolute -top-[2px] -right-[2px] bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
                         {unreadCount}
                       </span>
                     )}
