@@ -1,4 +1,4 @@
-import { deleteProduct, Product } from '../../redux/slices/products'
+import { deleteProduct, Product } from '../../../redux/slices/products'
 import { Link } from 'react-router-dom'
 import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
@@ -10,7 +10,7 @@ import { IoBag } from 'react-icons/io5'
 import { AnimatePresence, motion } from 'motion/react'
 import { jwtDecode } from 'jwt-decode'
 import { useDispatch } from 'react-redux'
-import { AppDispatch } from '../../redux/store'
+import { AppDispatch } from '../../../redux/store'
 
 interface ProductFormProps {
   product: Product

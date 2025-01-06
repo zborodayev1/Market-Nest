@@ -21,6 +21,7 @@ interface NotificationsState {
   totalPages: number
   page: number
   filter: string
+  unread: number
 }
 
 const initialState: NotificationsState = {
@@ -31,6 +32,7 @@ const initialState: NotificationsState = {
   totalPages: 0,
   page: 1,
   filter: 'read',
+  unread: 0,
 }
 
 export const fetchNotifications = createAsyncThunk(
@@ -74,34 +76,16 @@ export const markNotificationAsRead = createAsyncThunk(
   }
 )
 
-export const createNotification = createAsyncThunk(
-  'notifications/createNotification',
-  async (
-    {
-      message,
-      actionType,
-      title,
-      productId,
-    }: {
-      message: string
-      actionType: string
-      title?: string
-      productId?: string
-    },
-    { rejectWithValue }
-  ) => {
+export const fetchNotificationCount = createAsyncThunk(
+  'notifications/fetchNotificationCount',
+  async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post('/noti', {
-        message,
-        actionType,
-        title,
-        productId,
-      })
+      const { data } = await axios.get('/noti/unread-count')
       return data
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         return rejectWithValue(
-          error.response?.data || 'Failed to create notification'
+          error.response?.data || 'Failed to fetch notification count'
         )
       } else {
         return rejectWithValue('An unknown error occurred')
@@ -196,19 +180,7 @@ const notificationsSlice = createSlice({
         state.status = 'failed'
         state.error = action.error.message ?? 'Failed to mark as read'
       })
-      .addCase(createNotification.pending, (state) => {
-        state.status = 'loading'
-        state.error = null
-      })
-      .addCase(createNotification.fulfilled, (state, action) => {
-        state.status = 'succeeded'
 
-        state.notifications = [...state.notifications, action.payload]
-      })
-      .addCase(createNotification.rejected, (state, action) => {
-        state.status = 'failed'
-        state.error = action.error.message ?? 'Failed to create notification'
-      })
       .addCase(deleteAllNotifications.pending, (state) => {
         state.status = 'loading'
         state.error = null
@@ -231,6 +203,18 @@ const notificationsSlice = createSlice({
         state.status = 'failed'
         state.error =
           action.error.message ?? 'Failed to mark notifications as read'
+      })
+      .addCase(fetchNotificationCount.pending, (state) => {
+        state.status = 'loading'
+      })
+      .addCase(fetchNotificationCount.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.unread = action.payload
+      })
+      .addCase(fetchNotificationCount.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error =
+          action.error.message ?? 'Failed to fetch notification count'
       })
   },
 })

@@ -9,7 +9,7 @@ router.patch(
   checkAuth,
   NotiController.markAllNotificationsAsRead
 )
-router.post('/', checkAuth, NotiController.createNotification)
+router.get('/unread-count', checkAuth, NotiController.getNotificationCount)
 router.get('/', checkAuth, NotiController.getNotifications)
 router.delete(
   '/delete-all-noti',

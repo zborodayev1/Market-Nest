@@ -6,7 +6,6 @@ import {
   markAllNotificationsAsRead,
   deleteAllNotifications,
   Notification,
-  createNotification,
 } from '../../redux/slices/notifications'
 import { NotiForm } from './NotiForm'
 import { CircularProgress } from '@mui/material'
@@ -28,6 +27,7 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
   const { status, totalPages } = useSelector(
     (state: RootState) => state.notifications
   )
+
   const [message, setMessage] = useState('')
   const cacheKey = useMemo(() => `${filter}-${page}`, [filter, page])
   const notifications = useMemo(
@@ -105,25 +105,6 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
     dispatch(fetchNotifications({ page, limit, filter }))
   }, [dispatch, page, limit, filter])
 
-  useEffect(() => {
-    const socket = new WebSocket('ws://localhost:3000')
-
-    socket.onmessage = (event) => {
-      const notification = JSON.parse(event.data)
-
-      dispatch(
-        createNotification({
-          ...notification,
-          isRead: false,
-        })
-      )
-    }
-
-    return () => {
-      socket.close()
-    }
-  }, [dispatch])
-
   return (
     <AnimatePresence>
       <motion.div
@@ -191,6 +172,7 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
             )}
           </AnimatePresence>
         </div>
+
         <AnimatePresence>
           {status !== 'loading' && (
             <motion.div

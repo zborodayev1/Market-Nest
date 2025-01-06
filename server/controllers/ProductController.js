@@ -9,6 +9,7 @@ import multer from 'multer'
 import NotiModel from '../models/noti.js'
 import cron from 'node-cron'
 import levenshtein from 'fast-levenshtein'
+import { sendUnreadCountToClients } from '../webSokets/functions/sendUnreadCountToClients/sendUnreadCountToClients.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -84,6 +85,8 @@ export const createProduct = async (req, res) => {
         title: `Your product ${product.name} was created successfully`,
         productId: product._id,
       })
+
+      await sendUnreadCountToClients(req.userId, 1)
 
       const admins = await UserModel.find({ role: 'admin' })
 
@@ -230,6 +233,8 @@ export const patchProduct = async (req, res) => {
       productId: productId,
     })
 
+    await sendUnreadCountToClients(req.userId, 1)
+
     await session.commitTransaction()
 
     res.json({
@@ -279,6 +284,8 @@ export const deleteProduct = async (req, res) => {
         actionType: `approved`,
         productId: productId,
       })
+
+      await sendUnreadCountToClients(req.userId, 1)
 
       return res.status(200).json({
         message: 'Product deleted successfully',
@@ -426,6 +433,8 @@ export const approveProduct = async (req, res) => {
       actionType: 'approved',
       productId: product._id,
     })
+
+    await sendUnreadCountToClients(req.userId, 1)
 
     return res.status(200).json({
       success: true,

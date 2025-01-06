@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { WebSocketServer } from 'ws'
+import http from 'http'
 
 dotenv.config()
 
@@ -21,7 +22,12 @@ connectDB()
 const app = express()
 
 app.use(express.json())
-app.use(cors())
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+)
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/auth', authRoutes)
@@ -29,7 +35,7 @@ app.use('/products', productRoutes)
 app.use('/upload', uploadRoutes)
 app.use('/noti', notiRoutes)
 
-app.use((error, req, res) => {
+app.use((error, req, res, next) => {
   console.error(error)
   res.status(error.status || 500).json({
     success: false,
@@ -37,7 +43,6 @@ app.use((error, req, res) => {
   })
 })
 
-import http from 'http'
 const server = http.createServer(app)
 
 const wss = new WebSocketServer({ server })
@@ -47,13 +52,25 @@ const clients = new Map()
 wss.on('connection', (ws) => {
   console.log('WebSocket клиент подключён')
 
-  ws.on('message', (message) => {
-    const parsedMessage = JSON.parse(message)
-    if (parsedMessage.userId) {
-      ws.userId = parsedMessage.userId
-      clients.set(ws.userId, ws)
+  ws.on('message', async (message) => {
+    try {
+      const { type, userId } = JSON.parse(message)
+
+      if (type === 'auth' && userId) {
+        ws.userId = userId
+        clients.set(userId, ws)
+        console.log(`Клиент аутентифицирован с userId: ${userId}`)
+      } else {
+        ws.send(
+          JSON.stringify({ status: 'error', message: 'Unknown message type' })
+        )
+      }
+    } catch (error) {
+      console.error('Error processing message:', error)
+      ws.send(
+        JSON.stringify({ status: 'error', message: 'Invalid message format' })
+      )
     }
-    console.log('Получено сообщение:', message)
   })
 
   ws.on('close', () => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import UserModel from '../models/user.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'

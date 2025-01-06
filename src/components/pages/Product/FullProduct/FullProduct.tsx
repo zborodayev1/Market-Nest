@@ -1,5 +1,5 @@
 import { CircularProgress } from '@mui/material'
-import axios from '../../../axios'
+import axios from '../../../../axios'
 import { useState, useEffect } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { IoBag } from 'react-icons/io5'
@@ -10,7 +10,7 @@ import { BiSolidMessageSquare } from 'react-icons/bi'
 import { CiCalendarDate } from 'react-icons/ci'
 import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
-import { Product } from '../../redux/slices/products'
+import { Product } from '../../../redux/slices/products'
 import { Helmet } from 'react-helmet-async'
 
 interface Props {
@@ -143,16 +143,9 @@ export const FullProduct = (props: Props) => {
             <div className=" ml-2">
               <div className="flex items-center gap-1">
                 <h1 className="mr-2">{data.name}</h1>
-                <div className="mt-1 flex gap-1 absolute ml-[70px]">
-                  {data.tags && (
-                    <h1 className="text-base text-[#a7a7a7]">
-                      {data.tags.join(', ')}
-                    </h1>
-                  )}
-                </div>
               </div>
 
-              <div className="flex text-[#a7a7a7] text-sm gap-2 items-start mt-1 mb-3">
+              <div className="flex text-[#a7a7a7] items-center text-sm gap-2 mt-1 mb-5">
                 <div className="flex gap-1">
                   {data.viewsCount} <Eye className="w-5 h-5 " />
                 </div>
@@ -162,6 +155,13 @@ export const FullProduct = (props: Props) => {
                 </div>
                 <div className="flex gap-1">
                   {data.createdAt} <CiCalendarDate className="w-5 h-5 " />
+                </div>
+                <div className="flex gap-1 absolute ml-[180px]">
+                  {data.tags && (
+                    <h1 className="text-base text-[#a7a7a7]">
+                      {data.tags.join(', ')}
+                    </h1>
+                  )}
                 </div>
               </div>
             </div>

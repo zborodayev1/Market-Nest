@@ -1,17 +1,18 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { HomePage } from './components/pages/Home/HomePage'
 import { Header } from './components/assets/Headers/Header'
-import { NotFound } from './components/assets/errors/NotFound'
+import { NotFound } from './components/assets/Errors/NotFound'
 import { RegisterPage } from './components/pages/Register/RegisterPage'
 import { LogInPage } from './components/pages/LogIn/LogInPage'
 import { useSelector } from 'react-redux'
 import { selectIsAuth, selectUserProfile } from './components/redux/slices/auth'
 import { useEffect, useRef, useState } from 'react'
-import { FullProduct } from './components/pages/FullProduct/FullProduct'
-import { FavoritesPage } from './components/assets/Product/FavoritesPage'
-import { BagPage } from './components/assets/Product/BagPage'
-import { CreatePage } from './components/pages/CreateProduct/CreatePage'
-import { PendingProducts } from './components/pages/ForAdmins/PendingProducts'
+import { FullProduct } from './components/pages/Product/FullProduct/FullProduct'
+import { FavoritesPage } from './components/pages/Product/FavoritesProducts/FavoritesPage'
+import { BagPage } from './components/pages/Product/Bag/BagPage'
+import { CreatePage } from './components/pages/Product/CreateProduct/CreatePage'
+import { PendingProducts } from './components/pages/Product/ForAdmins/PendingProducts'
+import { ToastContainer } from 'react-toastify'
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)
@@ -36,6 +37,8 @@ export const App = () => {
   }, [])
   return (
     <div>
+      <ToastContainer position="bottom-center" />
+      {/* add toast  */}
       <div ref={dropdownRef}>
         {open ? (
           <button onClick={() => setOpen(false)}>

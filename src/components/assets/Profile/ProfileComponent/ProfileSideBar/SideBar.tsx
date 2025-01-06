@@ -5,12 +5,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { logout, selectUserProfile } from '../../../../redux/slices/auth'
 import { ChevronDown, LogOut, PackageCheck } from 'lucide-react'
 import CloseIcon from '@mui/icons-material/Close'
-
 import { UserData } from '../ProfileAuthForms/UserData'
 import { Email } from '../ProfileAuthForms/Email'
 import { Password } from '../ProfileAuthForms/Password'
 import { Link } from 'react-router-dom'
-import { ChangeAvatar } from './SideBarForms/ChangeAvatar/ChangeAvatar'
+import { ChangeAvatar } from './ChangeAvatar/ChangeAvatar'
 
 interface Props {
   setOpen: (value: boolean) => void

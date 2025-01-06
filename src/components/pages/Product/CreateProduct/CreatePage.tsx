@@ -1,11 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { useState, useRef, useEffect } from 'react'
-import { Package, Coins, Tags, ImagePlus, X, Info, Check } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Package, Coins, Tags, ImagePlus, X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { createProduct, selectProducts } from '../../redux/slices/products'
-import { AppDispatch } from '../../redux/store'
+import { createProduct, selectProducts } from '../../../redux/slices/products'
+import { AppDispatch } from '../../../redux/store'
 import { AnimatePresence, motion } from 'motion/react'
-
+import { toast } from 'react-toastify'
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 
@@ -18,10 +18,6 @@ interface FormData {
 
 export const CreatePage = () => {
   const dispatch: AppDispatch = useDispatch()
-  const [toast, setToast] = useState<{
-    des: string
-    type: 'success' | 'error' | 'info' | null
-  }>({ des: '', type: null })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [selectedTags, setSelectedTags] = useState<string[]>([])
@@ -74,7 +70,10 @@ export const CreatePage = () => {
       }
       await dispatch(createProduct(formData)).unwrap()
 
-      setToast({ type: 'success', des: 'Successfully created!' })
+      toast('Successfully created!', {
+        type: 'success',
+        onClose: () => navigate('/'),
+      })
     } catch (error) {
       const errorMessage =
         (error as { message?: string }).message || 'An unknown error occurred'
@@ -104,21 +103,6 @@ export const CreatePage = () => {
     'Decorations and luxury',
   ]
 
-  useEffect(() => {
-    if (toast.type !== null) {
-      const timer = setTimeout(() => {
-        setToast({ type: null, des: '' })
-
-        const timer2 = setTimeout(() => {
-          navigate('/')
-        }, 2000)
-
-        return () => clearTimeout(timer2)
-      }, 3000)
-
-      return () => clearTimeout(timer)
-    }
-  }, [toast, setToast, navigate])
   return (
     <>
       <Helmet>
@@ -145,7 +129,7 @@ export const CreatePage = () => {
           </h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="gap-2 bg-[#f5f5f5] p-5 px-6 rounded-md shadow-xl"
+            className="gap-2 bg-[#f5f5f5] p-5 px-6 rounded-2xl shadow-xl"
           >
             <div>
               <label className="flex items-center gap-2 text-xl font-bold text-black dark:text-gray-300 mb-1">
@@ -270,76 +254,6 @@ export const CreatePage = () => {
           </form>
         </div>
       </motion.div>
-      <AnimatePresence>
-        {toast.type !== null && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            exit={{
-              opacity: 0,
-              y: 50,
-              transition: {
-                delay: 0.9,
-              },
-            }}
-            transition={{
-              duration: 0.3,
-              delay: 0.3,
-              ease: 'easeOut',
-            }}
-            className="fixed bottom-5 left-[595px] p-4 rounded"
-          >
-            <motion.div
-              initial={{ width: 7, height: 7 }}
-              animate={{ width: 270, height: 56 }}
-              exit={{
-                width: 7,
-                height: 7,
-                transition: {
-                  width: { duration: 0.3, delay: 0.6 },
-                  height: { duration: 0.3, delay: 0.3 },
-                },
-              }}
-              transition={{
-                width: { duration: 0.3, delay: 0.6 },
-                height: { duration: 0.3, delay: 0.9 },
-              }}
-              className={`flex items-center justify-center shadow-xl bg-white p-2 px-5 ${toast.type === 'success' ? 'border-green-500' : toast.type === 'info' ? 'border-blue-500' : toast.type === 'error' ? 'border-red-500' : ''} border rounded-full`}
-            >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.3, delay: 0 } }}
-                transition={{
-                  duration: 0.2,
-                  delay: 0.9,
-                }}
-                className="flex gap-2"
-              >
-                <h1 className="text-lg font-medium">{toast.des}</h1>
-                {toast.type === 'success' && (
-                  <div className="text-green-500">
-                    <Check />
-                  </div>
-                )}
-                {toast.type === 'info' && (
-                  <div className="text-blue-500">
-                    <Info />
-                  </div>
-                )}
-                {toast.type === 'error' && (
-                  <div className="text-red-500">
-                    <X />
-                  </div>
-                )}
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   )
 }

@@ -3,13 +3,13 @@ import {
   fetchProducts,
   Product,
   selectProducts,
-} from '../../redux/slices/products'
+} from '../../../redux/slices/products'
 import { useDispatch, useSelector } from 'react-redux'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ProductForm } from './ProductForm'
-import { AppDispatch } from '../../redux/store'
+import { ProductForm } from '../ProductForm/ProductForm'
+import { AppDispatch } from '../../../redux/store'
 import { Helmet } from 'react-helmet-async'
-import { PageSettingsForm } from '../../forms/pageSettingsForm'
+import { PageSettingsForm } from '../../../forms/pageSettingsForm'
 import { CircularProgress } from '@mui/material'
 
 export const FavoritesPage = () => {
