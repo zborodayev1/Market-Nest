@@ -10,6 +10,7 @@ import { ProductForm } from '../ProductForm/ProductForm'
 import { AppDispatch } from '../../../redux/store'
 import { Helmet } from 'react-helmet-async'
 import { PageSettingsForm } from '../../../forms/pageSettingsForm'
+import CircularProgress from '@mui/material/CircularProgress'
 
 export const BagPage = () => {
   const { products, status } = useSelector(selectProducts)
@@ -133,7 +134,11 @@ export const BagPage = () => {
           )}
         </AnimatePresence>
       </motion.div>
-
+      {status === 'loading' && (
+        <div className="flex justify-center m-5">
+          <CircularProgress color="inherit" />
+        </div>
+      )}
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0 }}
@@ -146,7 +151,7 @@ export const BagPage = () => {
           <div
             className={`flex flex-wrap justify-center ${bagProducts.length === 0 ? 'mt-1' : 'mt-5'} gap-4`}
           >
-            {status === 'succeeded' && bagProducts.length > 0 && (
+            {status === 'succeeded' && bagProducts.length > 0 ? (
               <AnimatePresence>
                 {bagProducts.map((product: Product, index: number) => (
                   <motion.div
@@ -168,11 +173,12 @@ export const BagPage = () => {
                   </motion.div>
                 ))}
               </AnimatePresence>
-            )}
-            {status === 'succeeded' && bagProducts.length === 0 && (
-              <div className="text-center text-xl font-bold mt-2">
-                <p>Your bag is empty</p>
-              </div>
+            ) : (
+              status !== 'loading' && (
+                <div className="text-center font-bold text-xl">
+                  <p>Your bag is empty</p>
+                </div>
+              )
             )}
           </div>
         </motion.div>

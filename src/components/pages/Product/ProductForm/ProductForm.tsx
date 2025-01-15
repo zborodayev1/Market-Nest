@@ -8,9 +8,9 @@ import { Eye, X, Pencil } from 'lucide-react'
 import { BiSolidMessageSquare } from 'react-icons/bi'
 import { IoBag } from 'react-icons/io5'
 import { AnimatePresence, motion } from 'motion/react'
-import { jwtDecode } from 'jwt-decode'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '../../../redux/store'
+import { selectUserProfile } from '../../../redux/slices/auth'
 
 interface ProductFormProps {
   product: Product
@@ -20,10 +20,6 @@ interface ProductFormProps {
   Pending?: boolean
   Rejected?: boolean
   onSubmit?: () => void
-}
-
-interface DecodedToken {
-  role: string
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -37,25 +33,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false)
   const dispatch: AppDispatch = useDispatch()
-
+  const userData = useSelector(selectUserProfile)
   const [isBag, setIsBag] = useState<boolean>(false)
-  const [isAdmin, setIsAdmin] = useState(false)
-
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-
-    if (token) {
-      try {
-        const decoded = jwtDecode<DecodedToken>(token)
-        if (decoded.role === 'admin') {
-          setIsAdmin(true)
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (err) {
-        console.error('Failed to decode token')
-      }
-    }
-  }, [])
 
   const toggleFavorite = () => {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
@@ -130,7 +109,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   )}
                 </IconButton>
 
-                {isAdmin && (
+                {userData?.role === 'admin' && (
                   <IconButton
                     className="absolute top-0 left-[120px] ease-in-out duration-300"
                     color="error"
@@ -140,7 +119,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   </IconButton>
                 )}
                 {Edit ||
-                  (isAdmin && (
+                  (userData?.role === 'admin' && (
                     <Link to={`/edit/${product._id}`}>
                       <IconButton
                         className="absolute top-0 left-[-80px] ease-in-out duration-300"

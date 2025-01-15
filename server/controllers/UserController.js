@@ -4,27 +4,93 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
+import UnverifiedUserModel from '../models/unverified_user.js'
+import { generateVerificationCode } from '../utils/functions/generateVerificationCode.js'
+import { sendVerificationCode } from '../utils/functions/sendMailToClient.js'
 
 dotenv.config()
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret'
 const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 15
 
-export const register = async (req, res) => {
+export const temporaryRegister = async (req, res) => {
   try {
-    const password = req.body.password
+    const { fullName, email, password, phone, address, city, country } =
+      req.body
+
+    const existingTempUser = await UnverifiedUserModel.findOne({ email })
+    if (existingTempUser) {
+      return res
+        .status(400)
+        .json({ message: 'Verification email already sent' })
+    }
+
+    const existingUser = await UserModel.findOne({ email })
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email is already in use' })
+    }
+
     const salt = await bcrypt.genSalt(SALT_ROUNDS)
     const hash = await bcrypt.hash(password, salt)
 
-    const doc = new UserModel({
+    const verificationCode = generateVerificationCode()
+
+    const doc = new UnverifiedUserModel({
       _id: new mongoose.Types.ObjectId(),
-      fullName: req.body.fullName,
-      email: req.body.email,
-      avatarUrl: req.body.avatarUrl,
+      fullName,
+      email,
       passwordHash: hash,
+      phone,
+      address,
+      city,
+      country,
+      verificationCode,
     })
 
-    const user = await doc.save()
+    await doc.save()
+
+    // await sendVerificationCode(email, verificationCode)
+
+    res.status(201).json({
+      message: 'Verification email sent. Please verify your email.',
+      email: doc.email,
+    })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: 'Failed to initiate registration' })
+  }
+}
+
+export const completeRegistration = async (req, res) => {
+  try {
+    const { email, code } = req.body
+
+    const tempUser = await UnverifiedUserModel.findOne({ email })
+    if (!tempUser) {
+      return res
+        .status(404)
+        .json({ message: 'User not found or already registered' })
+    }
+
+    if (tempUser.verificationCode !== code) {
+      return res.status(400).json({ message: 'Invalid verification code' })
+    }
+
+    const userDoc = new UserModel({
+      _id: tempUser._id,
+      fullName: tempUser.fullName,
+      email: tempUser.email,
+      avatarUrl: tempUser.avatarUrl,
+      address: tempUser.address,
+      city: tempUser.city,
+      country: tempUser.country,
+      passwordHash: tempUser.passwordHash,
+      phone: tempUser.phone,
+    })
+
+    const user = await userDoc.save()
+
+    await UnverifiedUserModel.deleteOne({ _id: tempUser._id })
 
     const token = jwt.sign({ _id: user._id, role: user.role }, JWT_SECRET, {
       expiresIn: '90d',
@@ -35,12 +101,11 @@ export const register = async (req, res) => {
     res.json({
       ...userData,
       token,
+      message: 'Registration completed successfully!',
     })
   } catch (err) {
     console.log(err)
-    res.status(500).json({
-      message: 'Failed to register user',
-    })
+    res.status(500).json({ message: 'Failed to complete registration' })
   }
 }
 
@@ -109,7 +174,6 @@ export const patchProfileData = async (req, res) => {
       address: req.body.address,
       city: req.body.city,
       country: req.body.country,
-      phone: req.body.phone,
       fullName: req.body.fullName,
     }
     await UserModel.updateOne({ _id: req.userId }, updateData)
@@ -147,37 +211,111 @@ export const patchProfileEmail = async (req, res) => {
   }
 }
 
-export const patchProfilePassword = async (req, res) => {
+export const requestPasswordChangeCode = async (req, res) => {
   try {
-    const user = await UserModel.findById(req.userId)
+    const { email, currentPassword } = req.body
 
+    const user = await UserModel.findOne({ email })
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    const { oldPassword, password } = req.body
+    const isMatch = await bcrypt.compare(currentPassword, user.password)
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Incorrect password' })
+    }
 
-    if (password.length < 6) {
+    if (user.passwordChangeVerificationCode) {
       return res
         .status(400)
-        .json({ message: 'New password must be at least 6 characters long' })
+        .json({ message: 'Password change code already sent' })
     }
 
-    const isValidPass = await bcrypt.compare(oldPassword, user.passwordHash)
-    if (!isValidPass) {
-      return res.status(400).json({ message: 'Invalid password' })
-    }
+    const verificationCode = generateVerificationCode()
+    user.passwordChangeVerificationCode = verificationCode
+    await user.save()
 
-    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
-    await UserModel.updateOne(
-      { _id: req.userId },
-      { passwordHash: passwordHash }
-    )
+    await sendVerificationCode(user.email, verificationCode)
 
-    res.json({ message: 'Password changed successfully' })
+    res.json({ message: 'Verification code sent to your email, if it exists.' })
   } catch (err) {
     console.log(err)
-    res.status(500).json({ message: 'Failed to change password' })
+    res.status(500).json({ message: 'Failed to send verification code' })
+  }
+}
+
+export const confirmPasswordChange = async (req, res) => {
+  try {
+    const { email, verificationCode, newPassword } = req.body
+
+    const user = await UserModel.findOne({ email })
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    if (user.passwordChangeVerificationCode !== verificationCode) {
+      return res.status(400).json({ message: 'Invalid verification code' })
+    }
+    const salt = await bcrypt.genSalt(SALT_ROUNDS)
+    const hashedPassword = await bcrypt.hash(newPassword, salt)
+
+    user.password = hashedPassword
+
+    user.passwordChangeVerificationCode = undefined
+    await user.save()
+
+    res.json({ message: 'Password successfully updated.' })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: 'Failed to update password' })
+  }
+}
+
+export const requestPhoneChangeCode = async (req, res) => {
+  try {
+    const { email, newPhone } = req.body
+
+    const user = await UserModel.findOne({ email })
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const verificationCode = generateVerificationCode()
+    user.phoneChangeVerificationCode = verificationCode
+    user.newPhone = newPhone
+    await user.save()
+
+    await sendVerificationCode(user.email, verificationCode)
+
+    res.json({ message: 'Verification code sent to your email, if it exists.' })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: 'Failed to send verification code' })
+  }
+}
+
+export const confirmPhoneChange = async (req, res) => {
+  try {
+    const { email, verificationCode } = req.body
+
+    const user = await UserModel.findOne({ email })
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    if (user.phoneChangeVerificationCode !== verificationCode) {
+      return res.status(400).json({ message: 'Invalid verification code' })
+    }
+
+    user.phone = user.newPhone
+    user.newPhone = undefined
+    user.phoneChangeVerificationCode = undefined
+    await user.save()
+
+    res.json({ message: 'Phone number successfully updated.' })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: 'Failed to update phone number' })
   }
 }
 

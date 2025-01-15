@@ -22,7 +22,6 @@ export const FullProduct = (props: Props) => {
   const [data, setData] = useState<Product>()
   const [err, setErr] = useState(false)
   const { id } = useParams()
-  const [hovered, setHovered] = useState(false)
   const [isFavorite, setIsFavorite] = useState<boolean>(false)
   const [isBag, setIsBag] = useState<boolean>(false)
 
@@ -165,11 +164,7 @@ export const FullProduct = (props: Props) => {
                 </div>
               </div>
             </div>
-            <div
-              onMouseEnter={() => setHovered(true)}
-              onMouseLeave={() => setHovered(false)}
-              className="group flex"
-            >
+            <div className="group flex">
               <img
                 src={
                   data.image
@@ -183,8 +178,7 @@ export const FullProduct = (props: Props) => {
 
               <button
                 onClick={toggleFavorite}
-                className={`flex  text-2xl text-[#fd3939] transition-opacity duration-300 ease-in-out ${
-                  hovered || isFavorite ? 'opacity-100' : 'opacity-0'
+                className={`flex  text-2xl text-[#fd3939] transition-opacity duration-300 ease-in-out 
                 }`}
               >
                 <IconButton color="error">

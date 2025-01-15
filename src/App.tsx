@@ -13,12 +13,13 @@ import { BagPage } from './components/pages/Product/Bag/BagPage'
 import { CreatePage } from './components/pages/Product/CreateProduct/CreatePage'
 import { PendingProducts } from './components/pages/Product/ForAdmins/PendingProducts'
 import { ToastContainer } from 'react-toastify'
+import { VerifyMail } from './components/pages/Register/VerifyMail'
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-
+  const [code, setCode] = useState<boolean>(false)
   const userData = useSelector(selectUserProfile)
 
   useEffect(() => {
@@ -54,13 +55,23 @@ export const App = () => {
                   path="/signIn"
                 />
                 <Route
-                  element={isAuth ? <Navigate to="/" /> : <RegisterPage />}
+                  element={
+                    isAuth ? (
+                      <Navigate to="/" />
+                    ) : (
+                      <RegisterPage
+                        code={code}
+                        onSuccess={() => setCode(true)}
+                      />
+                    )
+                  }
                   path="/register"
                 />
                 <Route
                   element={!isAuth ? <Navigate to="/" /> : <CreatePage />}
                   path="/create-product"
                 />
+
                 <Route
                   element={<FullProduct noti={false} />}
                   path="/product/:id"
@@ -80,6 +91,12 @@ export const App = () => {
                     )
                   }
                   path="/products-pending"
+                />
+                <Route
+                  element={
+                    <VerifyMail code={code} onSuccess={() => setCode(true)} />
+                  }
+                  path="/verify-email"
                 />
               </Routes>
             </div>
@@ -98,7 +115,16 @@ export const App = () => {
                   path="/signIn"
                 />
                 <Route
-                  element={isAuth ? <Navigate to="/" /> : <RegisterPage />}
+                  element={
+                    isAuth ? (
+                      <Navigate to="/" />
+                    ) : (
+                      <RegisterPage
+                        code={code}
+                        onSuccess={() => setCode(true)}
+                      />
+                    )
+                  }
                   path="/register"
                 />
                 <Route
@@ -124,6 +150,12 @@ export const App = () => {
                     )
                   }
                   path="/products-pending"
+                />
+                <Route
+                  element={
+                    <VerifyMail code={code} onSuccess={() => setCode(true)} />
+                  }
+                  path="/verify-email"
                 />
               </Routes>
             </div>

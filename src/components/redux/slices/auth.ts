@@ -37,7 +37,7 @@ interface UserPassword {
   password: string
 }
 
-interface UserEmail {
+export interface UserEmail {
   email: string
   password: string
 }
@@ -50,12 +50,47 @@ interface AuthState {
   loading: boolean
 }
 
-export const fetchRegister = createAsyncThunk<
-  AuthResponse,
-  { fullName: string; email: string; password: string }
->('auth/fetchRegister', async (params) => {
-  const { data } = await axios.post('/auth/register', params)
-  return data
+export const fetchTemporaryRegister = createAsyncThunk<
+  { message: string },
+  {
+    fullName: string
+    email: string
+    password: string
+    phone: string
+    address: string
+    city: string
+    country: string
+  },
+  { rejectValue: string }
+>('auth/fetchTemporaryRegister', async (params, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.post('/auth/temporary-register', params)
+    return data
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
+
+    return rejectWithValue(errorMessage)
+  }
+})
+
+export const fetchCompleteRegistration = createAsyncThunk<
+  { message: string; token: string },
+  { email: string; code: string },
+  { rejectValue: string }
+>('auth/fetchCompleteRegistration', async (params, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.post('/auth/complete-register', params)
+    return data
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
+    return rejectWithValue(errorMessage)
+  }
 })
 
 export const uploadImage = createAsyncThunk<
@@ -194,9 +229,20 @@ const authSlice = createSlice({
     }
 
     builder
-      .addCase(fetchRegister.pending, handlePending)
-      .addCase(fetchRegister.fulfilled, handleFulfilled)
-      .addCase(fetchRegister.rejected, handleRejected)
+      .addCase(fetchTemporaryRegister.pending, handlePending)
+      .addCase(
+        fetchTemporaryRegister.fulfilled,
+        (state: AuthState, action: any) => {
+          state.status = 'succeeded'
+          state.user = action.payload.user || (action.payload as UserProfile)
+          state.error = null
+          state.loading = false
+        }
+      )
+      .addCase(fetchTemporaryRegister.rejected, handleRejected)
+      .addCase(fetchCompleteRegistration.pending, handlePending)
+      .addCase(fetchCompleteRegistration.fulfilled, handleFulfilled)
+      .addCase(fetchCompleteRegistration.rejected, handleRejected)
       .addCase(fetchLogin.pending, handlePending)
       .addCase(fetchLogin.fulfilled, handleFulfilled)
       .addCase(fetchLogin.rejected, handleRejected)

@@ -146,7 +146,7 @@ export const Header = () => {
   return (
     <div>
       <div className="">
-        <div className="relative items-center flex bg-[#F5F5F5] z-30 w-screen h-[100px]">
+        <div className="relative items-center flex bg-[#F5F5F5] z-30 w-full h-[100px]">
           <div className="absolute left-[120px] transform -translate-x-1/2 flex justify-center items-center z-10">
             <motion.div className="flex justify-center py-4 px-4 w-full cursor-pointer ">
               <div className=" hover:bg-[#e4e4e4] transition-colors duration-300 rounded-[15px] ease-in-out flex items-center p-2 px-3 ml-[50px]">
@@ -201,7 +201,7 @@ export const Header = () => {
                     onClick={() => setNotiOpen(!notiOpen)}
                   >
                     <Bell className="w-8 h-8 stroke-2 text-[#212121]" />
-                    {unreadCount && unreadCount > 0 && unreadCount !== null && (
+                    {unreadCount != null && unreadCount > 0 && (
                       <span className="absolute -top-[2px] -right-[2px] bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
                         {unreadCount}
                       </span>
