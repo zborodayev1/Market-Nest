@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import {
-  RootState,
   selectUserProfile,
   updateProfilePassword,
 } from '../../../../redux/slices/auth'
@@ -9,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Eye, EyeOff, RectangleEllipsis } from 'lucide-react'
 import { useState } from 'react'
 import { AppDispatch } from '../../../../redux/store'
+import { toast } from 'react-toastify'
 
 interface Formdata {
   password?: string
@@ -19,10 +19,8 @@ interface Props {
 }
 export const Password = (props: Props) => {
   const userData = useSelector(selectUserProfile)
-
-  const error = useSelector((state: RootState) => state.auth.error)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+  // const [forgotPassPage, setforgotPassPage] = useState(false)
   const { onSuccess } = props
   const dispatch: AppDispatch = useDispatch()
   const { reset, register, handleSubmit } = useForm<Formdata>({
@@ -45,6 +43,10 @@ export const Password = (props: Props) => {
         onSuccess()
       } else {
         console.error('Ошибка:', resultAction.payload || 'Неизвестная ошибка')
+        toast(resultAction.payload || 'Неизвестная ошибка', {
+          type: 'error',
+          position: 'bottom-right',
+        })
       }
     } catch (error) {
       console.error('Error:', error)
@@ -104,6 +106,7 @@ export const Password = (props: Props) => {
               </button>
             </div>
           </div>
+
           <div className="">
             <label className={labelClasses} htmlFor="password">
               <RectangleEllipsis size={23} />
@@ -151,15 +154,7 @@ export const Password = (props: Props) => {
           </motion.span>
         </motion.button>
 
-        {error && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-red-500 text-sm text-center mt-2"
-          >
-            {error}
-          </motion.p>
-        )}
+        <button>Forgot password</button>
       </motion.form>
     </AnimatePresence>
   )

@@ -120,11 +120,6 @@ export const updateProductStatus = createAsyncThunk(
   }
 )
 
-interface User {
-  id: string
-  fullName: string
-}
-
 export interface Product {
   saveAmount: number
   discount: number | null
@@ -138,7 +133,7 @@ export interface Product {
   viewsCount: number
   createdAt: string
   image: null | File
-  user: User
+  user: string
   commentsCount: number
   favorite: boolean
   status: string

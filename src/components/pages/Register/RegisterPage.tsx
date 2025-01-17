@@ -7,7 +7,13 @@ import { RegisterForm } from './RegisterForm'
 import { motion } from 'framer-motion'
 import { Helmet } from 'react-helmet-async'
 
-export const RegisterPage = () => {
+interface Props {
+  code: boolean
+  onSuccess: () => void
+}
+
+export const RegisterPage = (props: Props) => {
+  const { code, onSuccess } = props
   const isAuth = useSelector(selectIsAuth)
   const [err, setErr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -29,15 +35,24 @@ export const RegisterPage = () => {
         />
       </Helmet>
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3, delay: 0.4 }}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          opacity: { duration: 0.3, delay: 0.4 },
+          y: { duration: 0.3, delay: 0.5 },
+        }}
       >
-        <div className="bg-[#fff] h-screen flex flex-wrap justify-center">
-          <div className="bg-[#fff] border shadow-lg px-16 my-5 pt-8 w-[400px] h-[500px] phone:max-w-90 phone-md:max-w-96 rounded-md">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-[#fff] h-screen flex flex-wrap justify-center"
+        >
+          <div className="bg-[#fff] border shadow-lg px-16 my-5 py-8 w-[400px] min-h-[850px] max-h-[1500px] phone:max-w-90 phone-md:max-w-96 rounded-md">
             <div>
               <div className="flex justify-center">
-                <h1 className="text-xl font-bold text-[#212121] mb-5">
+                <h1 className="text-2xl font-bold text-[#212121] mb-5">
                   Register
                 </h1>
               </div>
@@ -46,6 +61,8 @@ export const RegisterPage = () => {
                 setLoading={setLoading}
                 setErr={setErr}
                 loading={loading}
+                code={code}
+                onSuccess={onSuccess}
               />
             </div>
             {err && !loading && (
@@ -64,7 +81,7 @@ export const RegisterPage = () => {
               </Link>
             </div>
           </div>
-        </div>
+        </motion.div>
         {loading && (
           <LinearProgress
             style={{

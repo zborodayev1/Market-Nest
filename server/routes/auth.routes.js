@@ -8,21 +8,46 @@ const router = express.Router()
 
 router.post('/login', loginValidation, handleValidErr, UserController.login)
 router.post(
-  '/register',
+  '/temporary-register',
   registerValidation,
   handleValidErr,
-  UserController.register
+  UserController.temporaryRegister
 )
+router.post('/complete-register', UserController.completeRegistration)
 
-router.get('/profile', checkAuth, UserController.getProfile)
-router.get('/user/:id', checkAuth, UserController.getUserProfile)
-router.get('/profile/products', checkAuth, UserController.getUserProducts)
-router.patch('/profile/data', checkAuth, UserController.patchProfileData)
-router.patch('/profile/email', checkAuth, UserController.patchProfileEmail)
 router.patch(
   '/profile/password',
   checkAuth,
   UserController.patchProfilePassword
 )
+
+router.patch('/profile/phone', checkAuth, UserController.patchProfilePhone)
+
+router.post(
+  '/request-password-change-code',
+  checkAuth,
+  UserController.requestPasswordChangeWEmail
+)
+router.post(
+  '/confirm-password-change',
+  checkAuth,
+  UserController.confirmPasswordChangeWEmail
+)
+router.post(
+  '/request-phone-change-code',
+  checkAuth,
+  UserController.requestPhoneChangeWEmail
+)
+router.post(
+  '/confirm-phone-change',
+  checkAuth,
+  UserController.confirmPhoneChangeWEmail
+)
+router.get('/profile', checkAuth, UserController.getProfile)
+router.get('/profile/products', checkAuth, UserController.getUserProducts)
+router.patch('/profile/data', checkAuth, UserController.patchProfileData)
+router.patch('/profile/email', checkAuth, UserController.patchProfileEmail)
+
+router.get('/user/:id', UserController.getUserProfile)
 
 export default router

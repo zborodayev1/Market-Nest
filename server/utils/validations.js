@@ -8,7 +8,7 @@ export const registerValidation = [
   body('fullName', 'Name must be longer than 3 characters!').isLength({
     min: 3,
   }),
-  body('avatarUrl', 'Invalid URL!').optional().isURL(),
+  body('phone', 'Invalid phone number!').isMobilePhone(),
 ]
 
 export const loginValidation = [

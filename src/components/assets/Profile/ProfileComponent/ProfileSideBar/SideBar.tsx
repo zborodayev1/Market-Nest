@@ -25,12 +25,10 @@ export const SideBar = (props: Props) => {
   const [state, setState] = useState<{
     ChangeName: boolean
     ChangePassword: boolean
-    ChangeAddress: boolean
     ChangeEmail: boolean
   }>({
     ChangeName: false,
     ChangePassword: false,
-    ChangeAddress: false,
     ChangeEmail: false,
   })
 
