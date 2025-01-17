@@ -7,7 +7,7 @@ import {
   selectUserProfile,
   updateProfileData,
 } from '../../../../redux/slices/auth'
-import { User, Phone, MapPin, Building2, Globe } from 'lucide-react'
+import { User, MapPin, Building2, Globe } from 'lucide-react'
 import { AppDispatch } from '../../../../redux/store'
 
 interface FormData {
@@ -37,7 +37,6 @@ export const UserData = ({ onSuccess }: Props) => {
   } = useForm<FormData>({
     defaultValues: {
       fullName: userData?.fullName || '',
-      phone: userData?.phone || '',
       address: userData?.address || '',
       city: userData?.city || '',
       country: userData?.country || '',
@@ -84,18 +83,6 @@ export const UserData = ({ onSuccess }: Props) => {
               className={inputClasses}
               placeholder="John Doe"
               spellCheck="false"
-            />
-          </div>
-
-          <div>
-            <label className={labelClasses}>
-              <Phone size={18} /> Phone
-            </label>
-            <input
-              {...register('phone')}
-              className={inputClasses}
-              spellCheck="false"
-              placeholder="+1 234 567 890"
             />
           </div>
 

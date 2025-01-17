@@ -36,7 +36,7 @@ export const ChangeAvatar = () => {
   }
 
   return (
-    <div>
+    <div className="flex items-center gap-3">
       <button
         onClick={() => inputFileRef.current?.click()}
         className="relative group items-center"
@@ -53,10 +53,12 @@ export const ChangeAvatar = () => {
           <Avatar style={{ width: 45, height: 45 }} src={userData?.avatarUrl} />
         </motion.div>
 
-        <div className="absolute inset-0 flex  justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-linear">
-          <span className="text-[#212121] text-xs font-medium">
-            Change Avatar
-          </span>
+        <div className="absolute inset-0 flex justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-linear">
+          <div className="bg-[#fafafa] bg-opacity-90 rounded-full flex items-center justify-center ">
+            <span className="text-[#212121] text-xs font-medium">
+              Change Avatar
+            </span>
+          </div>
         </div>
       </button>
       <input
@@ -72,7 +74,7 @@ export const ChangeAvatar = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleUpload}
-          className="px-3 py-1 bg-blue-50 text-[#212121] border border-[#212121] rounded-md text-sm"
+          className="px-3 py-1 bg-blue-50 h-[30px] text-[#212121] border border-[#212121] rounded-md "
         >
           Change
         </motion.button>

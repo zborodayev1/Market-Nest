@@ -14,25 +14,40 @@ router.post(
   UserController.temporaryRegister
 )
 router.post('/complete-register', UserController.completeRegistration)
+
+router.patch(
+  '/profile/password',
+  checkAuth,
+  UserController.patchProfilePassword
+)
+
+router.patch('/profile/phone', checkAuth, UserController.patchProfilePhone)
+
 router.post(
   '/request-password-change-code',
-  UserController.requestPasswordChangeCode
+  checkAuth,
+  UserController.requestPasswordChangeWEmail
 )
-router.post('/confirm-password-change', UserController.confirmPasswordChange)
+router.post(
+  '/confirm-password-change',
+  checkAuth,
+  UserController.confirmPasswordChangeWEmail
+)
+router.post(
+  '/request-phone-change-code',
+  checkAuth,
+  UserController.requestPhoneChangeWEmail
+)
+router.post(
+  '/confirm-phone-change',
+  checkAuth,
+  UserController.confirmPhoneChangeWEmail
+)
 router.get('/profile', checkAuth, UserController.getProfile)
-router.get('/user/:id', checkAuth, UserController.getUserProfile)
 router.get('/profile/products', checkAuth, UserController.getUserProducts)
 router.patch('/profile/data', checkAuth, UserController.patchProfileData)
 router.patch('/profile/email', checkAuth, UserController.patchProfileEmail)
-router.patch(
-  '/profile/request-password-change',
-  checkAuth,
-  UserController.requestPasswordChangeCode
-)
-router.patch(
-  '/profile/confirm-password-change',
-  checkAuth,
-  UserController.confirmPasswordChange
-)
+
+router.get('/user/:id', UserController.getUserProfile)
 
 export default router

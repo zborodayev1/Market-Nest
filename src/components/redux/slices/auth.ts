@@ -11,7 +11,7 @@ interface UpdateProfileResponse {
   user: UserProfile
 }
 
-interface UserProfile {
+export interface UserProfile {
   _id: string
   fullName?: string
   avatarUrl?: string
@@ -26,7 +26,6 @@ interface UserProfile {
 
 interface UserData {
   fullName?: string
-  phone?: string
   address?: string
   city?: string
   country?: string
@@ -42,9 +41,15 @@ export interface UserEmail {
   password: string
 }
 
+// interface UserPhone {
+//   password: string
+//   phone: string
+// }
+
 interface AuthState {
   user: UserProfile | null
   isAuth: boolean
+  productUser: UserProfile | null
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
   error: string | null
   loading: boolean
@@ -93,6 +98,46 @@ export const fetchCompleteRegistration = createAsyncThunk<
   }
 })
 
+export const requestPasswordChange = createAsyncThunk<
+  { message: string },
+  {
+    newPassword: string
+  },
+  { rejectValue: string }
+>('auth/requestPasswordChange', async (params, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.post(
+      '/auth/request-password-change-code',
+      params
+    )
+    return data
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
+
+    return rejectWithValue(errorMessage)
+  }
+})
+
+export const confirmPasswordChange = createAsyncThunk<
+  { message: string },
+  { code: string },
+  { rejectValue: string }
+>('auth/confirmPasswordChange', async (params, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.post('/auth/confirm-password-change', params)
+    return data
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
+    return rejectWithValue(errorMessage)
+  }
+})
+
 export const uploadImage = createAsyncThunk<
   { avatarUrl: string },
   FormData,
@@ -130,6 +175,23 @@ export const fetchProfileData = createAsyncThunk<UserProfile>(
     return data
   }
 )
+
+export const getUserProfile = createAsyncThunk<
+  UserProfile,
+  string,
+  { rejectValue: string; productUser: string | null }
+>('auth/fetchUserProfile', async (userId, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.get(`/auth/user/${userId}`)
+    return data
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      'Failed to fetch user profile'
+    return rejectWithValue(errorMessage)
+  }
+})
 
 export const updateProfileData = createAsyncThunk<
   UpdateProfileResponse,
@@ -187,6 +249,7 @@ export const updateProfilePassword = createAsyncThunk<
 const initialState: AuthState = {
   user: null,
   isAuth: false,
+  productUser: null,
   status: 'idle',
   error: null,
   loading: false,
@@ -277,7 +340,19 @@ const authSlice = createSlice({
         state.loading = false
       })
       .addCase(updateProfilePassword.rejected, handleRejected)
-    builder
+
+      .addCase(requestPasswordChange.pending, handlePending)
+      .addCase(requestPasswordChange.fulfilled, (state) => {
+        state.status = 'succeeded'
+        state.loading = false
+      })
+      .addCase(requestPasswordChange.rejected, handleRejected)
+      .addCase(confirmPasswordChange.pending, handlePending)
+      .addCase(confirmPasswordChange.fulfilled, (state) => {
+        state.status = 'succeeded'
+        state.loading = false
+      })
+      .addCase(confirmPasswordChange.rejected, handleRejected)
       .addCase(uploadImage.pending, (state) => {
         state.loading = true
         state.status = 'loading'
@@ -293,6 +368,21 @@ const authSlice = createSlice({
         state.loading = false
         state.status = 'failed'
         state.error = action.payload || 'Error while update avatar'
+      })
+      .addCase(getUserProfile.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+        state.loading = true
+      })
+      .addCase(getUserProfile.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.productUser = action.payload
+        state.loading = false
+      })
+      .addCase(getUserProfile.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.payload || 'Error occurred'
+        state.loading = false
       })
   },
 })

@@ -72,14 +72,15 @@ export const CreatePage = () => {
 
       toast('Successfully created!', {
         type: 'success',
-        onClose: () => navigate('/'),
+        onClose: () => {
+          navigate('/')
+          setIsSubmitting(false)
+        },
       })
     } catch (error) {
       const errorMessage =
         (error as { message?: string }).message || 'An unknown error occurred'
       setMessage(errorMessage)
-    } finally {
-      setIsSubmitting(false)
     }
   }
 

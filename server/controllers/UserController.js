@@ -7,6 +7,7 @@ import dotenv from 'dotenv'
 import UnverifiedUserModel from '../models/unverified_user.js'
 import { generateVerificationCode } from '../utils/functions/generateVerificationCode.js'
 import { sendVerificationCode } from '../utils/functions/sendMailToClient.js'
+import { UserEditDataModel } from '../models/editUserData.js'
 
 dotenv.config()
 
@@ -211,31 +212,63 @@ export const patchProfileEmail = async (req, res) => {
   }
 }
 
-export const requestPasswordChangeCode = async (req, res) => {
+export const patchProfilePassword = async (req, res) => {
   try {
-    const { email, currentPassword } = req.body
+    const user = await UserModel.findById(req.userId)
 
-    const user = await UserModel.findOne({ email })
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    const isMatch = await bcrypt.compare(currentPassword, user.password)
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Incorrect password' })
+    const { oldPassword, password } = req.body
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: 'New password must be at least 6 characters long' })
     }
 
-    if (user.passwordChangeVerificationCode) {
+    const isValidPass = await bcrypt.compare(oldPassword, user.passwordHash)
+    if (!isValidPass) {
+      return res.status(400).json({ message: 'Invalid password' })
+    }
+
+    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
+    await UserModel.updateOne(
+      { _id: req.userId },
+      { passwordHash: passwordHash }
+    )
+
+    res.json({ message: 'Password changed successfully' })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: 'Failed to change password' })
+  }
+}
+
+export const requestPasswordChangeWEmail = async (req, res) => {
+  try {
+    let userEditData = await UserEditDataModel.findOne({ userId: req.userId })
+
+    if (!userEditData) {
+      userEditData = new UserEditDataModel({ userId: req.userId })
+      await userEditData.save()
+    }
+
+    const { newPassword } = req.body
+
+    if (userEditData.passwordChangeVerificationCode) {
       return res
         .status(400)
         .json({ message: 'Password change code already sent' })
     }
 
     const verificationCode = generateVerificationCode()
-    user.passwordChangeVerificationCode = verificationCode
-    await user.save()
+    userEditData.passwordChangeVerificationCode = verificationCode
+    userEditData.newPassword = newPassword
+    await userEditData.save()
 
-    await sendVerificationCode(user.email, verificationCode)
+    // await sendVerificationCode(user.email, verificationCode)
 
     res.json({ message: 'Verification code sent to your email, if it exists.' })
   } catch (err) {
@@ -244,24 +277,35 @@ export const requestPasswordChangeCode = async (req, res) => {
   }
 }
 
-export const confirmPasswordChange = async (req, res) => {
+export const confirmPasswordChangeWEmail = async (req, res) => {
   try {
-    const { email, verificationCode, newPassword } = req.body
+    const user = await UserModel.findById(req.userId)
 
-    const user = await UserModel.findOne({ email })
+    let userEditData = await UserEditDataModel.findOne({ userId: req.userId })
+
+    if (!userEditData) {
+      userEditData = new UserEditDataModel({ userId: req.userId })
+      await userEditData.save()
+    }
+
+    const { verificationCode } = req.body
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    if (user.passwordChangeVerificationCode !== verificationCode) {
+    if (userEditData.passwordChangeVerificationCode !== verificationCode) {
       return res.status(400).json({ message: 'Invalid verification code' })
     }
     const salt = await bcrypt.genSalt(SALT_ROUNDS)
-    const hashedPassword = await bcrypt.hash(newPassword, salt)
+    const hashedPassword = await bcrypt.hash(userEditData.newPassword, salt)
 
     user.password = hashedPassword
 
-    user.passwordChangeVerificationCode = undefined
+    userEditData.passwordChangeVerificationCode = ''
+    userEditData.newPassword = ''
+
+    await userEditData.save()
     await user.save()
 
     res.json({ message: 'Password successfully updated.' })
@@ -271,21 +315,49 @@ export const confirmPasswordChange = async (req, res) => {
   }
 }
 
-export const requestPhoneChangeCode = async (req, res) => {
+export const patchProfilePhone = async (req, res) => {
   try {
-    const { email, newPhone } = req.body
+    const user = await UserModel.findById(req.userId)
+    const { password, phone } = req.body
 
-    const user = await UserModel.findOne({ email })
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' })
+    const isValidPass = await bcrypt.compare(password, user.passwordHash)
+    if (!isValidPass) {
+      return res.status(400).json({ message: 'Invalid password' })
+    }
+    const updateData = {
+      phone,
+    }
+
+    await UserModel.updateOne({ _id: req.userId }, updateData)
+    res.json({ user: updateData })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: 'Failed to change phone' })
+  }
+}
+
+export const requestPhoneChangeWEmail = async (req, res) => {
+  try {
+    let userEditData = await UserEditDataModel.findOne({ userId: req.userId })
+
+    if (!userEditData) {
+      userEditData = new UserEditDataModel({ userId: req.userId })
+      await userEditData.save()
+    }
+    const { newPhone } = req.body
+
+    if (!newPhone) {
+      return res.status(400).json({ message: 'New phone number is required' })
     }
 
     const verificationCode = generateVerificationCode()
-    user.phoneChangeVerificationCode = verificationCode
-    user.newPhone = newPhone
-    await user.save()
 
-    await sendVerificationCode(user.email, verificationCode)
+    userEditData.phoneChangeVerificationCode = verificationCode
+    userEditData.newPhone = newPhone
+
+    await userEditData.save()
+
+    // await sendVerificationCode(user.email, verificationCode)
 
     res.json({ message: 'Verification code sent to your email, if it exists.' })
   } catch (err) {
@@ -294,22 +366,30 @@ export const requestPhoneChangeCode = async (req, res) => {
   }
 }
 
-export const confirmPhoneChange = async (req, res) => {
+export const confirmPhoneChangeWEmail = async (req, res) => {
   try {
-    const { email, verificationCode } = req.body
+    const { verificationCode } = req.body
 
-    const user = await UserModel.findOne({ email })
+    const user = await UserModel.findOne(req.userId)
+    let userEditData = await UserEditDataModel.findOne({ userId: req.userId })
+
+    if (!userEditData) {
+      userEditData = new UserEditDataModel({ userId: req.userId })
+      await userEditData.save()
+    }
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    if (user.phoneChangeVerificationCode !== verificationCode) {
+    if (userEditData.phoneChangeVerificationCode !== verificationCode) {
       return res.status(400).json({ message: 'Invalid verification code' })
     }
 
-    user.phone = user.newPhone
-    user.newPhone = undefined
-    user.phoneChangeVerificationCode = undefined
+    user.phone = userEditData.newPhone
+    userEditData.newPhone = ''
+    userEditData.phoneChangeVerificationCode = ''
+
+    await userEditData.save()
     await user.save()
 
     res.json({ message: 'Phone number successfully updated.' })
@@ -322,7 +402,7 @@ export const confirmPhoneChange = async (req, res) => {
 export const getUserProfile = async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.id)
-    const { passwordHash, ...userData } = user._doc
+    const { passwordHash, email, role, ...userData } = user._doc
     res.json(userData)
   } catch (err) {
     console.log(err)

@@ -12,6 +12,10 @@ import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
 import { Product } from '../../../redux/slices/products'
 import { Helmet } from 'react-helmet-async'
+import { AppDispatch } from '../../../redux/store'
+import { useDispatch, useSelector } from 'react-redux'
+import { getUserProfile, UserProfile } from '../../../redux/slices/auth'
+import { formatPhoneNumber } from '../../../assets/functons/phone/PhoneFormet'
 
 interface Props {
   noti?: boolean
@@ -24,6 +28,11 @@ export const FullProduct = (props: Props) => {
   const { id } = useParams()
   const [isFavorite, setIsFavorite] = useState<boolean>(false)
   const [isBag, setIsBag] = useState<boolean>(false)
+  const dispatch: AppDispatch = useDispatch()
+  const productUser = useSelector(
+    (state: { auth: { productUser: UserProfile | null } }) =>
+      state.auth.productUser
+  )
 
   const toggleFavorite = () => {
     if (!data) return
@@ -54,6 +63,12 @@ export const FullProduct = (props: Props) => {
 
     fetchData()
   }, [id])
+
+  useEffect(() => {
+    if (data?.user) {
+      dispatch(getUserProfile(data.user))
+    }
+  }, [data?.user, dispatch])
 
   const toggleBag = () => {
     if (!data) return
@@ -155,7 +170,7 @@ export const FullProduct = (props: Props) => {
                 <div className="flex gap-1">
                   {data.createdAt} <CiCalendarDate className="w-5 h-5 " />
                 </div>
-                <div className="flex gap-1 absolute ml-[180px]">
+                <div className="flex gap-1 absolute ml-[185px]">
                   {data.tags && (
                     <h1 className="text-base text-[#a7a7a7]">
                       {data.tags.join(', ')}
@@ -241,6 +256,42 @@ export const FullProduct = (props: Props) => {
           </div>
         </div>
       </motion.div>
+      <div className="mt-10 ml-[140px] group bg-[#f5f5f5] border-gray-500 border max-w-[500px] min-w-[300px] rounded-md p-3">
+        <div>
+          <h1 className="text-2xl font-bold">Seller info</h1>
+        </div>
+        <div>
+          <div>
+            <div className="flex gap-3 mt-3 bg-[#e4e4e4] p-3 rounded-md">
+              <img
+                className="rounded-full w-[50px] h-[50px]"
+                src={productUser?.avatarUrl}
+              />
+              <div>
+                <div>
+                  <h1>{productUser?.fullName}</h1>
+                </div>
+                <div>
+                  <h1>
+                    {productUser?.phone && formatPhoneNumber(productUser.phone)}
+                  </h1>
+                </div>
+                <div className="flex gap-2">
+                  <div>
+                    <h1>{productUser?.address},</h1>
+                  </div>
+                  <div>
+                    <h1>{productUser?.city},</h1>
+                  </div>
+                  <div>
+                    <h1>{productUser?.country}</h1>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   )
 }
