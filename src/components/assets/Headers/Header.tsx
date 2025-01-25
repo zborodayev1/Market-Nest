@@ -15,9 +15,14 @@ import {
 } from 'lucide-react'
 import { getProductsBySearch, fetchProducts } from '../../redux/slices/products'
 import { AppDispatch, RootState } from '../../redux/store'
-import { NotiHeaderDropDown } from '../Dropdowns/NotiDropDowns/NotiHeaderDropDown'
+import { NotiHeaderDropDown } from '../Notification/NotiHeaderDropDown'
 
-export const Header = () => {
+interface Props {
+  toastRef?: React.RefObject<HTMLDivElement>
+}
+
+export const Header = (props: Props) => {
+  const { toastRef } = props
   const isAuth = useSelector(selectIsAuth)
   const unreadNotiCount = useSelector(
     (state: RootState) => state.notifications.unread
@@ -38,7 +43,8 @@ export const Header = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(event.target as Node) &&
+        !(toastRef?.current && toastRef.current.contains(event.target as Node))
       ) {
         setOpen(false)
       }
@@ -49,7 +55,7 @@ export const Header = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [])
+  }, [toastRef])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

@@ -15,7 +15,7 @@ import { Helmet } from 'react-helmet-async'
 import { AppDispatch } from '../../../redux/store'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserProfile, UserProfile } from '../../../redux/slices/auth'
-import { formatPhoneNumber } from '../../../assets/functons/phone/PhoneFormet'
+import { SellerInfo } from './Seller/SellerInfo'
 
 interface Props {
   noti?: boolean
@@ -191,19 +191,19 @@ export const FullProduct = (props: Props) => {
                 className="max-w-[500px] bg-[#f5f5f5] rounded-md border"
               />
 
-              <button
+              <IconButton
                 onClick={toggleFavorite}
                 className={`flex  text-2xl text-[#fd3939] transition-opacity duration-300 ease-in-out 
                 }`}
+                color="error"
               >
-                <IconButton color="error">
-                  {isFavorite ? (
-                    <FavoriteOutlinedIcon />
-                  ) : (
-                    <FavoriteBorderOutlinedIcon />
-                  )}
-                </IconButton>
-              </button>
+                {isFavorite ? (
+                  <FavoriteOutlinedIcon />
+                ) : (
+                  <FavoriteBorderOutlinedIcon />
+                )}
+              </IconButton>
+
               {noti && (
                 <div className="absolute right-[600px] top-[225px]">
                   {data.status === 'approved' ? (
@@ -261,35 +261,7 @@ export const FullProduct = (props: Props) => {
           <h1 className="text-2xl font-bold">Seller info</h1>
         </div>
         <div>
-          <div>
-            <div className="flex gap-3 mt-3 bg-[#e4e4e4] p-3 rounded-md">
-              <img
-                className="rounded-full w-[50px] h-[50px]"
-                src={productUser?.avatarUrl}
-              />
-              <div>
-                <div>
-                  <h1>{productUser?.fullName}</h1>
-                </div>
-                <div>
-                  <h1>
-                    {productUser?.phone && formatPhoneNumber(productUser.phone)}
-                  </h1>
-                </div>
-                <div className="flex gap-2">
-                  <div>
-                    <h1>{productUser?.address},</h1>
-                  </div>
-                  <div>
-                    <h1>{productUser?.city},</h1>
-                  </div>
-                  <div>
-                    <h1>{productUser?.country}</h1>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <SellerInfo user={productUser} />
         </div>
       </div>
     </>

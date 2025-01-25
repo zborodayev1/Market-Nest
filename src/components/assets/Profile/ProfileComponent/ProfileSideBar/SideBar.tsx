@@ -7,7 +7,7 @@ import { ChevronDown, LogOut, PackageCheck } from 'lucide-react'
 import CloseIcon from '@mui/icons-material/Close'
 import { UserData } from '../ProfileAuthForms/UserData'
 import { Email } from '../ProfileAuthForms/Email'
-import { Password } from '../ProfileAuthForms/Password'
+import { Password } from '../ProfileAuthForms/Password/Password'
 import { Link } from 'react-router-dom'
 import { ChangeAvatar } from './ChangeAvatar/ChangeAvatar'
 

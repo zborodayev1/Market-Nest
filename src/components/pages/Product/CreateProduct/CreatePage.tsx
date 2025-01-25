@@ -81,6 +81,7 @@ export const CreatePage = () => {
       const errorMessage =
         (error as { message?: string }).message || 'An unknown error occurred'
       setMessage(errorMessage)
+      setIsSubmitting(false)
     }
   }
 

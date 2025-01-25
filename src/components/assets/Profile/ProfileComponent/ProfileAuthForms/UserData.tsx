@@ -127,7 +127,7 @@ export const UserData = ({ onSuccess }: Props) => {
           type="submit"
           disabled={isSubmitting}
           whileTap={{ scale: 0.99 }}
-          className={` w-full p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128] hover:-translate-y-1 transition-all duration-300 ease-in-out    `}
+          className={` w-full p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128]  transition-all duration-300 ease-in-out    `}
         >
           <motion.span className="  text-[#fff] font-bold  duration-300 transition-colors ease-in-out group-hover:text-white  ">
             {isSubmitting ? 'Saving...' : 'Save Changes'}

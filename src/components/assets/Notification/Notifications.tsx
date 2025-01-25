@@ -186,7 +186,7 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
                 <button
                   onClick={() => updateFilter('read')}
                   disabled={filter === 'read'}
-                  className={`py-1 px-4 rounded-xl transition-colors duration-300 ease-linear ${
+                  className={`py-1 px-4 rounded-xl transition-colors duration-200 ease-linear ${
                     filter === 'read'
                       ? 'bg-[#3C8737] text-white hover:bg-[#2B6128]'
                       : 'bg-gray-200 hover:bg-gray-300 text-black'
@@ -197,7 +197,7 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
                 <button
                   onClick={() => updateFilter('unread')}
                   disabled={filter === 'unread'}
-                  className={`py-1 px-4 rounded-xl transition-colors duration-300 ease-linear ${
+                  className={`py-1 px-4 rounded-xl transition-colors duration-200 ease-linear ${
                     filter === 'unread'
                       ? 'bg-[#3C8737] text-white hover:bg-[#2B6128]'
                       : 'bg-gray-200 hover:bg-gray-300 text-black'
@@ -209,13 +209,13 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
               <div className="flex justify-center mt-2 gap-2">
                 <button
                   onClick={markAsRead}
-                  className="py-1 px-3 rounded-xl bg-gray-200 hover:bg-gray-300 text-black"
+                  className="py-1 px-3 rounded-xl bg-gray-200 hover:bg-gray-300 text-black transition-colors duration-200 ease-linear"
                 >
                   Read All
                 </button>
                 <button
                   onClick={deleteAll}
-                  className="py-1 px-3 rounded-xl bg-gray-200 hover:bg-gray-300 text-black"
+                  className="py-1 px-3 rounded-xl bg-gray-200 hover:bg-gray-300 text-black transition-colors duration-200 ease-linear"
                 >
                   Delete All
                 </button>
