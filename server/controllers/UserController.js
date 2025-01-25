@@ -53,8 +53,7 @@ export const temporaryRegister = async (req, res) => {
     // await sendVerificationCode(email, verificationCode)
 
     res.status(201).json({
-      message: 'Verification email sent. Please verify your email.',
-      email: doc.email,
+      message: 'Verification code sent. Please verify your email.',
     })
   } catch (err) {
     console.log(err)
@@ -233,6 +232,12 @@ export const patchProfilePassword = async (req, res) => {
       return res.status(400).json({ message: 'Invalid password' })
     }
 
+    if (password === oldPassword) {
+      return res
+        .status(400)
+        .json({ message: 'New password must be different from the old one' })
+    }
+
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
     await UserModel.updateOne(
       { _id: req.userId },
@@ -260,7 +265,7 @@ export const requestPasswordChangeWEmail = async (req, res) => {
     if (userEditData.passwordChangeVerificationCode) {
       return res
         .status(400)
-        .json({ message: 'Password change code already sent' })
+        .json({ message: 'Password change code already sent', success: false })
     }
 
     const verificationCode = generateVerificationCode()
@@ -270,7 +275,10 @@ export const requestPasswordChangeWEmail = async (req, res) => {
 
     // await sendVerificationCode(user.email, verificationCode)
 
-    res.json({ message: 'Verification code sent to your email, if it exists.' })
+    res.json({
+      message: 'Verification code sent to your email, if it exists.',
+      success: true,
+    })
   } catch (err) {
     console.log(err)
     res.status(500).json({ message: 'Failed to send verification code' })
@@ -295,7 +303,9 @@ export const confirmPasswordChangeWEmail = async (req, res) => {
     }
 
     if (userEditData.passwordChangeVerificationCode !== verificationCode) {
-      return res.status(400).json({ message: 'Invalid verification code' })
+      return res
+        .status(400)
+        .json({ message: 'Invalid verification code', success: false })
     }
     const salt = await bcrypt.genSalt(SALT_ROUNDS)
     const hashedPassword = await bcrypt.hash(userEditData.newPassword, salt)
@@ -308,7 +318,7 @@ export const confirmPasswordChangeWEmail = async (req, res) => {
     await userEditData.save()
     await user.save()
 
-    res.json({ message: 'Password successfully updated.' })
+    res.json({ message: 'Password successfully updated.', success: true })
   } catch (err) {
     console.log(err)
     res.status(500).json({ message: 'Failed to update password' })

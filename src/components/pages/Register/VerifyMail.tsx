@@ -48,7 +48,6 @@ export const VerifyMail = (props: Props) => {
     setLoading(true)
     try {
       const data = await dispatch(fetchCompleteRegistration(values)).unwrap()
-      console.log('Response data:', data)
       setLoading(false)
       onSuccess()
       navigate('/')
@@ -102,7 +101,7 @@ export const VerifyMail = (props: Props) => {
             </p>
           </div>
 
-          <form className="mt-10" onSubmit={handleSubmit(onSubmit)}>
+          <form className="mt-5" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex justify-center mb-5">
               <div>
                 <label className={labelClasses}>

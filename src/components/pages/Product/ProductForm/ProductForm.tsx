@@ -109,7 +109,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   )}
                 </IconButton>
 
-                {userData?.role === 'admin' && (
+                {(userData?.role === 'admin' ||
+                  userData?._id === product.user) && (
                   <IconButton
                     className="absolute top-0 left-[120px] ease-in-out duration-300"
                     color="error"
@@ -118,17 +119,19 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     <X />
                   </IconButton>
                 )}
-                {Edit ||
-                  (userData?.role === 'admin' && (
-                    <Link to={`/edit/${product._id}`}>
-                      <IconButton
-                        className="absolute top-0 left-[-80px] ease-in-out duration-300"
-                        color="primary"
-                      >
-                        <Pencil />
-                      </IconButton>
-                    </Link>
-                  ))}
+
+                {(Edit ||
+                  userData?.role === 'admin' ||
+                  userData?._id === product.user) && (
+                  <Link to={`/edit/${product._id}`}>
+                    <IconButton
+                      className="absolute top-0 left-[40px] ease-in-out duration-300"
+                      color="primary"
+                    >
+                      <Pencil />
+                    </IconButton>
+                  </Link>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -205,7 +208,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             <div className="mt-1 justify-center flex">
               <motion.button
                 onClick={toggleBag}
-                className="w-[240px] flex gap-1 bg-[#3C8737] rounded-md py-1 text-white text-base hover:bg-[#2b6128] transition-colors duration-150 ease-in-out justify-center"
+                className="w-[240px] flex gap-1 bg-[#3C8737] rounded-md p-1 text-white text-base hover:bg-[#2b6128] transition-colors duration-150 ease-in-out justify-center"
                 style={{ overflow: 'hidden' }}
               >
                 <motion.span
@@ -241,13 +244,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           ) : (
             <div className="flex justify-between mt-2">
               <button
-                className="bg-[#3C8737] text-white w-[120px] rounded-lg py-1 px-4 hover:-translate-y-1 transition-transform ease-in-out duration-300"
+                className="bg-[#3C8737] text-white w-[120px] rounded-lg py-1 px-4 hover:bg-[#33722e] transition-colors ease-linear duration-150"
                 onClick={onSubmit}
               >
                 Approve
               </button>
               <button
-                className="  bg-[#932525] text-white w-[120px] rounded-lg py-1 px-4 hover:-translate-y-1 transition-transform ease-in-out duration-300"
+                className="  bg-[#932525] text-white w-[120px] rounded-lg py-1 px-4 hover:bg-[#7e2525] transition-colors ease-linear duration-150"
                 onClick={() => handleDelete(product._id)}
               >
                 Reject

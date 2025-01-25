@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Notifications } from '../../Notification/Notifications'
+import { Notifications } from '../Notification/Notifications'
 import { RefObject } from 'react'
 
 interface Props {

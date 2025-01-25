@@ -41,11 +41,6 @@ export interface UserEmail {
   password: string
 }
 
-// interface UserPhone {
-//   password: string
-//   phone: string
-// }
-
 interface AuthState {
   user: UserProfile | null
   isAuth: boolean
@@ -99,7 +94,7 @@ export const fetchCompleteRegistration = createAsyncThunk<
 })
 
 export const requestPasswordChange = createAsyncThunk<
-  { message: string },
+  { message: string; success: boolean },
   {
     newPassword: string
   },
@@ -122,8 +117,8 @@ export const requestPasswordChange = createAsyncThunk<
 })
 
 export const confirmPasswordChange = createAsyncThunk<
-  { message: string },
-  { code: string },
+  { message: string; success: boolean },
+  { verificationCode: string },
   { rejectValue: string }
 >('auth/confirmPasswordChange', async (params, { rejectWithValue }) => {
   try {
