@@ -17,20 +17,34 @@ const __dirname = path.dirname(__filename)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = path.resolve(__dirname, '..', '..', 'public', 'uploads')
-    console.log('Destination path:', uploadPath)
-    cb(null, uploadPath)
+    fs.mkdir(uploadPath, { recursive: true }, (err) => {
+      if (err) {
+        console.error('Error creating upload directory:', err)
+        return cb(new Error('Failed to create upload directory'))
+      }
+      cb(null, uploadPath)
+    })
   },
   filename: (req, file, cb) => {
     const filename = Date.now() + path.extname(file.originalname)
-    console.log('File name:', filename)
     cb(null, filename)
   },
 })
 
 const upload = multer({ storage })
 
-export const handleUploadProductImage = upload.single('image')
-
+export const handleUploadProductImage = (req, res, next) => {
+  upload(req, res, (err) => {
+    if (err) {
+      console.error('File upload error:', err)
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to upload file',
+      })
+    }
+    next()
+  })
+}
 export const createProduct = async (req, res) => {
   try {
     const { name, tags, price, description } = req.body
@@ -41,6 +55,7 @@ export const createProduct = async (req, res) => {
         message: 'No file uploaded',
       })
     }
+
     if (!name || name.length <= 5 || !tags || !price || price <= 0) {
       const errors = []
       if (!name || name.length <= 5) errors.push('name (> 5 characters)')
@@ -95,12 +110,25 @@ export const createProduct = async (req, res) => {
           status: 'pending',
         })
 
-        admins.forEach(async (admin) => {
-          await NotiModel.create({
-            user: admin._id,
-            message: `There are ${productsToVerify} products awaiting admin verification this week.`,
+        if (productsToVerify > 0) {
+          const existingNotification = await NotiModel.findOne({
+            actionType: 'pending_review',
+            createdAt: { $gte: dayjs().startOf('week').toDate() },
           })
-        })
+
+          if (!existingNotification) {
+            await Promise.all(
+              admins.map(async (admin) => {
+                await NotiModel.create({
+                  userId: admin._id,
+                  title: 'Pending products',
+                  actionType: 'pending_review',
+                  message: `There are ${productsToVerify} products awaiting admin verification this week.`,
+                })
+              })
+            )
+          }
+        }
       })
 
       return res.status(201).json({
@@ -138,27 +166,47 @@ export const getOneProduct = async (req, res) => {
 
     session.startTransaction()
 
-    let product = await ProductModel.findById(productId).session(session).lean()
+    const product = await ProductModel.findById(productId).session(session)
 
     if (!product) {
+      await session.abortTransaction()
       return res.status(404).json({ message: 'Product not found' })
     }
 
-    if (!product.viewedBy.includes(userId)) {
-      product = await ProductModel.findOneAndUpdate(
+    const viewedBySet = new Set(
+      (product.viewedBy || []).map((id) => id.toString())
+    )
+
+    if (!viewedBySet.has(userId)) {
+      viewedBySet.add(userId)
+      const viewedByArray = [...viewedBySet].slice(-100) // Ограничение в 100 последних пользователей
+
+      await ProductModel.updateOne(
         { _id: productId },
         {
           $inc: { viewsCount: 1 },
-          $push: { viewedBy: userId },
+          $set: { viewedBy: viewedByArray },
         },
-        { new: true, session, lean: true }
+        { session }
       )
+
+      // Загружаем обновлённый продукт в новую переменную
+      const updatedProduct =
+        await ProductModel.findById(productId).session(session)
+
+      await session.commitTransaction()
+
+      return res.json({
+        ...updatedProduct.toObject(),
+        createdAt: dayjs(updatedProduct.createdAt).format('YY-MM-DD'),
+        updatedAt: dayjs(updatedProduct.updatedAt).format('YY-MM-DD'),
+      })
     }
 
     await session.commitTransaction()
 
-    res.json({
-      ...product,
+    return res.json({
+      ...product.toObject(),
       createdAt: dayjs(product.createdAt).format('YY-MM-DD'),
       updatedAt: dayjs(product.updatedAt).format('YY-MM-DD'),
     })
@@ -181,9 +229,12 @@ export const patchProduct = async (req, res) => {
       return res.status(400).json({ message: 'Invalid product ID' })
     }
 
+    session.startTransaction()
+
     const { name, tags, image, price, discount } = req.body
 
-    if (!name || !tags || !image || price === undefined || !description) {
+    if (!name || !tags || !image || price === undefined) {
+      await session.abortTransaction()
       return res.status(400).json({ message: 'Missing required fields' })
     }
 
@@ -192,16 +243,16 @@ export const patchProduct = async (req, res) => {
       tags,
       image,
       price,
-      description,
       updatedAt: new Date(),
     }
 
-    if (typeof discount === 'number' && discount >= 0 && discount <= 100) {
-      const product = await ProductModel.findById(productId).session(session)
-      if (!product) {
-        return res.status(404).json({ message: 'Product not found' })
-      }
+    const product = await ProductModel.findById(productId).session(session)
+    if (!product) {
+      await session.abortTransaction()
+      return res.status(404).json({ message: 'Product not found' })
+    }
 
+    if (typeof discount === 'number' && discount >= 0 && discount <= 100) {
       const { newPrice, discountAmount } = calculateDiscount(
         product.price,
         discount
@@ -212,8 +263,6 @@ export const patchProduct = async (req, res) => {
       updateData.price = newPrice
       updateData.saveAmount = discountAmount
     }
-
-    session.startTransaction()
 
     const updatedProduct = await ProductModel.findByIdAndUpdate(
       productId,
@@ -226,14 +275,19 @@ export const patchProduct = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' })
     }
 
-    await NotiModel.create({
-      userId: updatedProduct.user,
-      title: `Your product has been updated`,
-      actionType: `approved`,
-      productId: productId,
-    })
+    await NotiModel.create(
+      [
+        {
+          userId: updatedProduct.user,
+          title: `Your product has been updated`,
+          actionType: `approved`,
+          productId: productId,
+        },
+      ],
+      { session }
+    )
 
-    await sendUnreadCountToClients(req.userId, 1)
+    await sendUnreadCountToClients(updatedProduct.user, 1)
 
     await session.commitTransaction()
 
@@ -285,7 +339,7 @@ export const deleteProduct = async (req, res) => {
         productId: productId,
       })
 
-      await sendUnreadCountToClients(req.userId, 1)
+      await sendUnreadCountToClients(product.user, 1)
 
       return res.status(200).json({
         message: 'Product deleted successfully',
@@ -405,12 +459,16 @@ export const getProductsBySearch = async (req, res) => {
 }
 
 export const approveProduct = async (req, res) => {
-  const productId = req.params.id
+  const session = await mongoose.startSession()
 
   try {
-    const product = await ProductModel.findById(productId)
+    session.startTransaction()
+
+    const productId = req.params.id
+    const product = await ProductModel.findById(productId).session(session)
 
     if (!product) {
+      await session.abortTransaction()
       return res.status(404).json({
         success: false,
         message: 'Product not found',
@@ -418,6 +476,7 @@ export const approveProduct = async (req, res) => {
     }
 
     if (product.status === 'approved') {
+      await session.abortTransaction()
       return res.status(400).json({
         success: false,
         message: 'Product is already approved',
@@ -425,16 +484,22 @@ export const approveProduct = async (req, res) => {
     }
 
     product.status = 'approved'
-    await product.save()
+    await product.save({ session })
 
-    await NotiModel.create({
-      userId: product.user,
-      title: 'Your product has been approved',
-      actionType: 'approved',
-      productId: product._id,
-    })
+    await NotiModel.create(
+      [
+        {
+          userId: product.user,
+          title: 'Your product has been approved',
+          actionType: 'approved',
+          productId: product._id,
+        },
+      ],
+      { session }
+    )
 
-    await sendUnreadCountToClients(req.userId, 1)
+    await session.commitTransaction()
+    await sendUnreadCountToClients(product.user, 1)
 
     return res.status(200).json({
       success: true,
@@ -442,17 +507,21 @@ export const approveProduct = async (req, res) => {
       product,
     })
   } catch (error) {
+    await session.abortTransaction()
     console.error('Error updating product status:', error)
     res.status(500).json({
       success: false,
       message: 'Failed to update product status',
     })
+  } finally {
+    session.endSession()
   }
 }
 
 export const deleteAllProducts = async (req, res) => {
   try {
     const result = await ProductModel.deleteMany()
+    await NotiModel.deleteMany()
 
     if (result.deletedCount === 0) {
       return res.status(404).json({ message: 'No products found to delete' })

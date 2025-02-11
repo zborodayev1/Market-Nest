@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "deploy-fe": "scp -r ./dist/* vps:/var/www/market-nest",
-    "deploy-be": "scp -r ./server vps:~/market-nest && scp ./package.json vps:~/market-nest && scp ./index.js vps:~/market-nest && scp ./.env vps:~/market-nest",
+    "deploy-fe": "set -e && rm -rf dist && echo -e \"\\033[1;31mDeleting dist...\\033[0m\" && echo -e \"\\033[1;34mBuilding...\\033[0m\" && npm run build || true && echo -e \"\\033[1;32mDeploying...\\033[0m\" && scp -r ./dist vps:/var/www/market-frontend && echo -e \"\\033[1;33mRestarting Nginx...\\033[0m\" && ssh vps 'sudo systemctl restart nginx' && echo -e \"\\033[1;32mSuccess!\\033[0m\"",
+    "deploy-be": "echo -e \"\\033[1;34mDeploying backend...\\033[0m\" && scp -r ./server vps:~/market-nest && scp ./package.json vps:~/market-nest && scp -r ./public vps:~/market-nest && scp ./index.js vps:~/market-nest && scp ./.env vps:~/market-nest && echo -e \"\\033[1;32mBackend deployment completed!\\033[0m\"",
     "lint": "eslint .",
     "preview": "vite preview",
     "node": "nodemon index.js"

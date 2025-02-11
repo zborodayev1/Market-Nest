@@ -41,6 +41,11 @@ export interface UserEmail {
   password: string
 }
 
+interface UserPhone {
+  phone: string
+  password: string
+}
+
 interface AuthState {
   user: UserProfile | null
   isAuth: boolean
@@ -230,7 +235,25 @@ export const updateProfilePassword = createAsyncThunk<
   { rejectValue: string }
 >('auth/updateProfilePassword', async (params, { rejectWithValue }) => {
   try {
-    const { data } = await axios.patch('/auth/profile/password', params)
+    const { data } = await axios.patch('/auth/profile/phone', params)
+    return data
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
+
+    return rejectWithValue(errorMessage)
+  }
+})
+
+export const updateProfilePhone = createAsyncThunk<
+  UpdateProfileResponse,
+  UserPhone,
+  { rejectValue: string }
+>('auth/updateProfilePhone', async (params, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.patch('/auth/profile/phone', params)
     return data
   } catch (error: any) {
     const errorMessage =
@@ -288,15 +311,10 @@ const authSlice = createSlice({
 
     builder
       .addCase(fetchTemporaryRegister.pending, handlePending)
-      .addCase(
-        fetchTemporaryRegister.fulfilled,
-        (state: AuthState, action: any) => {
-          state.status = 'succeeded'
-          state.user = action.payload.user || (action.payload as UserProfile)
-          state.error = null
-          state.loading = false
-        }
-      )
+      .addCase(fetchTemporaryRegister.fulfilled, (state: AuthState) => {
+        state.status = 'succeeded'
+        state.loading = false
+      })
       .addCase(fetchTemporaryRegister.rejected, handleRejected)
       .addCase(fetchCompleteRegistration.pending, handlePending)
       .addCase(fetchCompleteRegistration.fulfilled, handleFulfilled)
@@ -335,6 +353,13 @@ const authSlice = createSlice({
         state.loading = false
       })
       .addCase(updateProfilePassword.rejected, handleRejected)
+
+      .addCase(updateProfilePhone.pending, handlePending)
+      .addCase(updateProfilePhone.fulfilled, (state) => {
+        state.status = 'succeeded'
+        state.loading = false
+      })
+      .addCase(updateProfilePhone.rejected, handleRejected)
 
       .addCase(requestPasswordChange.pending, handlePending)
       .addCase(requestPasswordChange.fulfilled, (state) => {

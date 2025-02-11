@@ -12,11 +12,11 @@ import {
   MapPin,
   Building2,
   Globe,
-  // Binary,
 } from 'lucide-react'
 import { motion } from 'motion/react'
 import { AppDispatch } from '../../redux/store'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../../context/auth/useAuth'
 
 interface Props {
   setLoading: (loading: boolean) => void
@@ -34,7 +34,7 @@ export const RegisterForm = (props: Props) => {
 
   const { setLoading, setErr, loading, onSuccess } = props
   const dispatch: AppDispatch = useDispatch()
-
+  const { setEmail } = useAuth()
   const navigate = useNavigate()
   const {
     register,
@@ -67,6 +67,7 @@ export const RegisterForm = (props: Props) => {
       onSuccess()
       await dispatch(fetchTemporaryRegister(values)).unwrap()
       setLoading(false)
+      setEmail(values.email)
       navigate('/verify-email')
     } catch (error) {
       console.error(error)

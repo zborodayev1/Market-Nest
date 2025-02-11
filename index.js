@@ -45,8 +45,6 @@ const wss = new WebSocketServer({ server })
 const clients = new Map()
 
 wss.on('connection', (ws) => {
-  console.log('WebSocket клиент подключён')
-
   ws.on('message', async (message) => {
     try {
       const { type, userId } = JSON.parse(message)
@@ -54,7 +52,6 @@ wss.on('connection', (ws) => {
       if (type === 'auth' && userId) {
         ws.userId = userId
         clients.set(userId, ws)
-        console.log(`Клиент аутентифицирован с userId: ${userId}`)
       } else {
         ws.send(
           JSON.stringify({ status: 'error', message: 'Unknown message type' })
@@ -69,7 +66,6 @@ wss.on('connection', (ws) => {
   })
 
   ws.on('close', () => {
-    console.log('Клиент отключился')
     if (ws.userId) {
       clients.delete(ws.userId)
     }
