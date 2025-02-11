@@ -20,7 +20,9 @@ export const temporaryRegister = async (req, res) => {
       req.body
 
     const existingTempUser = await UnverifiedUserModel.findOne({ email })
-    if (existingTempUser) {
+    const existingTempPhone = await UnverifiedUserModel.findOne({ phone })
+
+    if (existingTempUser || existingTempPhone) {
       return res
         .status(400)
         .json({ message: 'Verification email already sent' })
@@ -29,6 +31,11 @@ export const temporaryRegister = async (req, res) => {
     const existingUser = await UserModel.findOne({ email })
     if (existingUser) {
       return res.status(400).json({ message: 'Email is already in use' })
+    }
+
+    const existingUserPhone = await UserModel.findOne({ phone })
+    if (existingUserPhone) {
+      return res.status(400).json({ message: 'Phone number is already in use' })
     }
 
     const salt = await bcrypt.genSalt(SALT_ROUNDS)

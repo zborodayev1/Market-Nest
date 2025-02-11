@@ -155,10 +155,20 @@ export const FullProduct = (props: Props) => {
               )}
             </div>
             <div className=" ml-2">
-              <div className="flex items-center gap-1">
+              <div className="flex justify-between items-center gap-1">
                 <h1 className="mr-2">{data.name}</h1>
+                {noti && (
+                  <div className="relative right-[50px]">
+                    {data.status === 'approved' ? (
+                      <h1 className="text-[#3C8737] font-bold">Approved</h1>
+                    ) : data.status === 'rejected' ? (
+                      <h1 className="text-red-600 font-bold">Rejected</h1>
+                    ) : (
+                      <h1 className="text-blue-600 font-bold">Pending</h1>
+                    )}
+                  </div>
+                )}
               </div>
-
               <div className="flex text-[#a7a7a7] items-center text-sm gap-2 mt-1 mb-5">
                 <div className="flex gap-1">
                   {data.viewsCount} <Eye className="w-5 h-5 " />
@@ -193,7 +203,7 @@ export const FullProduct = (props: Props) => {
 
               <IconButton
                 onClick={toggleFavorite}
-                className={`flex  text-2xl text-[#fd3939] transition-opacity duration-300 ease-in-out 
+                className={`flex w-10 h-10  text-2xl text-[#fd3939] transition-opacity duration-300 ease-in-out 
                 }`}
                 color="error"
               >
@@ -203,18 +213,6 @@ export const FullProduct = (props: Props) => {
                   <FavoriteBorderOutlinedIcon />
                 )}
               </IconButton>
-
-              {noti && (
-                <div className="absolute right-[600px] top-[225px]">
-                  {data.status === 'approved' ? (
-                    <h1 className="text-[#3C8737] font-bold">Approved</h1>
-                  ) : data.status === 'rejected' ? (
-                    <h1 className="text-red-600 font-bold">Rejected</h1>
-                  ) : (
-                    <h1 className="text-blue-600 font-bold">Pending</h1>
-                  )}
-                </div>
-              )}
             </div>
           </div>
           <div className="flex ml-10 items-end">

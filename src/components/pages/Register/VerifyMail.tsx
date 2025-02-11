@@ -12,6 +12,7 @@ import { motion } from 'framer-motion'
 import { UserEmail } from '../../redux/slices/auth'
 import { Helmet } from 'react-helmet-async'
 import { useEffect } from 'react'
+import { useAuth } from '../../../context/auth/useAuth'
 
 interface Props {
   code: boolean
@@ -31,6 +32,7 @@ export const VerifyMail = (props: Props) => {
   )
   const isAuth = useSelector(selectIsAuth)
   const [err, setErr] = useState<string | null>(null)
+  const { email } = useAuth()
   const [loading, setLoading] = useState(false)
   const {
     register,
@@ -38,7 +40,7 @@ export const VerifyMail = (props: Props) => {
     formState: { isValid },
   } = useForm({
     defaultValues: {
-      email: user?.email,
+      email: '',
       code: '',
     },
     mode: 'all',
@@ -47,7 +49,9 @@ export const VerifyMail = (props: Props) => {
   const onSubmit = async (values: { email: string; code: string }) => {
     setLoading(true)
     try {
-      const data = await dispatch(fetchCompleteRegistration(values)).unwrap()
+      const data = await dispatch(
+        fetchCompleteRegistration({ code: values.code, email: email })
+      ).unwrap()
       setLoading(false)
       onSuccess()
       navigate('/')
@@ -80,7 +84,13 @@ export const VerifyMail = (props: Props) => {
           content="market, shop, market nest, market nests, login, market nest login, market nest sign up"
         />
       </Helmet>
-      <div className="flex justify-center mt-5">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex justify-center mt-5"
+      >
         <div
           style={{
             boxShadow: `
@@ -121,7 +131,7 @@ export const VerifyMail = (props: Props) => {
                 type="submit"
                 disabled={!isValid || loading}
                 whileTap={{ scale: 0.99 }}
-                className={`w-[320px] p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128] hover:-translate-y-1 transition-all duration-300 ease-in-out`}
+                className={`w-[320px] p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128]  transition-all duration-300 ease-in-out`}
               >
                 <span className="text-[#fff] font-bold duration-300 transition-colors ease-in-out group-hover:text-white">
                   {loading ? 'Verifying...' : 'Verify'}
@@ -133,7 +143,7 @@ export const VerifyMail = (props: Props) => {
             {err && <span>{err}</span>}
           </h1>
         </div>
-      </div>
+      </motion.div>
     </>
   )
 }

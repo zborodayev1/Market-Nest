@@ -32,9 +32,9 @@ const ProductSchema = new mongoose.Schema(
       min: 0,
     },
     viewedBy: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'User',
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
       default: [],
+      index: true,
     },
     comment: [
       {
@@ -68,10 +68,6 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    description: {
-      type: String,
-      maxlength: 500,
-    },
     status: {
       type: String,
 
@@ -83,5 +79,7 @@ const ProductSchema = new mongoose.Schema(
     timestamps: true,
   }
 )
+
+ProductSchema.index({ viewedBy: 1 })
 
 export default mongoose.model('Product', ProductSchema)
