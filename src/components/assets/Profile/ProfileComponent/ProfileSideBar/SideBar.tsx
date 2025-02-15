@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { AppDispatch, persistor } from '../../../../redux/store'
+import { AppDispatch } from '../../../../redux/store'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout, selectUserProfile } from '../../../../redux/slices/auth'
@@ -10,6 +10,7 @@ import { Email } from '../ProfileAuthForms/Email'
 import { Password } from '../ProfileAuthForms/Password/Password'
 import { Link } from 'react-router-dom'
 import { ChangeAvatar } from './ChangeAvatar/ChangeAvatar'
+import { Phone } from '../ProfileAuthForms/Phone/Phone'
 
 interface Props {
   setOpen: (value: boolean) => void
@@ -26,17 +27,18 @@ export const SideBar = (props: Props) => {
     ChangeName: boolean
     ChangePassword: boolean
     ChangeEmail: boolean
+    ChangePhone: boolean
   }>({
     ChangeName: false,
     ChangePassword: false,
     ChangeEmail: false,
+    ChangePhone: false,
   })
 
   useEffect(() => {
     if (logOutState === true) {
       dispatch(logout())
       localStorage.removeItem('token')
-      persistor.purge()
       setLogOutState(false)
     }
   }, [logOutState, dispatch])
@@ -45,7 +47,6 @@ export const SideBar = (props: Props) => {
     setLogOutState(true)
     dispatch(logout())
     localStorage.removeItem('token')
-    persistor.purge()
     setOpen(false)
   }
 
@@ -85,6 +86,7 @@ export const SideBar = (props: Props) => {
                       ChangeName: !prev.ChangeName,
                       ChangeEmail: false,
                       ChangePassword: false,
+                      ChangePhone: false,
                     }))
                   }
                   className="hover:bg-[#E4E4E4] p-2 py-3 rounded-xl flex items-center gap-1 transition-colors duration-300 ease-in-out"
@@ -139,6 +141,7 @@ export const SideBar = (props: Props) => {
                       ChangeEmail: !prev.ChangeEmail,
                       ChangeName: false,
                       ChangePassword: false,
+                      ChangePhone: false,
                     }))
                   }
                   className="hover:bg-[#E4E4E4] p-2 py-3 rounded-xl flex items-center gap-1 w-full transition-colors duration-300 ease-in-out"
@@ -192,6 +195,7 @@ export const SideBar = (props: Props) => {
                       ChangeEmail: false,
                       ChangeName: false,
                       ChangePassword: !prev.ChangePassword,
+                      ChangePhone: false,
                     }))
                   }
                   className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex items-center gap-1 w-full transition-colors duration-300 ease-in-out"
@@ -222,6 +226,54 @@ export const SideBar = (props: Props) => {
                         setState((prev) => ({
                           ...prev,
                           ChangePassword: !prev.ChangePassword,
+                        }))
+                      }
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <motion.div
+                variants={contentVariants}
+                className="text-sm font-bold"
+              >
+                <motion.button
+                  onClick={() =>
+                    setState((prev) => ({
+                      ...prev,
+                      ChangeEmail: false,
+                      ChangeName: false,
+                      ChangePassword: false,
+                      ChangePhone: !prev.ChangePhone,
+                    }))
+                  }
+                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex items-center gap-1 w-full transition-colors duration-300 ease-in-out"
+                >
+                  <div className="">Change phone number</div>
+
+                  <motion.div
+                    animate={{ rotate: state.ChangePhone ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ChevronDown style={{ width: 17 }} />
+                  </motion.div>
+                </motion.button>
+              </motion.div>
+              <AnimatePresence mode="wait">
+                {state.ChangePhone && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{
+                      duration: 0.2,
+                      ease: 'easeInOut',
+                    }}
+                  >
+                    <Phone
+                      onSuccess={() =>
+                        setState((prev) => ({
+                          ...prev,
+                          ChangePhone: !prev.ChangePhone,
                         }))
                       }
                     />

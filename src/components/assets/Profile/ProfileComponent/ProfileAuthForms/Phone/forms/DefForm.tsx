@@ -1,27 +1,26 @@
 import { useForm } from 'react-hook-form'
 import {
-  confirmPasswordChange,
   selectUserProfile,
+  updateProfilePhone,
 } from '../../../../../../redux/slices/auth'
 import { useDispatch, useSelector } from 'react-redux'
-import { Binary, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Phone, RectangleEllipsis } from 'lucide-react'
 import { useState } from 'react'
 import { AppDispatch } from '../../../../../../redux/store'
 import { toast } from 'react-toastify'
 import { motion } from 'framer-motion'
 
 interface Formdata {
-  verificationCode?: string
+  password?: string
+  newPhone?: string
 }
 interface Props {
   onSuccess: () => void
-  setPPS: (state: 'default' | 'forgotPass' | 'code') => void
 }
-
-export const Code = (props: Props) => {
+export const DefForm = (props: Props) => {
   const userData = useSelector(selectUserProfile)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { onSuccess, setPPS } = props
+  const { onSuccess } = props
   const dispatch: AppDispatch = useDispatch()
   const { reset, register, handleSubmit } = useForm<Formdata>({
     mode: 'onSubmit',
@@ -30,39 +29,26 @@ export const Code = (props: Props) => {
   const onSubmit = async (values: Formdata) => {
     try {
       setIsSubmitting(true)
+
       const payload = {
-        verificationCode: values.verificationCode || '',
+        password: values.password || '',
+        phone: values.newPhone || '',
       }
-      const comfirmPC = await dispatch(confirmPasswordChange(payload)).unwrap()
-      if (comfirmPC.success === true) {
+
+      const resultAction = await dispatch(updateProfilePhone(payload))
+
+      if (updateProfilePhone.fulfilled.match(resultAction)) {
         reset({ ...userData, ...values })
         onSuccess()
-
-        toast(comfirmPC.message, {
-          type: 'success',
-          position: 'bottom-right',
-        })
-        setPPS('default')
-      } else if (comfirmPC.success === false) {
-        toast(comfirmPC.message, {
+      } else {
+        console.error('Ошибка:', resultAction.payload || 'Неизвестная ошибка')
+        toast(resultAction.payload || 'Неизвестная ошибка', {
           type: 'error',
           position: 'bottom-right',
         })
       }
     } catch (error) {
-      console.error(error)
-      toast(String(error), {
-        type: 'error',
-        position: 'bottom-right',
-      })
-      if (
-        error === 'Password change code already sent' ||
-        error === 'Invalid verification code'
-      ) {
-        setPPS('code')
-      } else {
-        setPPS('default')
-      }
+      console.error('Error:', error)
     } finally {
       setIsSubmitting(false)
     }
@@ -79,20 +65,19 @@ export const Code = (props: Props) => {
       <div className="space-y-4">
         <div className="">
           <label className={labelClasses} htmlFor="password">
-            <Binary size={23} />
-            <h1 className="mt-[2px] ml-1">Code</h1>
+            <RectangleEllipsis size={23} />
+            <h1 className="mt-[2px] ml-1">Password</h1>
           </label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
               spellCheck="false"
-              placeholder="123456"
-              maxLength={6}
+              placeholder="12345678Test"
               id="password"
-              {...register('verificationCode', {
+              {...register('password', {
                 required: 'Password is required',
                 minLength: {
-                  value: 6,
+                  value: 8,
                   message: 'Password must be at least 8 characters',
                 },
               })}
@@ -112,6 +97,29 @@ export const Code = (props: Props) => {
             </button>
           </div>
         </div>
+
+        <div className="">
+          <label className={labelClasses} htmlFor="password">
+            <Phone size={18} />
+            <h1 className="mt-[2px] ml-1">New Phone Number</h1>
+          </label>
+          <div className="relative">
+            <input
+              type={'text'}
+              spellCheck="false"
+              placeholder="77777777777"
+              id="password"
+              {...register('newPhone', {
+                required: 'Password is required',
+                minLength: {
+                  value: 8,
+                  message: 'Password must be at least 8 characters',
+                },
+              })}
+              className={inputClasses}
+            />
+          </div>
+        </div>
       </div>
 
       <motion.button
@@ -121,7 +129,7 @@ export const Code = (props: Props) => {
         className={` w-full p-2 mt-5 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128]  transition-all duration-300 ease-in-out    `}
       >
         <motion.span className="  text-[#fff] font-bold  duration-300 transition-colors ease-in-out group-hover:text-white  ">
-          {isSubmitting ? 'Verification...' : 'Verify'}
+          {isSubmitting ? 'Saving...' : 'Save Changes'}
         </motion.span>
       </motion.button>
     </motion.form>
