@@ -419,6 +419,13 @@ export const confirmPhoneChangeWEmail = async (req, res) => {
 export const getUserProfile = async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.id)
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found',
+      })
+    }
+
     const { passwordHash, email, role, ...userData } = user._doc
     res.json(userData)
   } catch (err) {

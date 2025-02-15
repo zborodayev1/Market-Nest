@@ -10,7 +10,7 @@ export const SellerInfo = (props: Props) => {
   const { user } = props
   return (
     <div>
-      <div className="flex gap-3 mt-3 bg-[#e4e4e4] p-3 rounded-md">
+      <div className="flex gap-3 mt-3 bg-[#e4e4e4] p-5 rounded-md">
         {user?.avatarUrl ? (
           <img
             className="rounded-full w-[50px] h-[50px]"
