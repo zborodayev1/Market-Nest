@@ -80,6 +80,4 @@ const ProductSchema = new mongoose.Schema(
   }
 )
 
-ProductSchema.index({ viewedBy: 1 })
-
 export default mongoose.model('Product', ProductSchema)

@@ -155,19 +155,22 @@ export const Header = (props: Props) => {
         <div className="relative items-center flex bg-[#F5F5F5] z-30 w-full h-[100px]">
           <div className="absolute left-[120px] transform -translate-x-1/2 flex justify-center items-center z-10">
             <motion.div className="flex justify-center py-4 px-4 w-full cursor-pointer ">
-              <div className=" hover:bg-[#e4e4e4] transition-colors duration-300 rounded-[15px] ease-in-out flex items-center p-2 px-3 ml-[50px]">
+              <div className="hover:bg-[#e4e4e4] transition-colors duration-300 rounded-[15px] ease-in-out flex items-center p-2 px-3 ml-[50px]">
                 <input
                   type="text"
                   onChange={(e) => setSearchITem(e.target.value)}
                   value={searchITem}
                   placeholder="Search"
-                  className="w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:border-transparent transition-all duration-200"
+                  className=" w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:border-transparent transition-all duration-200"
                 />
                 <button
                   className="items-center absolute z-20 right-[35px]"
                   onClick={handleSearch}
                 >
-                  <PackageSearch className=" w-7 h-7 ml-2 text-[#212121]" />
+                  <PackageSearch
+                    style={{ strokeWidth: 1.8 }}
+                    className="w-7 h-7 ml-2 text-[#212121]"
+                  />
                 </button>
               </div>
             </motion.div>
@@ -231,8 +234,8 @@ export const Header = (props: Props) => {
                   >
                     <h1 className="text-md font-bold text-[#212121]">Bag</h1>
                     <ShoppingCart
-                      style={{ strokeWidth: 2 }}
-                      className="w-9 h-9 text-[#212121] stroke-1 "
+                      style={{ strokeWidth: 1.8 }}
+                      className="w-8 h-8 text-[#212121] stroke-1 "
                     />
                   </Link>
                   <Link
@@ -260,8 +263,8 @@ export const Header = (props: Props) => {
                 >
                   <h1 className="text-md font-bold text-[#212121]">Bag</h1>
                   <ShoppingCart
-                    style={{ strokeWidth: 2 }}
-                    className="w-9 h-9 text-[#212121] "
+                    style={{ strokeWidth: 1.8 }}
+                    className="w-8 h-8 text-[#212121] "
                   />
                 </Link>
                 <Link
@@ -278,7 +281,10 @@ export const Header = (props: Props) => {
                   <h1 className="text-md font-bold text-[#212121] transition-colors duration-300">
                     Sign in
                   </h1>
-                  <IdCard className="w-12 h-9 text-[#212121] transition-colors duration-300" />
+                  <IdCard
+                    style={{ strokeWidth: 1.8 }}
+                    className="w-[44px] h-9 text-[#212121] transition-colors duration-300"
+                  />
                 </Link>
               </div>
             )}

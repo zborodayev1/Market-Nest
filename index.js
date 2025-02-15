@@ -13,6 +13,7 @@ import authRoutes from './server/routes/auth.routes.js'
 import productRoutes from './server/routes/product.routes.js'
 import uploadRoutes from './server/routes/upload.routes.js'
 import notiRoutes from './server/routes/noti.routes.js'
+import deliveryRoutes from './server/routes/delivery.routes.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -29,6 +30,7 @@ app.use('/auth', authRoutes)
 app.use('/products', productRoutes)
 app.use('/upload', uploadRoutes)
 app.use('/noti', notiRoutes)
+app.use('/delivery', deliveryRoutes)
 
 app.use((error, req, res, next) => {
   console.error(error)

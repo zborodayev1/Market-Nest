@@ -120,6 +120,22 @@ export const updateProductStatus = createAsyncThunk(
   }
 )
 
+export const getOneProduct = createAsyncThunk<Product, string>(
+  'products/getOneProduct',
+  async (id, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get(`/products/${id}`)
+      return data
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data || 'Failed to get product')
+      } else {
+        return rejectWithValue('An unknown error occurred')
+      }
+    }
+  }
+)
+
 export interface Product {
   saveAmount: number
   discount: number | null
@@ -148,6 +164,7 @@ interface ProductsState {
     totalPages: number
     page: number
   }
+  fullProduct: Product | null
 }
 
 const initialState: ProductsState = {
@@ -159,6 +176,7 @@ const initialState: ProductsState = {
   },
   status: 'idle',
   error: null,
+  fullProduct: null,
 }
 
 const productSlice = createSlice({
@@ -281,6 +299,22 @@ const productSlice = createSlice({
         state.status = 'failed'
         state.error = action.error.message ?? 'Failed to load pending products'
       })
+      .addCase(getOneProduct.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+        state.fullProduct = null
+      })
+      .addCase(
+        getOneProduct.fulfilled,
+        (state, action: PayloadAction<Product>) => {
+          state.status = 'succeeded'
+          state.fullProduct = action.payload
+        }
+      )
+      .addCase(getOneProduct.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.payload as string
+      })
   },
 })
 
@@ -289,3 +323,6 @@ export const productReducer = productSlice.reducer
 export const selectProducts = (state: RootState) => state.products
 
 export const { setProducts } = productSlice.actions
+
+export const selectFullProduct = (state: RootState) =>
+  state.products.fullProduct

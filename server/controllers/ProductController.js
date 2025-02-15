@@ -158,7 +158,6 @@ export const getOneProduct = async (req, res) => {
 
   try {
     const productId = req.params.id
-    const userId = req.userId
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
       return res.status(400).json({ message: 'Invalid product ID' })
@@ -166,41 +165,15 @@ export const getOneProduct = async (req, res) => {
 
     session.startTransaction()
 
-    const product = await ProductModel.findById(productId).session(session)
+    const product = await ProductModel.findByIdAndUpdate(
+      productId,
+      { $inc: { viewsCount: 1 } },
+      { new: true, session }
+    )
 
     if (!product) {
       await session.abortTransaction()
       return res.status(404).json({ message: 'Product not found' })
-    }
-
-    const viewedBySet = new Set(
-      (product.viewedBy || []).map((id) => id.toString())
-    )
-
-    if (!viewedBySet.has(userId)) {
-      viewedBySet.add(userId)
-      const viewedByArray = [...viewedBySet].slice(-100) // Ограничение в 100 последних пользователей
-
-      await ProductModel.updateOne(
-        { _id: productId },
-        {
-          $inc: { viewsCount: 1 },
-          $set: { viewedBy: viewedByArray },
-        },
-        { session }
-      )
-
-      // Загружаем обновлённый продукт в новую переменную
-      const updatedProduct =
-        await ProductModel.findById(productId).session(session)
-
-      await session.commitTransaction()
-
-      return res.json({
-        ...updatedProduct.toObject(),
-        createdAt: dayjs(updatedProduct.createdAt).format('YY-MM-DD'),
-        updatedAt: dayjs(updatedProduct.updatedAt).format('YY-MM-DD'),
-      })
     }
 
     await session.commitTransaction()
