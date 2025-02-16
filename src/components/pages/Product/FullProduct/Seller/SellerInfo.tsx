@@ -21,14 +21,14 @@ export const SellerInfo = (props: Props) => {
         )}
         <div>
           <div>
-            <h1 className="font-bold">{user?.fullName}</h1>
+            <h1 className="font-bold  text-base">{user?.fullName}</h1>
           </div>
           <div>
-            <h1 className="font-bold">
+            <h1 className="font-bold text-base ">
               {user?.phone && formatPhoneNumber(user.phone)}
             </h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 text-base">
             <div>
               <h1>{user?.address},</h1>
             </div>

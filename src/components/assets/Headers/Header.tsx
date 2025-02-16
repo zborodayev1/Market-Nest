@@ -16,6 +16,7 @@ import {
 import { getProductsBySearch, fetchProducts } from '../../redux/slices/products'
 import { AppDispatch, RootState } from '../../redux/store'
 import { NotiHeaderDropDown } from '../Notification/NotiHeaderDropDown'
+import { getWebSocketUrl } from './GetWebsoketUrl'
 
 interface Props {
   toastRef?: React.RefObject<HTMLDivElement>
@@ -81,7 +82,7 @@ export const Header = (props: Props) => {
     }
   }, [notiOpen])
 
-  const socket = useMemo(() => new WebSocket('ws://195.210.47.125:3000'), []) //localhost:3000
+  const socket = useMemo(() => new WebSocket(getWebSocketUrl()), [])
 
   useEffect(() => {
     socket.onopen = () => {

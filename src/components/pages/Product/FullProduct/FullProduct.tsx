@@ -187,7 +187,7 @@ export const FullProduct = (props: Props) => {
                 </div>
               </div>
             </div>
-            <div className="group flex">
+            <div className="group grid">
               <img
                 src={
                   data.image
@@ -198,10 +198,18 @@ export const FullProduct = (props: Props) => {
                 }
                 className="max-w-[500px] bg-[#f5f5f5] rounded-md border"
               />
+              <div className="my-5 group bg-[#f5f5f5] border-gray-500 border max-w-[500px] min-w-[300px] rounded-md p-5">
+                <div>
+                  <h1 className="text-2xl font-bold">Seller info</h1>
+                </div>
+                <div>
+                  <SellerInfo user={productUser} />
+                </div>
+              </div>
             </div>
           </div>
           <div className="ml-10">
-            <div className="border border-[#6B7280] p-3 rounded-md">
+            <div className="border mt-10 border-[#6B7280] p-3 rounded-md">
               <div className="flex items-center gap-2">
                 <svg width={40} height={40} viewBox="0 0 40 40">
                   <g fillRule="evenodd">
@@ -275,14 +283,6 @@ export const FullProduct = (props: Props) => {
           </div>
         </div>
       </motion.div>
-      <div className="my-5 ml-[200px] group bg-[#f5f5f5] border-gray-500 border max-w-[500px] min-w-[300px] rounded-md p-5">
-        <div>
-          <h1 className="text-2xl font-bold">Seller info</h1>
-        </div>
-        <div>
-          <SellerInfo user={productUser} />
-        </div>
-      </div>
     </>
   )
 }

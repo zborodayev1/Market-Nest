@@ -34,7 +34,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage })
 
 export const handleUploadProductImage = (req, res, next) => {
-  upload(req, res, (err) => {
+  upload.single('image')(req, res, (err) => {
     if (err) {
       console.error('File upload error:', err)
       return res.status(500).json({
@@ -49,12 +49,12 @@ export const createProduct = async (req, res) => {
   try {
     const { name, tags, price, description } = req.body
 
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: 'No file uploaded',
-      })
-    }
+    // if (!req.file) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: 'No file uploaded',
+    //   })
+    // }
 
     if (!name || name.length <= 5 || !tags || !price || price <= 0) {
       const errors = []
@@ -70,18 +70,18 @@ export const createProduct = async (req, res) => {
 
     const parsedTags = Array.isArray(tags) ? tags : JSON.parse(tags)
 
-    const filePath = `/uploads/${req.file.filename}`
-    const fullPath = path.resolve(
-      __dirname,
-      '..',
-      '..',
-      'public',
-      'uploads',
-      req.file.filename
-    )
+    // const filePath = `/uploads/${req.file.filename}`
+    // const fullPath = path.resolve(
+    //   __dirname,
+    //   '..',
+    //   '..',
+    //   'public',
+    //   'uploads',
+    //   req.file.filename
+    // )
 
     try {
-      await fs.access(fullPath)
+      // await fs.access(fullPath)
 
       const product = await ProductModel.create({
         _id: new mongoose.Types.ObjectId(),
@@ -89,7 +89,7 @@ export const createProduct = async (req, res) => {
         tags: parsedTags,
         price,
         description,
-        image: filePath,
+        // image: filePath,
         user: req.userId,
         status: 'pending',
       })

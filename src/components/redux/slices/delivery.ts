@@ -10,7 +10,7 @@ export interface Delivery {
 }
 
 interface DeliveryResponse {
-  deliveries: Delivery[]
+  deliveries: Delivery[] | []
 }
 
 interface DeliveryState {
@@ -29,7 +29,7 @@ export const getDelivery = createAsyncThunk(
   'products/getDelivery',
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get<DeliveryResponse>('/delivery')
+      const { data } = await axios.get<DeliveryResponse>('/del')
       return data.deliveries
     } catch (error: unknown) {
       if (error instanceof AxiosError) {

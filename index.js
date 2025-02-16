@@ -22,15 +22,25 @@ connectDB()
 
 const app = express()
 
-app.use(express.json())
-app.use(cors())
+app.use(
+  cors({
+    origin: '*',
+    credentials: true,
+  })
+)
+
+app.use(express.json({ limit: '10mb' }))
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/auth', authRoutes)
-app.use('/products', productRoutes)
-app.use('/upload', uploadRoutes)
-app.use('/noti', notiRoutes)
-app.use('/delivery', deliveryRoutes)
+app.use('/api/auth', authRoutes)
+app.use('/api/products', productRoutes)
+app.use('/api/upload', uploadRoutes)
+app.use('/api/noti', notiRoutes)
+app.use('/api/del', deliveryRoutes)
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'))
+})
 
 app.use((error, req, res, next) => {
   console.error(error)
@@ -42,25 +52,28 @@ app.use((error, req, res, next) => {
 
 const server = http.createServer(app)
 
-const wss = new WebSocketServer({ server })
+const wss = new WebSocketServer({ server, path: '/ws' })
 
 const clients = new Map()
 
 wss.on('connection', (ws) => {
-  ws.on('message', async (message) => {
+  console.log('Новое WebSocket соединение')
+
+  ws.on('message', (message) => {
     try {
       const { type, userId } = JSON.parse(message)
 
       if (type === 'auth' && userId) {
         ws.userId = userId
         clients.set(userId, ws)
+        console.log(`Пользователь ${userId} подключен`)
       } else {
         ws.send(
           JSON.stringify({ status: 'error', message: 'Unknown message type' })
         )
       }
     } catch (error) {
-      console.error('Error processing message:', error)
+      console.error('Ошибка обработки сообщения:', error)
       ws.send(
         JSON.stringify({ status: 'error', message: 'Invalid message format' })
       )
@@ -70,6 +83,7 @@ wss.on('connection', (ws) => {
   ws.on('close', () => {
     if (ws.userId) {
       clients.delete(ws.userId)
+      console.log(`Пользователь ${ws.userId} отключен`)
     }
   })
 })
@@ -77,6 +91,6 @@ wss.on('connection', (ws) => {
 export { wss }
 
 const PORT = process.env.PORT || 3000
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Сервер запущен на порту ${PORT}`)
 })
