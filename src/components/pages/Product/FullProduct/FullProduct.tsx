@@ -198,7 +198,7 @@ export const FullProduct = (props: Props) => {
                 }
                 className="max-w-[500px] bg-[#f5f5f5] rounded-md border"
               />
-              <div className="my-5 group bg-[#f5f5f5] border-gray-500 border max-w-[500px] min-w-[300px] rounded-md p-5">
+              <div className="my-5 group bg-[#f5f5f5] border-gray-500 border max-w-[500px] min-w-[400px] rounded-md p-5">
                 <div>
                   <h1 className="text-2xl font-bold">Seller info</h1>
                 </div>

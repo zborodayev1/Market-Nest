@@ -41,13 +41,20 @@ export const PageSettingsForm = (props: Props) => {
   const [buttonPage, setButtonPage] = useState<boolean>(false)
   const dispatch: AppDispatch = useDispatch()
   const [loading, setLoading] = useState<boolean>(false)
+  const [PGStateChange, setPGStateChange] = useState<{
+    limit: number
+    page: number
+  }>({
+    limit: 10,
+    page: 1,
+  })
 
   const changeLimit = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.target.value))) {
       setLimitError(true)
     } else {
       setLimitError(false)
-      setPGState((prevState) => ({
+      setPGStateChange((prevState) => ({
         ...prevState,
         limit: Number(e.target.value),
       }))
@@ -56,30 +63,41 @@ export const PageSettingsForm = (props: Props) => {
 
   const changePage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const pageValue = Number(e.target.value)
-    if (pageValue > products.totalPages) {
-      setPGState((prevState) => ({
-        ...prevState,
-        page: products.totalPages,
-      }))
-    } else {
-      setPGState((prevState) => ({
-        ...prevState,
-        page: pageValue,
-      }))
-    }
+
+    setPGStateChange((prevState) => ({
+      ...prevState,
+      page: pageValue,
+    }))
   }
 
   const onSubmit = () => {
     if (!loading) {
       setLoading(true)
+      setButtonPage(true)
+
+      if (PGStateChange.page > products.totalPages) {
+        setPGState((prevState) => ({
+          ...prevState,
+          limit: PGStateChange.limit,
+          page: products.totalPages,
+        }))
+      } else {
+        setPGState((prevState) => ({
+          ...prevState,
+          limit: PGStateChange.limit,
+          page: PGStateChange.page,
+        }))
+      }
       dispatch(
         fetchProducts({
           limit: PGState.limit,
           page: PGState.page,
         })
       )
+
       setTimeout(() => {
         setLoading(false)
+        setButtonPage(false)
       }, 1000)
     }
   }
@@ -171,7 +189,7 @@ export const PageSettingsForm = (props: Props) => {
                 className="w-20 px-3 py-1 border rounded-md focus:outline-none focus:ring-1"
                 type="text"
                 onChange={changePage}
-                value={PGState.page}
+                defaultValue={PGState.limit}
               />
             </div>
             <div className="flex items-center gap-2">
@@ -191,8 +209,6 @@ export const PageSettingsForm = (props: Props) => {
                   opacity: 0,
                   transition: { duration: 0.3, delay: 0.1 },
                 }}
-                onFocus={() => setButtonPage(true)}
-                onBlur={() => setButtonPage(false)}
                 tabIndex={0}
                 transition={{
                   duration: 0.3,
@@ -203,7 +219,7 @@ export const PageSettingsForm = (props: Props) => {
                   MozAppearance: 'textfield',
                   WebkitAppearance: 'none',
                 }}
-                className=" px-3 py-1 border rounded-md focus:outline-none focus:ring-1"
+                className="px-3 py-1 border rounded-md focus:outline-none focus:ring-1"
                 onClick={onSubmit}
                 disabled={loading}
               >

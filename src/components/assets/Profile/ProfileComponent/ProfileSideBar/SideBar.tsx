@@ -162,6 +162,7 @@ export const SideBar = (props: Props) => {
                   </motion.div>
                 </motion.button>
               </motion.div>
+
               <AnimatePresence mode="wait">
                 {state.ChangeEmail && (
                   <motion.div
@@ -178,6 +179,60 @@ export const SideBar = (props: Props) => {
                         setState((prev) => ({
                           ...prev,
                           ChangeEmail: !prev.ChangeEmail,
+                        }))
+                      }
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <motion.div
+                variants={contentVariants}
+                className="text-sm font-bold"
+              >
+                <motion.button
+                  onClick={() =>
+                    setState((prev) => ({
+                      ...prev,
+                      ChangeEmail: false,
+                      ChangeName: false,
+                      ChangePassword: false,
+                      ChangePhone: !prev.ChangePhone,
+                    }))
+                  }
+                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex items-center gap-1 w-full transition-colors duration-300 ease-in-out"
+                >
+                  <div className="">
+                    {userData?.phone ? (
+                      <span>{userData.phone}</span>
+                    ) : (
+                      <div>Phone:</div>
+                    )}
+                  </div>
+
+                  <motion.div
+                    animate={{ rotate: state.ChangePhone ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ChevronDown style={{ width: 17 }} />
+                  </motion.div>
+                </motion.button>
+              </motion.div>
+              <AnimatePresence mode="wait">
+                {state.ChangePhone && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{
+                      duration: 0.2,
+                      ease: 'easeInOut',
+                    }}
+                  >
+                    <Phone
+                      onSuccess={() =>
+                        setState((prev) => ({
+                          ...prev,
+                          ChangePhone: !prev.ChangePhone,
                         }))
                       }
                     />
@@ -232,54 +287,7 @@ export const SideBar = (props: Props) => {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <motion.div
-                variants={contentVariants}
-                className="text-sm font-bold"
-              >
-                <motion.button
-                  onClick={() =>
-                    setState((prev) => ({
-                      ...prev,
-                      ChangeEmail: false,
-                      ChangeName: false,
-                      ChangePassword: false,
-                      ChangePhone: !prev.ChangePhone,
-                    }))
-                  }
-                  className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex items-center gap-1 w-full transition-colors duration-300 ease-in-out"
-                >
-                  <div className="">Change phone number</div>
 
-                  <motion.div
-                    animate={{ rotate: state.ChangePhone ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <ChevronDown style={{ width: 17 }} />
-                  </motion.div>
-                </motion.button>
-              </motion.div>
-              <AnimatePresence mode="wait">
-                {state.ChangePhone && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{
-                      duration: 0.2,
-                      ease: 'easeInOut',
-                    }}
-                  >
-                    <Phone
-                      onSuccess={() =>
-                        setState((prev) => ({
-                          ...prev,
-                          ChangePhone: !prev.ChangePhone,
-                        }))
-                      }
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
               <hr className="bg-[#212121]" />
               {userData?.role === 'admin' && (
                 <div>
