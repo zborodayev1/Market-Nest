@@ -66,7 +66,7 @@ const ProductSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      required: true,
+      // required: true,
     },
     status: {
       type: String,
@@ -79,7 +79,5 @@ const ProductSchema = new mongoose.Schema(
     timestamps: true,
   }
 )
-
-ProductSchema.index({ viewedBy: 1 })
 
 export default mongoose.model('Product', ProductSchema)

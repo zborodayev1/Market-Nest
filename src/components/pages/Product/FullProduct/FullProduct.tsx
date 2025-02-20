@@ -1,7 +1,6 @@
 import { CircularProgress } from '@mui/material'
-import axios from '../../../../axios'
 import { useState, useEffect } from 'react'
-import { Navigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { IoBag } from 'react-icons/io5'
 import { IconButton } from '@mui/material'
 import { Eye } from 'lucide-react'
@@ -10,12 +9,21 @@ import { BiSolidMessageSquare } from 'react-icons/bi'
 import { CiCalendarDate } from 'react-icons/ci'
 import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
-import { Product } from '../../../redux/slices/products'
+import {
+  getOneProduct,
+  selectFullProduct,
+} from '../../../redux/slices/products'
 import { Helmet } from 'react-helmet-async'
 import { AppDispatch } from '../../../redux/store'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserProfile, UserProfile } from '../../../redux/slices/auth'
 import { SellerInfo } from './Seller/SellerInfo'
+import {
+  Delivery,
+  getDelivery,
+  selectDeliveries,
+} from '../../../redux/slices/delivery'
+import { DeliveryForm } from './DeliveryForm'
 
 interface Props {
   noti?: boolean
@@ -23,8 +31,8 @@ interface Props {
 
 export const FullProduct = (props: Props) => {
   const { noti } = props
-  const [data, setData] = useState<Product>()
-  const [err, setErr] = useState(false)
+  const data = useSelector(selectFullProduct)
+  const delivery = useSelector(selectDeliveries)
   const { id } = useParams()
   const [isFavorite, setIsFavorite] = useState<boolean>(false)
   const [isBag, setIsBag] = useState<boolean>(false)
@@ -33,7 +41,6 @@ export const FullProduct = (props: Props) => {
     (state: { auth: { productUser: UserProfile | null } }) =>
       state.auth.productUser
   )
-
   const toggleFavorite = () => {
     if (!data) return
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
@@ -50,25 +57,20 @@ export const FullProduct = (props: Props) => {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`/products/${id}`)
-
-        setData(response.data)
-      } catch (err) {
-        console.warn('Error fetching product:', err)
-        setErr(true)
-      }
+    if (id) {
+      dispatch(getOneProduct(id))
     }
-
-    fetchData()
-  }, [id])
+  }, [dispatch, id])
 
   useEffect(() => {
     if (data?.user) {
       dispatch(getUserProfile(data.user))
     }
   }, [data?.user, dispatch])
+
+  useEffect(() => {
+    dispatch(getDelivery())
+  }, [dispatch])
 
   const toggleBag = () => {
     if (!data) return
@@ -94,10 +96,6 @@ export const FullProduct = (props: Props) => {
       setIsBag(bag.includes(data._id))
     }
   }, [data])
-
-  if (err) {
-    return <Navigate to="/" />
-  }
 
   if (!data) {
     return (
@@ -132,7 +130,7 @@ export const FullProduct = (props: Props) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, transition: { duration: 0.5 } }}
         exit={{ opacity: 0 }}
-        className=" ml-[140px] mt-5"
+        className="ml-[200px] mt-5"
       >
         <div className="flex">
           <div className="text-2xl flex flex-col text-start">
@@ -169,7 +167,7 @@ export const FullProduct = (props: Props) => {
                   </div>
                 )}
               </div>
-              <div className="flex text-[#a7a7a7] items-center text-sm gap-2 mt-1 mb-5">
+              <div className="flex text-[#a7a7a7]  items-center text-sm gap-2 mt-1 mb-5">
                 <div className="flex gap-1">
                   {data.viewsCount} <Eye className="w-5 h-5 " />
                 </div>
@@ -180,7 +178,7 @@ export const FullProduct = (props: Props) => {
                 <div className="flex gap-1">
                   {data.createdAt} <CiCalendarDate className="w-5 h-5 " />
                 </div>
-                <div className="flex gap-1 absolute ml-[185px]">
+                <div className="flex gap-1">
                   {data.tags && (
                     <h1 className="text-base text-[#a7a7a7]">
                       {data.tags.join(', ')}
@@ -189,7 +187,7 @@ export const FullProduct = (props: Props) => {
                 </div>
               </div>
             </div>
-            <div className="group flex">
+            <div className="group grid">
               <img
                 src={
                   data.image
@@ -200,68 +198,91 @@ export const FullProduct = (props: Props) => {
                 }
                 className="max-w-[500px] bg-[#f5f5f5] rounded-md border"
               />
-
-              <IconButton
-                onClick={toggleFavorite}
-                className={`flex w-10 h-10  text-2xl text-[#fd3939] transition-opacity duration-300 ease-in-out 
-                }`}
-                color="error"
-              >
-                {isFavorite ? (
-                  <FavoriteOutlinedIcon />
-                ) : (
-                  <FavoriteBorderOutlinedIcon />
-                )}
-              </IconButton>
+              <div className="my-5 group bg-[#f5f5f5] border-gray-500 border max-w-[500px] min-w-[400px] rounded-md p-5">
+                <div>
+                  <h1 className="text-2xl font-bold">Seller info</h1>
+                </div>
+                <div>
+                  <SellerInfo user={productUser} />
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex ml-10 items-end">
-            <div className="">
-              <button
-                onClick={toggleBag}
-                className="font-bold flex gap-2 w-[450px] bg-[#3C8737] rounded-xl py-3 text-white text-lg hover:bg-[#2b6128] transition-colors duration-150 ease-in-out justify-center"
-              >
-                <motion.span
-                  key={isBag ? 'add' : 'remove'}
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 30 }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 300,
-                    damping: 20,
-                    delay: 0.2,
-                  }}
-                >
-                  {isBag ? 'Remove from bag' : 'Add to bag'}
-                </motion.span>
+          <div className="ml-10">
+            <div className="border mt-10 border-[#6B7280] p-3 rounded-md">
+              <div className="flex items-center gap-2">
+                <svg width={40} height={40} viewBox="0 0 40 40">
+                  <g fillRule="evenodd">
+                    <path d="M36 27h-2.557c-.693-1.189-1.968-2-3.443-2s-2.75.811-3.443 2H25V14h6.485L36 20.32V27zm-6 4c-1.103 0-2-.897-2-2s.897-2 2-2 2 .897 2 2-.897 2-2 2zm-17 0c-1.103 0-2-.897-2-2s.897-2 2-2 2 .897 2 2-.897 2-2 2zm24.813-11.581l-5-7A.997.997 0 0032 12h-7V7a1 1 0 00-1-1H5a1 1 0 00-1 1v2.728a1 1 0 002 0V8h17v19h-6.556c-.694-1.189-1.97-2-3.444-2s-2.75.811-3.444 2H6v-3a1 1 0 10-2 0v4a1 1 0 001 1h4c0 2.206 1.794 4 4 4s4-1.794 4-4h9c0 2.206 1.794 4 4 4s4-1.794 4-4h3a1 1 0 001-1v-8a.994.994 0 00-.187-.581z"></path>
+                    <path d="M3 14h7a1 1 0 000-2H3a1 1 0 000 2m8 7a1 1 0 00-1-1H3a1 1 0 100 2h7a1 1 0 001-1m-7-4a1 1 0 001 1h7a1 1 0 000-2H5a1 1 0 00-1 1"></path>
+                  </g>
+                </svg>
 
-                <motion.div
-                  className="absolute"
-                  initial={{ x: 70 }}
-                  animate={{ x: isBag ? 90 : 60 }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 300,
-                    damping: 15,
-                    delay: 0,
-                  }}
+                <h1 className="text-xl font-bold ">Delivery</h1>
+              </div>
+              <div className="ml-3 mt-2 border-[#e4e4e4] border p-3 rounded-lg gap-1">
+                {delivery &&
+                  delivery.map((delivery: Delivery) => (
+                    <DeliveryForm Delivery={delivery} />
+                  ))}
+              </div>
+            </div>
+            <div className="flex mt-5">
+              <div>
+                <button
+                  onClick={toggleBag}
+                  className="font-bold flex gap-2 w-[450px] bg-[#3C8737] rounded-xl py-3 text-white text-lg hover:bg-[#2b6128] transition-colors duration-150 ease-in-out justify-center"
                 >
-                  <IoBag style={{ marginTop: '5px' }} />
-                </motion.div>
-              </button>
+                  <motion.span
+                    key={isBag ? 'add' : 'remove'}
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 30 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 300,
+                      damping: 20,
+                      delay: 0.2,
+                    }}
+                  >
+                    {isBag ? 'Remove from bag' : 'Add to bag'}
+                  </motion.span>
+
+                  <motion.div
+                    className="absolute ml-1"
+                    initial={{ x: 70 }}
+                    animate={{ x: isBag ? 90 : 60 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 300,
+                      damping: 15,
+                      delay: 0,
+                    }}
+                  >
+                    <IoBag style={{ marginTop: '5px' }} />
+                  </motion.div>
+                </button>
+              </div>
+              <div className="ml-1">
+                <IconButton
+                  onClick={toggleFavorite}
+                  className="flex w-[50px] h-[50px] text-2xl text-[#fd3939] transition-opacity duration-300 ease-in-out 
+                "
+                  color="error"
+                >
+                  {isFavorite ? (
+                    <FavoriteOutlinedIcon style={{ width: 28, height: 28 }} />
+                  ) : (
+                    <FavoriteBorderOutlinedIcon
+                      style={{ width: 28, height: 28 }}
+                    />
+                  )}
+                </IconButton>
+              </div>
             </div>
           </div>
         </div>
       </motion.div>
-      <div className="mt-10 ml-[140px] group bg-[#f5f5f5] border-gray-500 border max-w-[500px] min-w-[300px] rounded-md p-3">
-        <div>
-          <h1 className="text-2xl font-bold">Seller info</h1>
-        </div>
-        <div>
-          <SellerInfo user={productUser} />
-        </div>
-      </div>
     </>
   )
 }

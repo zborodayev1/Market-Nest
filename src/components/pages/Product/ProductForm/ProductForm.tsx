@@ -16,7 +16,6 @@ interface ProductFormProps {
   product: Product
   onRemoveFavorite?: (id: string) => void
   onRemoveBag?: (id: string) => void
-  Edit?: boolean
   Pending?: boolean
   Rejected?: boolean
   onSubmit?: () => void
@@ -28,7 +27,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   onRemoveBag,
   Pending,
   Rejected,
-  Edit,
   onSubmit,
 }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false)
@@ -120,13 +118,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   </IconButton>
                 )}
 
-                {(Edit ||
-                  userData?.role === 'admin' ||
-                  userData?._id === product.user) && (
+                {userData?.role === 'admin' && (
                   <Link to={`/edit/${product._id}`}>
                     <IconButton
                       className="absolute top-0 left-[40px] ease-in-out duration-300"
-                      color="primary"
+                      color="inherit"
                     >
                       <Pencil />
                     </IconButton>

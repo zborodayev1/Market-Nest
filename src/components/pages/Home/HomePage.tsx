@@ -148,19 +148,6 @@ export const HomePage = () => {
             </motion.div>
           </div>
         </motion.div>
-        <PageSettingsForm
-          open={open}
-          setOpen={setOpen}
-          limitError={limitError}
-          setLimitError={setLimitError}
-          PGState={PGState}
-          setPGState={setPGState}
-          products={products}
-          focusLimit={focusLimit}
-          setFocusLimit={setFocusLimit}
-          focusPage={focusPage}
-          setFocusPage={setFocusPage}
-        />
 
         <AnimatePresence>
           <div className="">
@@ -173,7 +160,7 @@ export const HomePage = () => {
                   filter: 'blur(5px)',
                   transition: { duration: 0.4 },
                 }}
-                className="flex justify-center text-2xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent"
+                className="flex mt-5 justify-center text-2xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent"
               >
                 Something went wrong
               </motion.span>
@@ -187,7 +174,7 @@ export const HomePage = () => {
                   filter: 'blur(5px)',
                   transition: { duration: 0.4 },
                 }}
-                className="flex justify-center text-2xl font-bold text-black"
+                className="mt-5 flex justify-center text-2xl font-bold text-black"
               >
                 No products available, Try to refresh the{' '}
                 <button onClick={handleRefresh} className="z-20">
@@ -214,9 +201,8 @@ export const HomePage = () => {
         <div className="h-screen bg-[#FFFFFF] pt-3">
           <div className="mx-3">
             <AnimatePresence>
-              <div className="flex flex-wrap justify-center gap-4">
-                {status === 'succeeded' &&
-                  filteredProducts.length > 0 &&
+              <div className="flex mt-5 flex-wrap justify-center gap-4">
+                {filteredProducts.length > 0 &&
                   filteredProducts.map((product: Product, index: number) => (
                     <motion.div
                       initial={{ opacity: 0, filter: 'blur(5px)' }}
@@ -234,9 +220,19 @@ export const HomePage = () => {
                   ))}
               </div>
             </AnimatePresence>
-          </div>
-          <div>
-            <h1>{filteredProducts.totalProducts}</h1>
+            <PageSettingsForm
+              open={open}
+              setOpen={setOpen}
+              limitError={limitError}
+              setLimitError={setLimitError}
+              PGState={PGState}
+              setPGState={setPGState}
+              products={products}
+              focusLimit={focusLimit}
+              setFocusLimit={setFocusLimit}
+              focusPage={focusPage}
+              setFocusPage={setFocusPage}
+            />
           </div>
         </div>
       </motion.div>

@@ -90,28 +90,6 @@ export const FavoritesPage = () => {
         }}
         className="w-screen"
       >
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: 1,
-            transition: { duration: 0.5, delay: 1 },
-          }}
-          className="absolute top-[120px]"
-        >
-          <PageSettingsForm
-            open={open}
-            setOpen={setOpen}
-            limitError={limitError}
-            setLimitError={setLimitError}
-            PGState={PGState}
-            setPGState={setPGState}
-            products={products}
-            focusLimit={focusLimit}
-            setFocusLimit={setFocusLimit}
-            focusPage={focusPage}
-            setFocusPage={setFocusPage}
-          />
-        </motion.div>
         <div className="flex w-full text-center items-center justify-center mt-5">
           <motion.span
             layout
@@ -150,7 +128,7 @@ export const FavoritesPage = () => {
             }}
             exit={{ opacity: 0 }}
           >
-            <div className="flex flex-wrap justify-center mt-5 gap-4 min-h-[300px]">
+            <div className="flex flex-wrap justify-center mt-5 gap-4 ">
               {status === 'succeeded' && favoriteProducts.length > 0 ? (
                 <AnimatePresence>
                   {favoriteProducts.map((product: Product, index: number) => (
@@ -182,6 +160,21 @@ export const FavoritesPage = () => {
               )}
             </div>
           </motion.div>
+          {status !== 'loading' && (
+            <PageSettingsForm
+              open={open}
+              setOpen={setOpen}
+              limitError={limitError}
+              setLimitError={setLimitError}
+              PGState={PGState}
+              setPGState={setPGState}
+              products={products}
+              focusLimit={focusLimit}
+              setFocusLimit={setFocusLimit}
+              focusPage={focusPage}
+              setFocusPage={setFocusPage}
+            />
+          )}
         </AnimatePresence>
       </motion.div>
     </>

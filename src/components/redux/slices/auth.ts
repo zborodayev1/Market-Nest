@@ -264,6 +264,42 @@ export const updateProfilePhone = createAsyncThunk<
     return rejectWithValue(errorMessage)
   }
 })
+export const requestPhoneChange = createAsyncThunk<
+  { message: string; success: boolean },
+  {
+    newPhone: string
+  },
+  { rejectValue: string }
+>('auth/requestPhoneChange', async (params, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.post('/auth/request-phone-change-code', params)
+    return data
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
+
+    return rejectWithValue(errorMessage)
+  }
+})
+
+export const confirmPhoneChange = createAsyncThunk<
+  { message: string; success: boolean },
+  { verificationCode: string },
+  { rejectValue: string }
+>('auth/confirmPhoneChange', async (params, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.post('/auth/confirm-phone-change', params)
+    return data
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
+    return rejectWithValue(errorMessage)
+  }
+})
 const initialState: AuthState = {
   user: null,
   isAuth: false,
@@ -404,6 +440,18 @@ const authSlice = createSlice({
         state.error = action.payload || 'Error occurred'
         state.loading = false
       })
+      .addCase(requestPhoneChange.pending, handlePending)
+      .addCase(requestPhoneChange.fulfilled, (state) => {
+        state.status = 'succeeded'
+        state.loading = false
+      })
+      .addCase(requestPhoneChange.rejected, handleRejected)
+      .addCase(confirmPhoneChange.pending, handlePending)
+      .addCase(confirmPhoneChange.fulfilled, (state) => {
+        state.status = 'succeeded'
+        state.loading = false
+      })
+      .addCase(confirmPhoneChange.rejected, handleRejected)
   },
 })
 

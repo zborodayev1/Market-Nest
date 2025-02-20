@@ -72,28 +72,7 @@ export const BagPage = () => {
           content="market, shop, market nest, market nests, bag"
         />
       </Helmet>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{
-          opacity: 1,
-          transition: { duration: 0.5, delay: 1 },
-        }}
-        className="absolute top-[120px]"
-      >
-        <PageSettingsForm
-          open={open}
-          setOpen={setOpen}
-          limitError={limitError}
-          setLimitError={setLimitError}
-          PGState={PGState}
-          setPGState={setPGState}
-          products={products}
-          focusLimit={focusLimit}
-          setFocusLimit={setFocusLimit}
-          focusPage={focusPage}
-          setFocusPage={setFocusPage}
-        />
-      </motion.div>
+
       <motion.span
         initial={{ opacity: 0 }}
         animate={{
@@ -181,6 +160,21 @@ export const BagPage = () => {
               )
             )}
           </div>
+          {status !== 'loading' && (
+            <PageSettingsForm
+              open={open}
+              setOpen={setOpen}
+              limitError={limitError}
+              setLimitError={setLimitError}
+              PGState={PGState}
+              setPGState={setPGState}
+              products={products}
+              focusLimit={focusLimit}
+              setFocusLimit={setFocusLimit}
+              focusPage={focusPage}
+              setFocusPage={setFocusPage}
+            />
+          )}
         </motion.div>
       </AnimatePresence>
     </div>

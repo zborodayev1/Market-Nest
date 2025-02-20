@@ -1,6 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
 import { DefForm } from './forms/DefForm'
+import { ForgotPassForm } from './forms/ForgotPassForm'
+import { Code } from './forms/Code'
 
 interface Props {
   onSuccess: () => void
@@ -19,16 +21,21 @@ export const Phone = (props: Props) => {
         className="max-w-md mx-auto p-6  bg-[#fff] border-[2px] border-[#212121] dark:bg-gray-900 rounded-xl shadow-lg space-y-6"
       >
         {phonePageState === 'default' && <DefForm onSuccess={onSuccess} />}
+        {phonePageState === 'forgotPass' && (
+          <ForgotPassForm setPPS={(state) => setPhonePageState(state)} />
+        )}
+        {phonePageState === 'code' && (
+          <Code
+            onSuccess={onSuccess}
+            setPPS={(state) => setPhonePageState(state)}
+          />
+        )}
+        {phonePageState === 'default' && (
+          <button onClick={() => setPhonePageState('forgotPass')}>
+            Forgot password
+          </button>
+        )}
       </motion.div>
-      <motion.button
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-        onClick={() => setPhonePageState('forgotPass')}
-      >
-        forgot pass
-      </motion.button>
     </AnimatePresence>
   )
 }

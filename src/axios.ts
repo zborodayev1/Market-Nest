@@ -1,7 +1,14 @@
 import axios from 'axios'
 
+const getBaseUrl = () => {
+  if (window.location.hostname === 'localhost') {
+    return 'http://localhost:3000/api'
+  }
+  return `${window.location.origin}/api`
+}
+
 const instance = axios.create({
-  baseURL: 'http://195.210.47.125:3000', // http://195.210.47.125:3000 http://localhost:3000
+  baseURL: getBaseUrl(),
 })
 
 instance.interceptors.request.use(

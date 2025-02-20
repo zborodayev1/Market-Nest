@@ -34,7 +34,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage })
 
 export const handleUploadProductImage = (req, res, next) => {
-  upload(req, res, (err) => {
+  upload.single('image')(req, res, (err) => {
     if (err) {
       console.error('File upload error:', err)
       return res.status(500).json({
@@ -49,12 +49,12 @@ export const createProduct = async (req, res) => {
   try {
     const { name, tags, price, description } = req.body
 
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: 'No file uploaded',
-      })
-    }
+    // if (!req.file) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: 'No file uploaded',
+    //   })
+    // }
 
     if (!name || name.length <= 5 || !tags || !price || price <= 0) {
       const errors = []
@@ -70,18 +70,18 @@ export const createProduct = async (req, res) => {
 
     const parsedTags = Array.isArray(tags) ? tags : JSON.parse(tags)
 
-    const filePath = `/uploads/${req.file.filename}`
-    const fullPath = path.resolve(
-      __dirname,
-      '..',
-      '..',
-      'public',
-      'uploads',
-      req.file.filename
-    )
+    // const filePath = `/uploads/${req.file.filename}`
+    // const fullPath = path.resolve(
+    //   __dirname,
+    //   '..',
+    //   '..',
+    //   'public',
+    //   'uploads',
+    //   req.file.filename
+    // )
 
     try {
-      await fs.access(fullPath)
+      // await fs.access(fullPath)
 
       const product = await ProductModel.create({
         _id: new mongoose.Types.ObjectId(),
@@ -89,7 +89,7 @@ export const createProduct = async (req, res) => {
         tags: parsedTags,
         price,
         description,
-        image: filePath,
+        // image: filePath,
         user: req.userId,
         status: 'pending',
       })
@@ -158,7 +158,6 @@ export const getOneProduct = async (req, res) => {
 
   try {
     const productId = req.params.id
-    const userId = req.userId
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
       return res.status(400).json({ message: 'Invalid product ID' })
@@ -166,41 +165,15 @@ export const getOneProduct = async (req, res) => {
 
     session.startTransaction()
 
-    const product = await ProductModel.findById(productId).session(session)
+    const product = await ProductModel.findByIdAndUpdate(
+      productId,
+      { $inc: { viewsCount: 1 } },
+      { new: true, session }
+    )
 
     if (!product) {
       await session.abortTransaction()
       return res.status(404).json({ message: 'Product not found' })
-    }
-
-    const viewedBySet = new Set(
-      (product.viewedBy || []).map((id) => id.toString())
-    )
-
-    if (!viewedBySet.has(userId)) {
-      viewedBySet.add(userId)
-      const viewedByArray = [...viewedBySet].slice(-100) // Ограничение в 100 последних пользователей
-
-      await ProductModel.updateOne(
-        { _id: productId },
-        {
-          $inc: { viewsCount: 1 },
-          $set: { viewedBy: viewedByArray },
-        },
-        { session }
-      )
-
-      // Загружаем обновлённый продукт в новую переменную
-      const updatedProduct =
-        await ProductModel.findById(productId).session(session)
-
-      await session.commitTransaction()
-
-      return res.json({
-        ...updatedProduct.toObject(),
-        createdAt: dayjs(updatedProduct.createdAt).format('YY-MM-DD'),
-        updatedAt: dayjs(updatedProduct.updatedAt).format('YY-MM-DD'),
-      })
     }
 
     await session.commitTransaction()

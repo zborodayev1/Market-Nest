@@ -73,21 +73,6 @@ export const PendingProducts = () => {
         <h1 className="flex justify-center text-3xl font-bold">
           Pending Products
         </h1>
-        <div className="mb-[20px]">
-          <PageSettingsForm
-            open={open}
-            setOpen={setOpen}
-            limitError={limitError}
-            setLimitError={setLimitError}
-            PGState={PGState}
-            setPGState={setPGState}
-            products={products}
-            focusLimit={focusLimit}
-            setFocusLimit={setFocusLimit}
-            focusPage={focusPage}
-            setFocusPage={setFocusPage}
-          />
-        </div>
 
         <div className="m-3 mt-6">
           <div className="flex flex-wrap justify-center gap-4">
@@ -116,6 +101,23 @@ export const PendingProducts = () => {
               </p>
             )}
           </div>
+        </div>
+        <div className="mb-[20px]">
+          {status !== 'loading' && (
+            <PageSettingsForm
+              open={open}
+              setOpen={setOpen}
+              limitError={limitError}
+              setLimitError={setLimitError}
+              PGState={PGState}
+              setPGState={setPGState}
+              products={products}
+              focusLimit={focusLimit}
+              setFocusLimit={setFocusLimit}
+              focusPage={focusPage}
+              setFocusPage={setFocusPage}
+            />
+          )}
         </div>
       </motion.div>
     </>

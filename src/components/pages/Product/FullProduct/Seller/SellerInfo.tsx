@@ -10,7 +10,7 @@ export const SellerInfo = (props: Props) => {
   const { user } = props
   return (
     <div>
-      <div className="flex gap-3 mt-3 bg-[#e4e4e4] p-3 rounded-md">
+      <div className="flex gap-3 mt-3 bg-[#e4e4e4] p-5 rounded-md">
         {user?.avatarUrl ? (
           <img
             className="rounded-full w-[50px] h-[50px]"
@@ -21,14 +21,14 @@ export const SellerInfo = (props: Props) => {
         )}
         <div>
           <div>
-            <h1 className="font-bold">{user?.fullName}</h1>
+            <h1 className="font-bold  text-base">{user?.fullName}</h1>
           </div>
           <div>
-            <h1 className="font-bold">
+            <h1 className="font-bold text-base ">
               {user?.phone && formatPhoneNumber(user.phone)}
             </h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 text-base">
             <div>
               <h1>{user?.address},</h1>
             </div>

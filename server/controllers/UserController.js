@@ -294,7 +294,7 @@ export const requestPasswordChangeWEmail = async (req, res) => {
 
 export const confirmPasswordChangeWEmail = async (req, res) => {
   try {
-    const user = await UserModel.findById(req.userId)
+    const user = await UserModel.findOne({ _id: req.userId })
 
     let userEditData = await UserEditDataModel.findOne({ userId: req.userId })
 
@@ -363,6 +363,12 @@ export const requestPhoneChangeWEmail = async (req, res) => {
     }
     const { newPhone } = req.body
 
+    if (userEditData.phoneChangeVerificationCode) {
+      return res
+        .status(400)
+        .json({ message: 'Phone change code already sent', success: false })
+    }
+
     if (!newPhone) {
       return res.status(400).json({ message: 'New phone number is required' })
     }
@@ -376,7 +382,10 @@ export const requestPhoneChangeWEmail = async (req, res) => {
 
     // await sendVerificationCode(user.email, verificationCode)
 
-    res.json({ message: 'Verification code sent to your email, if it exists.' })
+    res.json({
+      message: 'Verification code sent to your email, if it exists.',
+      success: true,
+    })
   } catch (err) {
     console.log(err)
     res.status(500).json({ message: 'Failed to send verification code' })
@@ -387,7 +396,8 @@ export const confirmPhoneChangeWEmail = async (req, res) => {
   try {
     const { verificationCode } = req.body
 
-    const user = await UserModel.findOne(req.userId)
+    const user = await UserModel.findOne({ _id: req.userId })
+
     let userEditData = await UserEditDataModel.findOne({ userId: req.userId })
 
     if (!userEditData) {
@@ -399,7 +409,9 @@ export const confirmPhoneChangeWEmail = async (req, res) => {
     }
 
     if (userEditData.phoneChangeVerificationCode !== verificationCode) {
-      return res.status(400).json({ message: 'Invalid verification code' })
+      return res
+        .status(400)
+        .json({ message: 'Invalid verification code', success: false })
     }
 
     user.phone = userEditData.newPhone
@@ -409,7 +421,7 @@ export const confirmPhoneChangeWEmail = async (req, res) => {
     await userEditData.save()
     await user.save()
 
-    res.json({ message: 'Phone number successfully updated.' })
+    res.json({ message: 'Phone number successfully updated.', success: true })
   } catch (err) {
     console.log(err)
     res.status(500).json({ message: 'Failed to update phone number' })
@@ -419,6 +431,13 @@ export const confirmPhoneChangeWEmail = async (req, res) => {
 export const getUserProfile = async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.id)
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found',
+      })
+    }
+
     const { passwordHash, email, role, ...userData } = user._doc
     res.json(userData)
   } catch (err) {
