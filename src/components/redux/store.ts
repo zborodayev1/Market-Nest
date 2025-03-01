@@ -16,12 +16,14 @@ import { persistConfig } from './persist'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { productReducer } from './slices/products'
 import { deliveryReducer } from './slices/delivery'
+import { cacheReducer } from './slices/cache'
 
 const rootReducer = combineReducers({
   auth: authReducer,
   products: productReducer,
   notifications: notificationsReducer,
   delivery: deliveryReducer,
+  cache: cacheReducer,
 })
 
 const store = configureStore({

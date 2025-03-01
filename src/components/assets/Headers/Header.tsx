@@ -142,11 +142,21 @@ export const Header = (props: Props) => {
     },
   }
 
+  const previousSearchItem = useRef<string | null>(null)
+
   const handleSearch = async () => {
-    if (searchITem.trim() === '') {
+    const trimmedSearchItem = searchITem.trim()
+
+    if (previousSearchItem.current === trimmedSearchItem) {
+      return
+    }
+
+    previousSearchItem.current = trimmedSearchItem
+
+    if (trimmedSearchItem === '') {
       dispatch(fetchProducts({ limit: 20, page: 1 }))
     } else {
-      dispatch(getProductsBySearch(searchITem))
+      dispatch(getProductsBySearch(trimmedSearchItem))
     }
   }
 
