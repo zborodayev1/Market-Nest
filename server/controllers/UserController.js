@@ -6,7 +6,7 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import UnverifiedUserModel from '../models/unverified_user.js'
 import { generateVerificationCode } from '../utils/functions/generateVerificationCode.js'
-import { sendVerificationCode } from '../utils/functions/sendMailToClient.js'
+// import { sendVerificationCode } from '../utils/functions/sendMailToClient.js'
 import { UserEditDataModel } from '../models/editUserData.js'
 
 dotenv.config()

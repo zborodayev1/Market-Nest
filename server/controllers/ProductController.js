@@ -2,59 +2,23 @@ import mongoose from 'mongoose'
 import ProductModel from '../models/product.js'
 import UserModel from '../models/user.js'
 import dayjs from 'dayjs'
-import fs from 'fs/promises'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import multer from 'multer'
 import NotiModel from '../models/noti.js'
-import cron from 'node-cron'
-import levenshtein from 'fast-levenshtein'
 import { sendUnreadCountToClients } from '../webSokets/functions/sendUnreadCountToClients/sendUnreadCountToClients.js'
+import upload from '../config/cloudinaryConfig.js'
+import cloudinary from 'cloudinary'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+export const handleUploadProductImage = upload.single('image')
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadPath = path.resolve(__dirname, '..', '..', 'public', 'uploads')
-    fs.mkdir(uploadPath, { recursive: true }, (err) => {
-      if (err) {
-        console.error('Error creating upload directory:', err)
-        return cb(new Error('Failed to create upload directory'))
-      }
-      cb(null, uploadPath)
-    })
-  },
-  filename: (req, file, cb) => {
-    const filename = Date.now() + path.extname(file.originalname)
-    cb(null, filename)
-  },
-})
-
-const upload = multer({ storage })
-
-export const handleUploadProductImage = (req, res, next) => {
-  upload.single('image')(req, res, (err) => {
-    if (err) {
-      console.error('File upload error:', err)
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to upload file',
-      })
-    }
-    next()
-  })
-}
 export const createProduct = async (req, res) => {
   try {
-    const { name, tags, price, description } = req.body
+    const { name, tags, price } = req.body
 
-    // if (!req.file) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: 'No file uploaded',
-    //   })
-    // }
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded',
+      })
+    }
 
     if (!name || name.length <= 5 || !tags || !price || price <= 0) {
       const errors = []
@@ -70,79 +34,31 @@ export const createProduct = async (req, res) => {
 
     const parsedTags = Array.isArray(tags) ? tags : JSON.parse(tags)
 
-    // const filePath = `/uploads/${req.file.filename}`
-    // const fullPath = path.resolve(
-    //   __dirname,
-    //   '..',
-    //   '..',
-    //   'public',
-    //   'uploads',
-    //   req.file.filename
-    // )
+    const product = await ProductModel.create({
+      _id: new mongoose.Types.ObjectId(),
+      name,
+      tags: parsedTags,
+      price,
+      image: req.file.path,
+      public_id: req.file.filename,
+      user: req.userId,
+      status: 'pending',
+    })
 
-    try {
-      // await fs.access(fullPath)
+    await NotiModel.create({
+      userId: req.userId,
+      actionType: 'created',
+      title: `Your product ${product.name} was created successfully`,
+      productId: product._id,
+    })
 
-      const product = await ProductModel.create({
-        _id: new mongoose.Types.ObjectId(),
-        name,
-        tags: parsedTags,
-        price,
-        description,
-        // image: filePath,
-        user: req.userId,
-        status: 'pending',
-      })
+    await sendUnreadCountToClients(req.userId, 1)
 
-      await NotiModel.create({
-        userId: req.userId,
-        actionType: 'created',
-        title: `Your product ${product.name} was created successfully`,
-        productId: product._id,
-      })
-
-      await sendUnreadCountToClients(req.userId, 1)
-
-      const admins = await UserModel.find({ role: 'admin' })
-
-      cron.schedule('0 13 * * 1', async () => {
-        const productsToVerify = await ProductModel.countDocuments({
-          status: 'pending',
-        })
-
-        if (productsToVerify > 0) {
-          const existingNotification = await NotiModel.findOne({
-            actionType: 'pending_review',
-            createdAt: { $gte: dayjs().startOf('week').toDate() },
-          })
-
-          if (!existingNotification) {
-            await Promise.all(
-              admins.map(async (admin) => {
-                await NotiModel.create({
-                  userId: admin._id,
-                  title: 'Pending products',
-                  actionType: 'pending_review',
-                  message: `There are ${productsToVerify} products awaiting admin verification this week.`,
-                })
-              })
-            )
-          }
-        }
-      })
-
-      return res.status(201).json({
-        success: true,
-        product,
-        message: 'Product created successfully and notification sent.',
-      })
-    } catch (err) {
-      console.error('Error during file access:', err)
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to create product',
-      })
-    }
+    return res.status(201).json({
+      success: true,
+      product,
+      message: 'Product created successfully and notification sent.',
+    })
   } catch (error) {
     console.error('Error during product creation:', error)
     return res.status(500).json({
@@ -169,7 +85,7 @@ export const getOneProduct = async (req, res) => {
       productId,
       { $inc: { viewsCount: 1 } },
       { new: true, session }
-    )
+    ).populate('user', 'fullName email phone address city country avatarUrl')
 
     if (!product) {
       await session.abortTransaction()
@@ -180,8 +96,8 @@ export const getOneProduct = async (req, res) => {
 
     return res.json({
       ...product.toObject(),
-      createdAt: dayjs(product.createdAt).format('YY-MM-DD'),
-      updatedAt: dayjs(product.updatedAt).format('YY-MM-DD'),
+      createdAt: dayjs(product.createdAt).format('YYYY-MM-DD'),
+      updatedAt: dayjs(product.updatedAt).format('YYYY-MM-DD'),
     })
   } catch (err) {
     await session.abortTransaction()
@@ -204,19 +120,12 @@ export const patchProduct = async (req, res) => {
 
     session.startTransaction()
 
-    const { name, tags, image, price, discount } = req.body
+    const { name, tags, price } = req.body
+    const imageFile = req.file
 
-    if (!name || !tags || !image || price === undefined) {
+    if (!name || !tags || price === undefined || price === null || price < 0) {
       await session.abortTransaction()
       return res.status(400).json({ message: 'Missing required fields' })
-    }
-
-    const updateData = {
-      name,
-      tags,
-      image,
-      price,
-      updatedAt: new Date(),
     }
 
     const product = await ProductModel.findById(productId).session(session)
@@ -225,16 +134,29 @@ export const patchProduct = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' })
     }
 
-    if (typeof discount === 'number' && discount >= 0 && discount <= 100) {
-      const { newPrice, discountAmount } = calculateDiscount(
-        product.price,
-        discount
-      )
+    const updateData = {
+      name,
+      tags,
+      price,
+      updatedAt: new Date(),
+    }
 
-      updateData.discount = discount
-      updateData.oldPrice = product.price
-      updateData.price = newPrice
-      updateData.saveAmount = discountAmount
+    if (imageFile) {
+      if (product.public_id) {
+        await cloudinary.uploader.destroy(product.public_id)
+      }
+
+      updateData.image = imageFile.path
+      updateData.public_id = imageFile.filename
+    }
+
+    updateData.oldPrice = product.price
+    updateData.price = price
+
+    if (updateData.price < updateData.oldPrice) {
+      updateData.saveAmount = updateData.oldPrice - updateData.price
+    } else {
+      updateData.saveAmount = null
     }
 
     const updatedProduct = await ProductModel.findByIdAndUpdate(
@@ -266,8 +188,8 @@ export const patchProduct = async (req, res) => {
 
     res.json({
       ...updatedProduct.toObject(),
-      createdAt: dayjs(updatedProduct.createdAt).format('YY-MM-DD'),
-      updatedAt: dayjs(updatedProduct.updatedAt).format('YY-MM-DD'),
+      createdAt: dayjs(updatedProduct.createdAt).format('YYYY-MM-DD'),
+      updatedAt: dayjs(updatedProduct.updatedAt).format('YYYY-MM-DD'),
     })
   } catch (err) {
     await session.abortTransaction()
@@ -303,6 +225,10 @@ export const deleteProduct = async (req, res) => {
       user.role === 'admin' ||
       product.user.toString() === userId.toString()
     ) {
+      if (product.public_id) {
+        await cloudinary.uploader.destroy(product.public_id)
+      }
+
       await ProductModel.findByIdAndDelete(productId)
 
       await NotiModel.create({
@@ -350,8 +276,8 @@ export const getAllProducts = async (req, res) => {
 
     const formattedProducts = products.map((product) => ({
       ...product.toObject(),
-      createdAt: dayjs(product.createdAt).format('YY-MM-DD'),
-      updatedAt: dayjs(product.updatedAt).format('YY-MM-DD'),
+      createdAt: dayjs(product.createdAt).format('YYYY-MM-DD'),
+      updatedAt: dayjs(product.updatedAt).format('YYYY-MM-DD'),
     }))
 
     res.json({
@@ -387,8 +313,8 @@ export const getPendingProducts = async (req, res) => {
 
     const formattedProducts = products.map((product) => ({
       ...product.toObject(),
-      createdAt: dayjs(product.createdAt).format('YY-MM-DD'),
-      updatedAt: dayjs(product.updatedAt).format('YY-MM-DD'),
+      createdAt: dayjs(product.createdAt).format('YYYY-MM-DD'),
+      updatedAt: dayjs(product.updatedAt).format('YYYY-MM-DD'),
     }))
 
     res.json({
@@ -408,23 +334,19 @@ export const getProductsBySearch = async (req, res) => {
   try {
     const search = req.body.search
 
+    if (search.length > 50) {
+      return res.status(400).json({ message: 'Search query too long' })
+    }
+
     if (!search) {
       return res.status(400).json({ message: 'Search parameter is required' })
     }
 
-    const maxDistance = 3
-
-    const products = await ProductModel.find()
-
-    const filteredProducts = products.filter((product) => {
-      const productName = product.name.toLowerCase()
-
-      const distance = levenshtein.get(search.toLowerCase(), productName)
-
-      return distance <= maxDistance
+    const products = await ProductModel.find({
+      name: { $regex: search, $options: 'i' },
+      status: 'approved',
     })
-
-    res.json(filteredProducts)
+    res.json(products)
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Failed to get products by search' })
@@ -493,6 +415,14 @@ export const approveProduct = async (req, res) => {
 
 export const deleteAllProducts = async (req, res) => {
   try {
+    const products = await ProductModel.find({}, 'public_id')
+
+    const deleteImagePromises = products
+      .filter((product) => product.public_id)
+      .map((product) => cloudinary.uploader.destroy(product.public_id))
+
+    await Promise.all(deleteImagePromises)
+
     const result = await ProductModel.deleteMany()
     await NotiModel.deleteMany()
 
@@ -500,20 +430,13 @@ export const deleteAllProducts = async (req, res) => {
       return res.status(404).json({ message: 'No products found to delete' })
     }
 
-    res.status(200).json({ message: 'All products deleted successfully' })
+    res
+      .status(200)
+      .json({ message: 'All products and images deleted successfully' })
   } catch (error) {
+    console.error(error)
     res
       .status(500)
       .json({ message: 'Failed to delete products', error: error.message })
-  }
-}
-
-const calculateDiscount = (originalPrice, discount) => {
-  const discountAmount = (discount / 100) * originalPrice
-  const newPrice = originalPrice - discountAmount
-
-  return {
-    newPrice: Math.round(newPrice * 100) / 100,
-    discountAmount: Math.round(discountAmount * 100) / 100,
   }
 }

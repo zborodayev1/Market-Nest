@@ -108,7 +108,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </IconButton>
 
                 {(userData?.role === 'admin' ||
-                  userData?._id === product.user) && (
+                  userData?._id === product.user?._id) && (
                   <IconButton
                     className="absolute top-0 left-[120px] ease-in-out duration-300"
                     color="error"

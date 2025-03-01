@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import axios from '../../../axios'
 import { RootState } from '../store'
 import { AxiosError } from 'axios'
+import { UserProfile } from './auth'
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
@@ -149,7 +150,7 @@ export interface Product {
   viewsCount: number
   createdAt: string
   image: null | File
-  user: string
+  user: UserProfile | null
   commentsCount: number
   favorite: boolean
   status: string
