@@ -8,7 +8,7 @@ const router = express.Router()
 router.post(
   '/',
   checkAuth,
-  ProductController.handleUploadProductImage,
+  ProductController.handleUploadImage,
   ProductController.createProduct
 )
 

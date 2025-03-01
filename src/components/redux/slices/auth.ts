@@ -138,13 +138,13 @@ export const confirmPasswordChange = createAsyncThunk<
   }
 })
 
-export const uploadImage = createAsyncThunk<
+export const uploadAvatar = createAsyncThunk<
   { avatarUrl: string },
   FormData,
   { rejectValue: string }
->('user/uploadImage', async (formData, { rejectWithValue }) => {
+>('user/uploadAvatar', async (formData, { rejectWithValue }) => {
   try {
-    const { data } = await axios.post('/upload', formData, {
+    const { data } = await axios.patch('/auth/user/avatar', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -160,12 +160,43 @@ export const uploadImage = createAsyncThunk<
   }
 })
 
+export const deleteAvatar = createAsyncThunk<
+  { avatarUrl: string },
+  FormData,
+  { rejectValue: string }
+>('user/deleteAvatar', async (formData, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.delete('/auth/user/avatar', {
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return data
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
+    return rejectWithValue(errorMessage)
+  }
+})
+
 export const fetchLogin = createAsyncThunk<
   AuthResponse,
-  { email: string; password: string }
->('auth/fetchLogin', async (params) => {
-  const { data } = await axios.post('/auth/login', params)
-  return data
+  { email: string; password: string },
+  { rejectValue: string } // добавлено
+>('auth/fetchLogin', async (params, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.post('/auth/login', params)
+    return data
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      'An unknown error occurred'
+    return rejectWithValue(errorMessage)
+  }
 })
 
 export const fetchProfileData = createAsyncThunk<UserProfile>(
@@ -235,7 +266,7 @@ export const updateProfilePassword = createAsyncThunk<
   { rejectValue: string }
 >('auth/updateProfilePassword', async (params, { rejectWithValue }) => {
   try {
-    const { data } = await axios.patch('/auth/profile/phone', params)
+    const { data } = await axios.patch('/auth/profile/password', params)
     return data
   } catch (error: any) {
     const errorMessage =
@@ -409,22 +440,40 @@ const authSlice = createSlice({
         state.loading = false
       })
       .addCase(confirmPasswordChange.rejected, handleRejected)
-      .addCase(uploadImage.pending, (state) => {
+      .addCase(uploadAvatar.pending, (state) => {
         state.loading = true
         state.status = 'loading'
       })
-      .addCase(uploadImage.fulfilled, (state, action) => {
+      .addCase(uploadAvatar.fulfilled, (state, action) => {
         if (state.user) {
           state.user.avatarUrl = action.payload.avatarUrl
         }
         state.loading = false
         state.status = 'succeeded'
       })
-      .addCase(uploadImage.rejected, (state, action) => {
+      .addCase(uploadAvatar.rejected, (state, action) => {
         state.loading = false
         state.status = 'failed'
         state.error = action.payload || 'Error while update avatar'
       })
+
+      .addCase(deleteAvatar.pending, (state) => {
+        state.loading = true
+        state.status = 'loading'
+      })
+      .addCase(deleteAvatar.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.avatarUrl = action.payload.avatarUrl
+        }
+        state.loading = false
+        state.status = 'succeeded'
+      })
+      .addCase(deleteAvatar.rejected, (state, action) => {
+        state.loading = false
+        state.status = 'failed'
+        state.error = action.payload || 'Error while update avatar'
+      })
+
       .addCase(getUserProfile.pending, (state) => {
         state.status = 'loading'
         state.error = null

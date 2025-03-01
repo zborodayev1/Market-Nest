@@ -7,7 +7,7 @@ import { sendUnreadCountToClients } from '../webSokets/functions/sendUnreadCount
 import upload from '../config/cloudinaryConfig.js'
 import cloudinary from 'cloudinary'
 
-export const handleUploadProductImage = upload.single('image')
+export const handleUploadImage = upload.single('image')
 
 export const createProduct = async (req, res) => {
   try {

@@ -1,5 +1,5 @@
 import express from 'express'
-import { UserController } from '../controllers/index.js'
+import { UserController, ProductController } from '../controllers/index.js'
 import { loginValidation, registerValidation } from '../utils/validations.js'
 import handleValidErr from '../utils/hanldeValidErr.js'
 import { checkAuth } from '../utils/checkAuth.js'
@@ -13,6 +13,16 @@ router.post(
   handleValidErr,
   UserController.temporaryRegister
 )
+
+router.patch(
+  '/user/avatar',
+  checkAuth,
+  ProductController.handleUploadImage,
+  UserController.uploadAvatar
+)
+
+router.delete('/user/avatar', checkAuth, UserController.deleteAvatar)
+
 router.post('/complete-register', UserController.completeRegistration)
 
 router.patch(

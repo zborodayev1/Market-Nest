@@ -11,7 +11,6 @@ dotenv.config()
 import { connectDB } from './server/config/database.js'
 import authRoutes from './server/routes/auth.routes.js'
 import productRoutes from './server/routes/product.routes.js'
-import uploadRoutes from './server/routes/upload.routes.js'
 import notiRoutes from './server/routes/noti.routes.js'
 import deliveryRoutes from './server/routes/delivery.routes.js'
 
@@ -34,7 +33,6 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/api/auth', authRoutes)
 app.use('/api/products', productRoutes)
-app.use('/api/upload', uploadRoutes)
 app.use('/api/noti', notiRoutes)
 app.use('/api/del', deliveryRoutes)
 
