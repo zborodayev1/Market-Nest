@@ -16,6 +16,7 @@ router.delete(
   checkAuth,
   NotiController.deleteAllNotifications
 )
+router.get('/:id', checkAuth, NotiController.getOneNotification)
 router.patch('/:id', checkAuth, NotiController.markNotificationAsRead)
 
 export default router

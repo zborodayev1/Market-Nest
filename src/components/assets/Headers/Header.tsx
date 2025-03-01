@@ -220,7 +220,7 @@ export const Header = (props: Props) => {
                   <NotiHeaderDropDown
                     notiOpen={notiOpen}
                     notificationRef={notificationRef}
-                    PropsForNoti={() => setNotiOpen}
+                    onSuccess={() => setNotiOpen(!notiOpen)}
                   />
                   <Link
                     className="mx-1 ml-3 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"

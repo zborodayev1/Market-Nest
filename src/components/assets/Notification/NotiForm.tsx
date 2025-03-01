@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import React from 'react'
 import {
   markNotificationAsRead,
@@ -6,11 +5,16 @@ import {
 } from '../../redux/slices/notifications'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../redux/store'
-import { CircleCheck, CircleEllipsis, CircleX } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+
+interface FullNoti {
+  state: string
+  id: string
+}
 
 interface Props {
   notification: Notification
-  onSuccess: () => void
+  onSuccess: (state: FullNoti) => void
 }
 
 const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
@@ -19,48 +23,50 @@ const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
   const onClick = () => {
     if (!notification.isRead) {
       dispatch(markNotificationAsRead(notification._id.toString()))
-      onSuccess()
     }
+    onSuccess({ state: 'full', id: notification._id.toString() })
   }
 
   return (
-    <button
-      onClick={onClick}
-      className={`w-[200px] min-h-[60px] p-3 px-3 bg-[#fafafa] text-sm shadow-lg border-2 ${
-        notification.actionType === 'approved' ||
-        notification.actionType === 'created'
-          ? 'border-green-600 '
-          : notification.actionType === 'rejected'
-            ? 'border-red-600 '
-            : 'border-blue-600 '
-      } border-gray-950 rounded-lg hover:-translate-y-1 duration-300 relative`}
-    >
-      <Link to={`/noti/product/${notification.productId}`}>
-        <div className="flex z-20 items-center">
-          <div className="absolute top-[-8px] left-[-8px]">
-            {notification.actionType === 'created' ||
-            notification.actionType === 'approved' ? (
-              <CircleCheck className="text-green-600 bg-white rounded-full" />
-            ) : notification.actionType === 'rejected' ? (
-              <CircleX className="text-red-600 bg-white rounded-full" />
-            ) : (
-              <CircleEllipsis className="text-blue-600 bg-white rounded-full" />
-            )}
+    <>
+      <button
+        onClick={onClick}
+        className={`w-[300px] h-[50px] p-3 px-3 bg-[#fafafa] text-sm duration-300 relative`}
+      >
+        <div className="flex gap-2 items-center">
+          <img
+            className="w-7 h-7 p-1 bg-gradient-to-r from-gray-500 to-[#fafafa] rounded-full"
+            src={'./icon.svg'}
+          />
+          <div className="flex z-20 items-center">
+            <div className="flex justify-center">
+              <h1
+                style={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width: '215px',
+                }}
+                className=""
+              >
+                {notification.title}
+              </h1>
+            </div>
           </div>
-
-          <div className="flex justify-center">
-            <h1 className="">{notification.title}</h1>
+          <div>
+            <ChevronRight className={`h-5 w-5 absolute right-2 top-[15px] }`} />
           </div>
         </div>
 
         {!notification.isRead && (
           <div>
-            <div className="absolute w-2 h-2 bg-emerald-500 rounded-full animate-ping top-1 right-1 z-10"></div>
-            <div className="absolute w-2 h-2 bg-emerald-500 rounded-full top-1 right-1 z-10"></div>
+            <div className="absolute w-2 h-2 bg-emerald-500/50 rounded-full animate-ping top-0 right-0 z-10"></div>
+            <div className="absolute w-2 h-2 bg-emerald-500/50 rounded-full top-0 right-0 z-10"></div>
           </div>
         )}
-      </Link>
-    </button>
+      </button>
+      <hr className="my-2 bg-[#f0f0f0] h-[2px]" />
+    </>
   )
 }
 

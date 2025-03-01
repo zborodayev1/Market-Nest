@@ -174,28 +174,20 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 )}
               </div>
               <div className="w-auto">
-                <Link to={`/product/${product._id}`} className="text-base">
-                  {product.name}
-                </Link>
+                <div className="text-base">{product.name}</div>
               </div>
               <div className="">
                 <div className="">
-                  <Link
-                    to={`/product/${product._id}`}
-                    className="text-sm flex text-black/50 gap-1 "
-                  >
+                  <div className="text-sm flex text-black/50 gap-1 ">
                     <Eye className="w-5 h-5 " />
                     {product.viewsCount} views
-                  </Link>
+                  </div>
                 </div>
                 <div className="">
-                  <Link
-                    to={`/product/${product._id}`}
-                    className="text-sm flex text-black/50 gap-1 "
-                  >
+                  <div className="text-sm flex text-black/50 gap-1 ">
                     <BiSolidMessageSquare className="w-4 h-4" />
                     {product.commentsCount} reviews
-                  </Link>
+                  </div>
                 </div>
               </div>
             </div>
