@@ -156,22 +156,21 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 <h1 className={` ${product.saveAmount && 'text-[#ff3535]'}`}>
                   {product.price}$
                 </h1>
-                {product.discount != 0 && product.saveAmount != 0 && (
-                  <div className="text-xs flex gap-1 items-center">
-                    <h1 className="bg-[#3C8737] flex text-white rounded-md p-1">
-                      save {product.saveAmount}
-                      <h1
-                        className=""
-                        style={{ fontSize: '12px', lineHeight: '16px' }}
-                      >
-                        $
+                {product.saveAmount &&
+                  product.saveAmount !== null &&
+                  product.saveAmount !== 0 && (
+                    <div className="text-xs flex gap-1 items-center">
+                      <h1 className="bg-[#3C8737] flex text-white rounded-md p-1">
+                        save {product.saveAmount}
+                        <h1
+                          className=""
+                          style={{ fontSize: '12px', lineHeight: '16px' }}
+                        >
+                          $
+                        </h1>
                       </h1>
-                    </h1>
-                    <h1 className="text-base text-[#D3312F]">
-                      -{product.discount}%
-                    </h1>
-                  </div>
-                )}
+                    </div>
+                  )}
               </div>
               <div className="w-auto">
                 <div className="text-base">{product.name}</div>

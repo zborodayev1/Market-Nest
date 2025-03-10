@@ -36,7 +36,7 @@ const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
         <div className="flex gap-2 items-center">
           <img
             className="w-7 h-7 p-1 bg-gradient-to-r from-gray-500 to-[#fafafa] rounded-full"
-            src={'./icon.svg'}
+            src={'http://localhost:5173/icon.svg'}
           />
           <div className="flex z-20 items-center">
             <div className="flex justify-center">

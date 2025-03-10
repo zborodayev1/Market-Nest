@@ -31,7 +31,7 @@ export const FullNotiForm: React.FC<Props> = ({
       <div className="flex gap-2 items-center">
         <img
           className="w-8 h-8 p-1 pt-[6px] bg-gradient-to-r from-gray-500 to-[#fafafa] rounded-full"
-          src={'./icon.svg'}
+          src={'http://localhost:5173/icon.svg'}
         />
       </div>
       <div className="flex  items-center">

@@ -17,8 +17,7 @@ const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 15
 
 export const temporaryRegister = async (req, res) => {
   try {
-    const { fullName, email, password, phone, address, city, country } =
-      req.body
+    const { fullName, email, password, phone, address } = req.body
 
     const existingTempUser = await UnverifiedUserModel.findOne({ email })
     const existingTempPhone = await UnverifiedUserModel.findOne({ phone })
@@ -51,8 +50,6 @@ export const temporaryRegister = async (req, res) => {
       passwordHash: hash,
       phone,
       address,
-      city,
-      country,
       verificationCode,
     })
 
@@ -180,8 +177,6 @@ export const patchProfileData = async (req, res) => {
   try {
     const updateData = {
       address: req.body.address,
-      city: req.body.city,
-      country: req.body.country,
       fullName: req.body.fullName,
     }
     await UserModel.updateOne({ _id: req.userId }, updateData)

@@ -24,14 +24,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
-    city: {
-      type: String,
-      default: '',
-    },
-    country: {
-      type: String,
-      default: '',
-    },
     avatarUrl: {
       type: String,
       default: '',

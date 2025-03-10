@@ -136,9 +136,6 @@ export const FullProduct = (props: Props) => {
                   <h1 className="text-gray-400 text-sm">
                     was {data.oldPrice}$
                   </h1>
-                  <h1 className="text-lg pb-3 text-[#fd3939]">
-                    -{data.discount}%
-                  </h1>
                 </div>
               )}
             </div>

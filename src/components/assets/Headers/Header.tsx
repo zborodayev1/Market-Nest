@@ -217,10 +217,10 @@ export const Header = (props: Props) => {
                 <div className="flex">
                   <button
                     ref={buttonRef}
-                    className="relative z-10 mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-3 rounded-full duration-500 ease-in-out group"
+                    className="relative z-10 mx-1 flex gap-2 stroke items-center hover:bg-[#E4E4E4] p-2 px-3 rounded-full duration-500 ease-in-out group"
                     onClick={() => setNotiOpen(!notiOpen)}
                   >
-                    <Bell className="w-8 h-8 stroke-2 text-[#212121]" />
+                    <Bell className="w-8 h-8  text-[#212121]" />
                     {unreadCount != null && unreadCount > 0 && (
                       <span className="absolute -top-[2px] -right-[2px] bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
                         {unreadCount}
@@ -317,7 +317,7 @@ export const Header = (props: Props) => {
           </motion.div>
         </div>
 
-        <hr className="h-[2px] shadow-xl" />
+        <div className="h-[1px] bg-[#E5E7EB]"></div>
       </div>
     </div>
   )

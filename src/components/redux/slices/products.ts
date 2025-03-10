@@ -70,6 +70,32 @@ export const createProduct = createAsyncThunk(
   }
 )
 
+export const editProduct = createAsyncThunk(
+  'products/editProduct',
+  async (
+    { id, productData }: { id: string | undefined; productData: FormData },
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data } = await axios.patch(`/products/${id}`, productData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      return data
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data || 'Failed to create product'
+        )
+      } else {
+        return rejectWithValue('An unknown error occurred')
+      }
+    }
+  }
+)
+
 export const getProductsBySearch = createAsyncThunk(
   'products/getProductsBySearch',
   async (search: string) => {
@@ -186,6 +212,13 @@ const productSlice = createSlice({
   reducers: {
     setProducts(state, action) {
       state.products.products = action.payload
+    },
+    setFullProduct(state, action: PayloadAction<string>) {
+      const productId = action.payload
+      const foundProduct = state.products.products.find(
+        (product) => product._id === productId
+      )
+      state.fullProduct = foundProduct || null
     },
   },
   extraReducers: (builder) => {
@@ -314,7 +347,7 @@ const productSlice = createSlice({
       )
       .addCase(getOneProduct.rejected, (state, action) => {
         state.status = 'failed'
-        state.error = action.payload as string
+        state.error = action.error.message ?? 'Failed to get product'
       })
   },
 })
@@ -323,7 +356,7 @@ export const productReducer = productSlice.reducer
 
 export const selectProducts = (state: RootState) => state.products
 
-export const { setProducts } = productSlice.actions
+export const { setProducts, setFullProduct } = productSlice.actions
 
 export const selectFullProduct = (state: RootState) =>
   state.products.fullProduct

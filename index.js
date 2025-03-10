@@ -5,6 +5,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { WebSocketServer } from 'ws'
 import http from 'http'
+import multer from 'multer'
 
 dotenv.config()
 
@@ -28,8 +29,10 @@ app.use(
   })
 )
 
+app.use(express.urlencoded({ extended: true }))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(multer().none())
 
 app.use('/api/auth', authRoutes)
 app.use('/api/products', productRoutes)
@@ -40,7 +43,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
-app.use((error, req, res, next) => {
+app.use((error, req, res) => {
   console.error(error)
   res.status(error.status || 500).json({
     success: false,

@@ -19,7 +19,7 @@ export const Password = (props: Props) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="max-w-md mx-auto p-6  bg-[#fff] border-[2px] border-[#212121] dark:bg-gray-900 rounded-xl shadow-lg space-y-6"
+        className="max-w-md mx-auto p-6  bg-[#fff] border-[2px] border-[#212121]  rounded-xl shadow-lg space-y-6"
       >
         {passwordPageState === 'default' && <DefForm onSuccess={onSuccess} />}
         {passwordPageState === 'forgotPass' && (

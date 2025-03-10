@@ -7,15 +7,14 @@ import {
   selectUserProfile,
   updateProfileData,
 } from '../../../../redux/slices/auth'
-import { User, MapPin, Building2, Globe } from 'lucide-react'
+import { User } from 'lucide-react'
 import { AppDispatch } from '../../../../redux/store'
+import { AddressPicker } from '../../../functons/address/AddressPicker'
 
 interface FormData {
   fullName?: string
   phone?: string
   address?: string
-  city?: string
-  country?: string
 }
 
 interface Props {
@@ -28,7 +27,10 @@ export const UserData = ({ onSuccess }: Props) => {
   const status = useSelector((state: RootState) => state.auth.status)
   const error = useSelector((state: RootState) => state.auth.error)
   const dispatch: AppDispatch = useDispatch()
-
+  const [address, setAddress] = useState<string>('')
+  const [coordinates, setCoordinates] = useState<[number, number]>([
+    45.02626419993138, 78.38643193244936,
+  ])
   const {
     register,
     handleSubmit,
@@ -38,8 +40,6 @@ export const UserData = ({ onSuccess }: Props) => {
     defaultValues: {
       fullName: userData?.fullName || '',
       address: userData?.address || '',
-      city: userData?.city || '',
-      country: userData?.country || '',
     },
   })
 
@@ -62,7 +62,7 @@ export const UserData = ({ onSuccess }: Props) => {
   const inputClasses =
     'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 '
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-black dark:text-gray-300 mb-1'
+    'flex items-center gap-2 text-sm font-medium text-black  mb-1'
 
   return (
     <AnimatePresence>
@@ -70,7 +70,7 @@ export const UserData = ({ onSuccess }: Props) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="max-w-md mx-auto p-6 bg-[#fff] border-[2px] border-[#212121]  dark:bg-gray-900 rounded-xl shadow-lg space-y-6"
+        className="max-w-md mx-auto p-6 bg-[#fff] border-[2px] border-[#212121]  rounded-xl shadow-lg space-y-6"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="space-y-4">
@@ -85,42 +85,13 @@ export const UserData = ({ onSuccess }: Props) => {
               spellCheck="false"
             />
           </div>
-
-          <div>
-            <label className={labelClasses}>
-              <MapPin size={18} /> Address
-            </label>
-            <input
-              {...register('address')}
-              className={inputClasses}
-              spellCheck="false"
-              placeholder="123 Main St"
-            />
-          </div>
-
-          <div>
-            <label className={labelClasses}>
-              <Building2 size={18} /> City
-            </label>
-            <input
-              {...register('city')}
-              className={inputClasses}
-              spellCheck="false"
-              placeholder="New York"
-            />
-          </div>
-
-          <div>
-            <label className={labelClasses}>
-              <Globe size={18} /> Country
-            </label>
-            <input
-              {...register('country')}
-              className={inputClasses}
-              spellCheck="false"
-              placeholder="United States"
-            />
-          </div>
+          
+            <AddressPicker
+                address={address}
+                setAddress={setAddress}
+                coordinates={coordinates}
+                setCoordinates={setCoordinates}
+              />
         </div>
 
         <motion.button

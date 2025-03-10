@@ -12,14 +12,9 @@ import { CircularProgress } from '@mui/material'
 import { PageSettingsForm } from '../../forms/pageSettingsForm'
 import { Helmet } from 'react-helmet-async'
 import { fetchNotificationCount } from '../../redux/slices/notifications'
-import {
-  selectFetchProducts,
-  updateFetchProducts,
-} from '../../redux/slices/cache'
 
 export const HomePage = () => {
   const dispatch: AppDispatch = useDispatch()
-  const cacheFetchProducts = useSelector(selectFetchProducts)
   const { products, status } = useSelector(selectProducts)
   const [PGState, setPGState] = useState<{ limit: number; page: number }>({
     limit: 10,
@@ -54,16 +49,13 @@ export const HomePage = () => {
   }
 
   useEffect(() => {
-    if (!cacheFetchProducts.isChange) {
-      dispatch(
-        fetchProducts({
-          limit: PGState.limit,
-          page: PGState.page,
-        })
-      )
-      dispatch(updateFetchProducts({ data: products.products, isChange: true }))
-    }
-  }, [dispatch, PGState, cacheFetchProducts, products.products])
+    dispatch(
+      fetchProducts({
+        limit: PGState.limit,
+        page: PGState.page,
+      })
+    )
+  }, [dispatch, PGState])
 
   useEffect(() => {
     dispatch(fetchNotificationCount())

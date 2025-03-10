@@ -17,8 +17,6 @@ export interface UserProfile {
   avatarUrl?: string
   phone?: string
   address?: string
-  city?: string
-  country?: string
   email?: string
   password?: string
   role?: string
@@ -27,8 +25,6 @@ export interface UserProfile {
 interface UserData {
   fullName?: string
   address?: string
-  city?: string
-  country?: string
 }
 
 interface UserPassword {
@@ -63,8 +59,6 @@ export const fetchTemporaryRegister = createAsyncThunk<
     password: string
     phone: string
     address: string
-    city: string
-    country: string
   },
   { rejectValue: string }
 >('auth/fetchTemporaryRegister', async (params, { rejectWithValue }) => {
