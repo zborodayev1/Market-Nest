@@ -1,13 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { Eye, EyeOff, Mail, RectangleEllipsis } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   RootState,
   selectUserProfile,
   updateProfileEmail,
 } from '../../../../redux/slices/auth'
-import { useDispatch, useSelector } from 'react-redux'
-import { Mail, Eye, EyeOff, RectangleEllipsis } from 'lucide-react'
-import { useState } from 'react'
 import { AppDispatch } from '../../../../redux/store'
 
 interface Formdata {
@@ -70,7 +70,7 @@ export const Email = (props: Props) => {
   const inputClasses =
     'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 '
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-black dark:text-gray-300 mb-1'
+    'flex items-center gap-2 text-sm font-medium text-black mb-1'
 
   return (
     <AnimatePresence>
@@ -121,7 +121,7 @@ export const Email = (props: Props) => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />

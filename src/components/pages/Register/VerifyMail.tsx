@@ -21,9 +21,9 @@ interface Props {
 
 export const VerifyMail = (props: Props) => {
   const inputClasses =
-    ' px-5 py-2 w-[300px] h-[50px] bg-[#fff] dark:bg-gray-800 border border-[#212121] dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] dark:focus:ring-emerald-400 focus:border-transparent transition-all duration-200 '
+    ' px-5 py-2 w-[300px] h-[50px] bg-[#fff]  border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4]  focus:border-transparent transition-all duration-200 '
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-[#212121] dark:text-gray-300 mb-1'
+    'flex items-center gap-2 text-sm font-medium text-[#212121]  mb-1'
   const { onSuccess } = props
   const navigate = useNavigate()
   const dispatch: AppDispatch = useDispatch()

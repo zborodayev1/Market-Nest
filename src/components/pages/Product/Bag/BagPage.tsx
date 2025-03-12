@@ -100,12 +100,12 @@ export const BagPage = () => {
             >
               <span className="text-2xl text-[#212121]">
                 <span className="font-bold">Total: </span>
-                <span className="bg-[#3C8737] text-white p-1 rounded-md">
+                <span className="bg-[#3C8737] text-white px-2 p-1 rounded-md">
                   {totalPrice}$
                 </span>
               </span>
 
-              <span className="text-2xl text-[#212121]">
+              <span className="text-xl text-[#212121]">
                 <span className="font-bold">Count: </span>
                 <span>{totalCount} items</span>
               </span>

@@ -88,6 +88,7 @@ export const PageSettingsForm = (props: Props) => {
           page: PGStateChange.page,
         }))
       }
+
       dispatch(
         fetchProducts({
           limit: PGState.limit,

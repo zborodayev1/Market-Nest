@@ -6,8 +6,9 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import UnverifiedUserModel from '../models/unverified_user.js'
 import { generateVerificationCode } from '../utils/functions/generateVerificationCode.js'
-import { sendVerificationCode } from '../utils/functions/sendMailToClient.js'
+// import { sendVerificationCode } from '../utils/functions/sendMailToClient.js'
 import { UserEditDataModel } from '../models/editUserData.js'
+import cloudinary from 'cloudinary'
 
 dotenv.config()
 
@@ -16,8 +17,7 @@ const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 15
 
 export const temporaryRegister = async (req, res) => {
   try {
-    const { fullName, email, password, phone, address, city, country } =
-      req.body
+    const { fullName, email, password, phone, address } = req.body
 
     const existingTempUser = await UnverifiedUserModel.findOne({ email })
     const existingTempPhone = await UnverifiedUserModel.findOne({ phone })
@@ -50,8 +50,6 @@ export const temporaryRegister = async (req, res) => {
       passwordHash: hash,
       phone,
       address,
-      city,
-      country,
       verificationCode,
     })
 
@@ -179,8 +177,6 @@ export const patchProfileData = async (req, res) => {
   try {
     const updateData = {
       address: req.body.address,
-      city: req.body.city,
-      country: req.body.country,
       fullName: req.body.fullName,
     }
     await UserModel.updateOne({ _id: req.userId }, updateData)
@@ -470,5 +466,61 @@ export const getUserProducts = async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Failed to fetch products' })
+  }
+}
+
+export const uploadAvatar = async (req, res) => {
+  try {
+    const userId = req.userId
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded',
+      })
+    }
+
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    await UserModel.updateOne(
+      { _id: userId },
+      { avatarUrl: req.file.path, public_id: req.file.filename }
+    )
+
+    res.json({ user })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: 'Failed to upload avatar' })
+  }
+}
+
+export const deleteAvatar = async (req, res) => {
+  try {
+    const userId = req.userId
+
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    if (user.public_id) {
+      await cloudinary.uploader.destroy(user.public_id)
+    } else {
+      return res.status(400).json({ message: 'No avatar to delete' })
+    }
+
+    user.avatarUrl = null
+    user.public_id = null
+    await user.save()
+
+    res.json({ message: 'Avatar deleted successfully', avatarUrl: null })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: 'Failed to delete avatar' })
   }
 }

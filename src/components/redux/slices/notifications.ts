@@ -21,6 +21,7 @@ interface NotificationsState {
   totalPages: number
   page: number
   filter: string
+  fullNotifi: Notification | null
   unread: number
 }
 
@@ -31,6 +32,7 @@ const initialState: NotificationsState = {
   total: 0,
   totalPages: 0,
   page: 1,
+  fullNotifi: null,
   filter: 'read',
   unread: 0,
 }
@@ -128,7 +130,23 @@ export const markAllNotificationsAsRead = createAsyncThunk(
     }
   }
 )
-
+export const getOneNotification = createAsyncThunk(
+  'notifications/getOneNotification',
+  async ({ id }: { id: string }, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get(`/noti/${id}`)
+      return data
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data || 'Failed to fetch notifications'
+        )
+      } else {
+        return rejectWithValue('An unknown error occurred')
+      }
+    }
+  }
+)
 const notificationsSlice = createSlice({
   name: 'notifications',
   initialState,
@@ -137,6 +155,9 @@ const notificationsSlice = createSlice({
       state.notifications = state.notifications.filter(
         (notif) => notif._id !== action.payload
       )
+    },
+    clearFullNotifi: (state) => {
+      state.fullNotifi = null
     },
   },
   extraReducers: (builder) => {
@@ -216,7 +237,25 @@ const notificationsSlice = createSlice({
         state.error =
           action.error.message ?? 'Failed to fetch notification count'
       })
+      .addCase(getOneNotification.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(getOneNotification.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.fullNotifi = action.payload
+      })
+      .addCase(getOneNotification.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message ?? 'Something went wrong'
+      })
   },
 })
 
 export const notificationsReducer = notificationsSlice.reducer
+
+export const selectFullNotifi = (state: {
+  notifications: NotificationsState
+}) => state.notifications.fullNotifi
+
+export const clearFullNotifi = notificationsSlice.actions.clearFullNotifi

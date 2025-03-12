@@ -14,6 +14,7 @@ import { CreatePage } from './components/pages/Product/CreateProduct/CreatePage'
 import { PendingProducts } from './components/pages/Product/ForAdmins/PendingProducts'
 import { ToastContainer } from 'react-toastify'
 import { VerifyMail } from './components/pages/Register/VerifyMail'
+import { EditProduct } from './components/pages/Product/EditProduct/EditProduct'
 
 export const App = () => {
   const isAuth = useSelector(selectIsAuth)
@@ -51,7 +52,10 @@ export const App = () => {
             element={!isAuth ? <Navigate to="/" /> : <CreatePage />}
             path="/create-product"
           />
-
+          <Route
+            element={!isAuth ? <Navigate to="/" /> : <EditProduct />}
+            path="/edit/:id"
+          />
           <Route element={<FullProduct noti={false} />} path="/product/:id" />
           <Route
             element={<FullProduct noti={true} />}

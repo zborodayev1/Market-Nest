@@ -16,7 +16,6 @@ import {
 import { Helmet } from 'react-helmet-async'
 import { AppDispatch } from '../../../redux/store'
 import { useDispatch, useSelector } from 'react-redux'
-import { getUserProfile, UserProfile } from '../../../redux/slices/auth'
 import { SellerInfo } from './Seller/SellerInfo'
 import {
   Delivery,
@@ -37,10 +36,7 @@ export const FullProduct = (props: Props) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false)
   const [isBag, setIsBag] = useState<boolean>(false)
   const dispatch: AppDispatch = useDispatch()
-  const productUser = useSelector(
-    (state: { auth: { productUser: UserProfile | null } }) =>
-      state.auth.productUser
-  )
+
   const toggleFavorite = () => {
     if (!data) return
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
@@ -61,12 +57,6 @@ export const FullProduct = (props: Props) => {
       dispatch(getOneProduct(id))
     }
   }, [dispatch, id])
-
-  useEffect(() => {
-    if (data?.user) {
-      dispatch(getUserProfile(data.user))
-    }
-  }, [data?.user, dispatch])
 
   useEffect(() => {
     dispatch(getDelivery())
@@ -146,9 +136,6 @@ export const FullProduct = (props: Props) => {
                   <h1 className="text-gray-400 text-sm">
                     was {data.oldPrice}$
                   </h1>
-                  <h1 className="text-lg pb-3 text-[#fd3939]">
-                    -{data.discount}%
-                  </h1>
                 </div>
               )}
             </div>
@@ -203,7 +190,7 @@ export const FullProduct = (props: Props) => {
                   <h1 className="text-2xl font-bold">Seller info</h1>
                 </div>
                 <div>
-                  <SellerInfo user={productUser} />
+                  <SellerInfo user={data.user} />
                 </div>
               </div>
             </div>

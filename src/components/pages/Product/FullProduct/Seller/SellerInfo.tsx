@@ -32,12 +32,6 @@ export const SellerInfo = (props: Props) => {
             <div>
               <h1>{user?.address},</h1>
             </div>
-            <div>
-              <h1>{user?.city},</h1>
-            </div>
-            <div>
-              <h1>{user?.country}</h1>
-            </div>
           </div>
         </div>
       </div>

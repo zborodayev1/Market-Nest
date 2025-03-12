@@ -1,13 +1,19 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Package, Coins, Tags, ImagePlus, X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { createProduct, selectProducts } from '../../../redux/slices/products'
+import {
+  editProduct,
+  selectFullProduct,
+  selectProducts,
+  getOneProduct,
+} from '../../../redux/slices/products'
 import { AppDispatch } from '../../../redux/store'
 import { AnimatePresence, motion } from 'motion/react'
 import { toast } from 'react-toastify'
 import { Helmet } from 'react-helmet-async'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { selectUserProfile } from '../../../redux/slices/auth'
 
 interface FormData {
   name: string
@@ -16,23 +22,42 @@ interface FormData {
   image: File | null
 }
 
-export const CreatePage = () => {
+export const EditProduct = () => {
   const dispatch: AppDispatch = useDispatch()
+  const { id } = useParams()
+  const product = useSelector(selectFullProduct)
+  const userData = useSelector(selectUserProfile)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    product?.image || null
+  )
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    product?.tags || []
+  )
   const { error } = useSelector(selectProducts)
   const [message, setMessage] = useState<string>('')
   const { register, handleSubmit, setValue } = useForm<FormData>({
     defaultValues: {
-      name: '',
-      price: 0,
-      tags: [],
-      image: null,
+      name: product?.name || '',
+      price: product?.price || 0,
+      tags: product?.tags || [],
+      image: product?.image || null,
     },
   })
   const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (id && (!product || product?._id !== id)) {
+      dispatch(getOneProduct(id))
+    }
+  }, [id, dispatch, product])
+
+  useEffect(() => {
+    if (userData?.role !== 'admin' && product?.user.id !== userData?._id) {
+      navigate('/')
+    }
+  }, [navigate, product?.user, userData])
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null
@@ -55,20 +80,30 @@ export const CreatePage = () => {
   }
 
   const onSubmit = async (values: FormData) => {
+    const formData = new FormData()
+    formData.append('name', values.name)
+    formData.append('price', values.price.toString())
+    formData.append('tags', JSON.stringify(selectedTags))
+
+    if (values.image instanceof File) {
+      formData.append('image', values.image)
+    }
+
+    const isChanged =
+      values.name !== product?.name ||
+      values.price !== product?.price ||
+      JSON.stringify(selectedTags) !== JSON.stringify(product?.tags) ||
+      values.image instanceof File
+
+    if (!isChanged) {
+      return navigate('/')
+    }
+
     try {
       setIsSubmitting(true)
+      console.log('FormData:', Object.fromEntries(formData.entries()))
 
-      const formData = new FormData()
-      formData.append('name', values.name)
-      formData.append('price', values.price.toString())
-      formData.append('tags', JSON.stringify(selectedTags))
-
-      if (values.image instanceof File) {
-        formData.append('image', values.image)
-      } else {
-        formData.append('image', '')
-      }
-      await dispatch(createProduct(formData)).unwrap()
+      await dispatch(editProduct({ productData: formData, id: id })).unwrap()
 
       toast('Successfully created!', {
         type: 'success',
@@ -108,7 +143,7 @@ export const CreatePage = () => {
   return (
     <>
       <Helmet>
-        <title>Create Product</title>
+        <title>Edit Product</title>
         <meta
           name="description"
           content="Welcome to the page Create product of Market Nest"
@@ -127,7 +162,7 @@ export const CreatePage = () => {
       >
         <div>
           <h1 className="flex justify-center mb-5 font-bold text-2xl">
-            Create Product
+            Edit Product
           </h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -174,7 +209,7 @@ export const CreatePage = () => {
                     ${
                       selectedTags.includes(tag)
                         ? 'bg-[#2B6128] text-white hover:bg-[#3C8737]'
-                        : 'bg-gray-200 text-gray-800 hover:bg-[#1f5e1c'
+                        : 'bg-gray-200 text-gray-800 hover:bg-[#1f5e1c]'
                     } 
                     hover:bg-[#2B6128] hover:text-white`}
                   >

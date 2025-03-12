@@ -35,8 +35,8 @@ export const RegisterPage = (props: Props) => {
         />
       </Helmet>
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{
           opacity: { duration: 0.3, delay: 0.4 },
           y: { duration: 0.3, delay: 0.5 },
@@ -47,16 +47,15 @@ export const RegisterPage = (props: Props) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-[#fff] h-screen flex flex-wrap justify-center"
+          className="bg-[#fff] flex  justify-center"
         >
-          <div className="bg-[#fff] border shadow-lg px-16 my-5 py-8 w-[400px] min-h-[850px] max-h-[1500px] phone:max-w-90 phone-md:max-w-96 rounded-md">
+          <div className="mt-5">
+            <div className="flex justify-center">
+              <h1 className="text-2xl  font-bold text-[#212121] mb-5">
+                Register
+              </h1>
+            </div>
             <div>
-              <div className="flex justify-center">
-                <h1 className="text-2xl font-bold text-[#212121] mb-5">
-                  Register
-                </h1>
-              </div>
-
               <RegisterForm
                 setLoading={setLoading}
                 setErr={setErr}

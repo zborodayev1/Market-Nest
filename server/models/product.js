@@ -5,6 +5,7 @@ const ProductSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      index: 'text',
     },
     tags: {
       type: [String],
@@ -20,21 +21,14 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       min: 0,
     },
-    discount: {
+    saveAmount: {
       type: Number,
-      default: 0,
       min: 0,
-      max: 100,
     },
     viewsCount: {
       type: Number,
       default: 0,
       min: 0,
-    },
-    viewedBy: {
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-      default: [],
-      index: true,
     },
     comment: [
       {
@@ -66,7 +60,10 @@ const ProductSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      // required: true,
+    },
+    public_id: {
+      type: String,
+      sparse: true,
     },
     status: {
       type: String,

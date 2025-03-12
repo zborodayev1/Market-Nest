@@ -220,19 +220,21 @@ export const HomePage = () => {
                   ))}
               </div>
             </AnimatePresence>
-            <PageSettingsForm
-              open={open}
-              setOpen={setOpen}
-              limitError={limitError}
-              setLimitError={setLimitError}
-              PGState={PGState}
-              setPGState={setPGState}
-              products={products}
-              focusLimit={focusLimit}
-              setFocusLimit={setFocusLimit}
-              focusPage={focusPage}
-              setFocusPage={setFocusPage}
-            />
+            {status !== 'loading' && (
+              <PageSettingsForm
+                open={open}
+                setOpen={setOpen}
+                limitError={limitError}
+                setLimitError={setLimitError}
+                PGState={PGState}
+                setPGState={setPGState}
+                products={products}
+                focusLimit={focusLimit}
+                setFocusLimit={setFocusLimit}
+                focusPage={focusPage}
+                setFocusPage={setFocusPage}
+              />
+            )}
           </div>
         </div>
       </motion.div>
