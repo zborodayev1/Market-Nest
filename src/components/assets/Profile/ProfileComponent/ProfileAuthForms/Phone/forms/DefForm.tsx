@@ -1,65 +1,65 @@
-import { useForm } from 'react-hook-form'
+import { motion } from 'framer-motion';
+import { Eye, EyeOff, Phone, RectangleEllipsis } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import {
   selectUserProfile,
   updateProfilePhone,
-} from '../../../../../../redux/slices/auth'
-import { useDispatch, useSelector } from 'react-redux'
-import { Eye, EyeOff, Phone, RectangleEllipsis } from 'lucide-react'
-import { useState } from 'react'
-import { AppDispatch } from '../../../../../../redux/store'
-import { toast } from 'react-toastify'
-import { motion } from 'framer-motion'
+} from '../../../../../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../../../../../redux/store';
 
 interface Formdata {
-  password?: string
-  newPhone?: string
+  password?: string;
+  newPhone?: string;
 }
 interface Props {
-  onSuccess: () => void
+  onSuccess: () => void;
 }
 export const DefForm = (props: Props) => {
-  const userData = useSelector(selectUserProfile)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { onSuccess } = props
-  const dispatch: AppDispatch = useDispatch()
+  const userData = useSelector(selectUserProfile);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { onSuccess } = props;
+  const dispatch: AppDispatch = useDispatch();
   const { reset, register, handleSubmit } = useForm<Formdata>({
     mode: 'onSubmit',
-  })
+  });
 
   const onSubmit = async (values: Formdata) => {
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
 
       const payload = {
         password: values.password || '',
         phone: values.newPhone || '',
-      }
+      };
 
-      const resultAction = await dispatch(updateProfilePhone(payload))
+      const resultAction = await dispatch(updateProfilePhone(payload));
 
       if (updateProfilePhone.fulfilled.match(resultAction)) {
-        reset({ ...userData, ...values })
-        onSuccess()
+        reset({ ...userData, ...values });
+        onSuccess();
       } else {
-        console.error('Ошибка:', resultAction.payload || 'Неизвестная ошибка')
+        console.error('Ошибка:', resultAction.payload || 'Неизвестная ошибка');
         toast(resultAction.payload || 'Неизвестная ошибка', {
           type: 'error',
           position: 'bottom-right',
-        })
+        });
       }
     } catch (error) {
-      console.error('Error:', error)
+      console.error('Error:', error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   const inputClasses =
-    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 '
+    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 ';
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-black mb-1'
+    'flex items-center gap-2 text-sm font-medium text-black mb-1';
   return (
     <motion.form onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-4">
@@ -133,5 +133,5 @@ export const DefForm = (props: Props) => {
         </motion.span>
       </motion.button>
     </motion.form>
-  )
-}
+  );
+};

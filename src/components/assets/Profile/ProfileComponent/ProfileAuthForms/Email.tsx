@@ -1,50 +1,50 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { Eye, EyeOff, Mail, RectangleEllipsis } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { useDispatch, useSelector } from 'react-redux'
+import { AnimatePresence, motion } from 'framer-motion';
+import { Eye, EyeOff, Mail, RectangleEllipsis } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   RootState,
   selectUserProfile,
   updateProfileEmail,
-} from '../../../../redux/slices/auth'
-import { AppDispatch } from '../../../../redux/store'
+} from '../../../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../../../redux/store';
 
 interface Formdata {
-  email?: string
-  password?: string
+  email?: string;
+  password?: string;
 }
 interface Props {
-  onSuccess: () => void
+  onSuccess: () => void;
 }
 export const Email = (props: Props) => {
-  const userData = useSelector(selectUserProfile)
-  const status = useSelector((state: RootState) => state.auth.status)
-  const error = useSelector((state: RootState) => state.auth.error)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errors, setErrors] = useState({ email: '' })
-  const { onSuccess } = props
-  const dispatch: AppDispatch = useDispatch()
+  const userData = useSelector(selectUserProfile);
+  const status = useSelector((state: RootState) => state.auth.status);
+  const error = useSelector((state: RootState) => state.auth.error);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({ email: '' });
+  const { onSuccess } = props;
+  const dispatch: AppDispatch = useDispatch();
   const { reset, register, handleSubmit } = useForm<Formdata>({
     mode: 'onSubmit',
-  })
+  });
 
   const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const onSubmit = async (values: Formdata) => {
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
       // Validate before dispatching
       const emailError = !validateEmail(values.email || '')
         ? 'Invalid email format'
-        : ''
+        : '';
 
       if (emailError) {
-        setErrors({ email: emailError })
-        return
+        setErrors({ email: emailError });
+        return;
       }
 
       dispatch(
@@ -52,25 +52,25 @@ export const Email = (props: Props) => {
           email: values.email ?? '',
           password: values.password ?? '',
         })
-      )
+      );
 
       if (status === 'succeeded') {
-        reset({ ...userData, ...values })
-        onSuccess()
+        reset({ ...userData, ...values });
+        onSuccess();
       }
     } catch (error) {
-      console.error('Error:', error)
+      console.error('Error:', error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   const inputClasses =
-    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 '
+    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 ';
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-black mb-1'
+    'flex items-center gap-2 text-sm font-medium text-black mb-1';
 
   return (
     <AnimatePresence>
@@ -155,5 +155,5 @@ export const Email = (props: Props) => {
         )}
       </motion.form>
     </AnimatePresence>
-  )
-}
+  );
+};

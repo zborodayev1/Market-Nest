@@ -1,28 +1,31 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useState, useRef } from 'react'
-import { Package, Coins, Tags, ImagePlus, X } from 'lucide-react'
-import { useForm } from 'react-hook-form'
-import { createProduct, selectProducts } from '../../../redux/slices/products'
-import { AppDispatch } from '../../../redux/store'
-import { AnimatePresence, motion } from 'motion/react'
-import { toast } from 'react-toastify'
-import { Helmet } from 'react-helmet-async'
-import { useNavigate } from 'react-router-dom'
+import { Coins, ImagePlus, Package, Tags, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useRef, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import {
+  createProduct,
+  selectProducts,
+} from '../../../../redux/slices/productSlice';
+import { AppDispatch } from '../../../../redux/store';
 
 interface FormData {
-  name: string
-  price: number
-  tags: string[]
-  image: File | null
+  name: string;
+  price: number;
+  tags: string[];
+  image: File | null;
 }
 
 export const CreatePage = () => {
-  const dispatch: AppDispatch = useDispatch()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const { error } = useSelector(selectProducts)
-  const [message, setMessage] = useState<string>('')
+  const dispatch: AppDispatch = useDispatch();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const { error } = useSelector(selectProducts);
+  const [message, setMessage] = useState<string>('');
   const { register, handleSubmit, setValue } = useForm<FormData>({
     defaultValues: {
       name: '',
@@ -30,70 +33,70 @@ export const CreatePage = () => {
       tags: [],
       image: null,
     },
-  })
-  const inputRef = useRef<HTMLInputElement>(null)
-  const navigate = useNavigate()
+  });
+  const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files ? event.target.files[0] : null
+    const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      setValue('image', file)
-      const reader = new FileReader()
+      setValue('image', file);
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleImageRemove = () => {
-    setImagePreview(null)
-    setValue('image', null)
+    setImagePreview(null);
+    setValue('image', null);
     if (inputRef.current) {
-      inputRef.current.value = ''
+      inputRef.current.value = '';
     }
-  }
+  };
 
   const onSubmit = async (values: FormData) => {
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
 
-      const formData = new FormData()
-      formData.append('name', values.name)
-      formData.append('price', values.price.toString())
-      formData.append('tags', JSON.stringify(selectedTags))
+      const formData = new FormData();
+      formData.append('name', values.name);
+      formData.append('price', values.price.toString());
+      formData.append('tags', JSON.stringify(selectedTags));
 
       if (values.image instanceof File) {
-        formData.append('image', values.image)
+        formData.append('image', values.image);
       } else {
-        formData.append('image', '')
+        formData.append('image', '');
       }
-      await dispatch(createProduct(formData)).unwrap()
+      await dispatch(createProduct(formData)).unwrap();
 
       toast('Successfully created!', {
         type: 'success',
         onClose: () => {
-          navigate('/')
-          setIsSubmitting(false)
+          navigate('/');
+          setIsSubmitting(false);
         },
-      })
+      });
     } catch (error) {
       const errorMessage =
-        (error as { message?: string }).message || 'An unknown error occurred'
-      setMessage(errorMessage)
-      setIsSubmitting(false)
+        (error as { message?: string }).message || 'An unknown error occurred';
+      setMessage(errorMessage);
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleTagClick = (tag: string) => {
     setSelectedTags((prevTags) => {
       if (prevTags.includes(tag)) {
-        return prevTags.filter((t) => t !== tag)
+        return prevTags.filter((t) => t !== tag);
       } else {
-        return [...prevTags, tag]
+        return [...prevTags, tag];
       }
-    })
-  }
+    });
+  };
 
   const availableTags = [
     'Clothes',
@@ -103,7 +106,7 @@ export const CreatePage = () => {
     'Sport',
     "Children's products",
     'Decorations and luxury',
-  ]
+  ];
 
   return (
     <>
@@ -257,5 +260,5 @@ export const CreatePage = () => {
         </div>
       </motion.div>
     </>
-  )
-}
+  );
+};

@@ -24,6 +24,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    coordinates: {
+      lat: { type: Number, required: true },
+      lng: { type: Number, required: true },
+    },
     avatarUrl: {
       type: String,
       default: '',

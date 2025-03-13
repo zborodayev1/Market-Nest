@@ -1,34 +1,34 @@
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { Avatar } from '@mui/material';
+import { motion } from 'motion/react';
+import { useEffect } from 'react';
+import { CgProfile } from 'react-icons/cg';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchProfileData,
   selectUserProfile,
-} from '../../../../redux/slices/auth'
-import { Avatar } from '@mui/material'
-import { CgProfile } from 'react-icons/cg'
-import { motion } from 'motion/react'
-import { AppDispatch } from '../../../../redux/store'
+} from '../../../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../../../redux/store';
 
 interface Props {
-  onSuccess: () => void
+  onSuccess: () => void;
 }
 
 export const ProdileHeader = (props: Props) => {
-  const { onSuccess } = props
-  const dispatch: AppDispatch = useDispatch()
-  const userData = useSelector(selectUserProfile)
+  const { onSuccess } = props;
+  const dispatch: AppDispatch = useDispatch();
+  const userData = useSelector(selectUserProfile);
 
   useEffect(() => {
     const loadProfileData = () => {
-      dispatch(fetchProfileData())
-    }
+      dispatch(fetchProfileData());
+    };
 
-    loadProfileData()
-  }, [dispatch])
+    loadProfileData();
+  }, [dispatch]);
 
   const handleCLick = () => {
-    onSuccess()
-  }
+    onSuccess();
+  };
 
   return (
     <div className="group px-3">
@@ -55,5 +55,5 @@ export const ProdileHeader = (props: Props) => {
         </div>
       </button>
     </div>
-  )
-}
+  );
+};

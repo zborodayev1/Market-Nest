@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from '../../../axios'
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import axios from '../../axios'
 
 interface AuthResponse {
   token: string
@@ -17,6 +17,10 @@ export interface UserProfile {
   avatarUrl?: string
   phone?: string
   address?: string
+  coordinates?: {
+    lat: number
+    lng: number
+  }
   email?: string
   password?: string
   role?: string
@@ -25,6 +29,10 @@ export interface UserProfile {
 interface UserData {
   fullName?: string
   address?: string
+  coordinates?: {
+    lat: number
+    lng: number
+  }
 }
 
 interface UserPassword {
@@ -179,7 +187,7 @@ export const deleteAvatar = createAsyncThunk<
 export const fetchLogin = createAsyncThunk<
   AuthResponse,
   { email: string; password: string },
-  { rejectValue: string } // добавлено
+  { rejectValue: string }
 >('auth/fetchLogin', async (params, { rejectWithValue }) => {
   try {
     const { data } = await axios.post('/auth/login', params)

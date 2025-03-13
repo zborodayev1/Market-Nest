@@ -1,62 +1,64 @@
-import { useDispatch, useSelector } from 'react-redux'
+import { motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchPendingProducts,
   Product,
   selectProducts,
   updateProductStatus,
-} from '../../../redux/slices/products'
-import { AppDispatch } from '../../../redux/store'
-import { useEffect, useState } from 'react'
-import { ProductForm } from '../ProductForm/ProductForm'
-import { motion } from 'motion/react'
-import { Helmet } from 'react-helmet-async'
-import { PageSettingsForm } from '../../../forms/pageSettingsForm'
+} from '../../../../redux/slices/productSlice';
+import { AppDispatch } from '../../../../redux/store';
+import { PageSettingsForm } from '../../../forms/pageSettingsForm';
+import { ProductForm } from '../ProductForm/ProductForm';
 
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 
 export const PendingProducts = () => {
-  const dispatch: AppDispatch = useDispatch()
-  const { products, status } = useSelector(selectProducts)
+  const dispatch: AppDispatch = useDispatch();
+  const { products, status } = useSelector(selectProducts);
   const [PGState, setPGState] = useState<{ limit: number; page: number }>({
     limit: 10,
     page: 1,
-  })
-  const [limitError, setLimitError] = useState<boolean>(false)
-  const [focusLimit, setFocusLimit] = useState<boolean>(false)
-  const [focusPage, setFocusPage] = useState<boolean>(false)
-  const [open, setOpen] = useState<boolean>(false)
+  });
+  const [limitError, setLimitError] = useState<boolean>(false);
+  const [focusLimit, setFocusLimit] = useState<boolean>(false);
+  const [focusPage, setFocusPage] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    dispatch(fetchPendingProducts({ page: PGState.page, limit: PGState.limit }))
-  }, [dispatch, PGState])
+    dispatch(
+      fetchPendingProducts({ page: PGState.page, limit: PGState.limit })
+    );
+  }, [dispatch, PGState]);
 
   const filteredProducts = (products.products || []).filter(
     (product: Product) => product.status === 'pending'
-  )
+  );
 
   const handleUpdateStatus = async (productId: string, newStatus: string) => {
     try {
       await dispatch(
         updateProductStatus({ productId, status: newStatus })
-      ).unwrap()
+      ).unwrap();
       dispatch({
         type: 'products/setProducts',
         payload: filteredProducts.filter(
           (product: Product) => product._id !== productId
         ),
-      })
+      });
       toast('Successfully update product status to success!', {
         type: 'success',
         position: 'top-right',
-      })
+      });
     } catch (error) {
-      console.error('Failed to update product status:', error)
+      console.error('Failed to update product status:', error);
     }
-  }
+  };
 
   const onSubmit = (productId: string) => {
-    handleUpdateStatus(productId, 'approved')
-  }
+    handleUpdateStatus(productId, 'approved');
+  };
 
   return (
     <>
@@ -121,5 +123,5 @@ export const PendingProducts = () => {
         </div>
       </motion.div>
     </>
-  )
-}
+  );
+};

@@ -1,91 +1,90 @@
-import { CircularProgress } from '@mui/material'
-import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { IoBag } from 'react-icons/io5'
-import { IconButton } from '@mui/material'
-import { Eye } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { BiSolidMessageSquare } from 'react-icons/bi'
-import { CiCalendarDate } from 'react-icons/ci'
-import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined'
-import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined';
+import { CircularProgress, IconButton } from '@mui/material';
+import { motion } from 'framer-motion';
+import { Eye } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { BiSolidMessageSquare } from 'react-icons/bi';
+import { CiCalendarDate } from 'react-icons/ci';
+import { IoBag } from 'react-icons/io5';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import {
+  fetchDeliveryReq,
+  selectDeliveries,
+} from '../../../../redux/slices/deliverySlice';
 import {
   getOneProduct,
   selectFullProduct,
-} from '../../../redux/slices/products'
-import { Helmet } from 'react-helmet-async'
-import { AppDispatch } from '../../../redux/store'
-import { useDispatch, useSelector } from 'react-redux'
-import { SellerInfo } from './Seller/SellerInfo'
-import {
-  Delivery,
-  getDelivery,
-  selectDeliveries,
-} from '../../../redux/slices/delivery'
-import { DeliveryForm } from './DeliveryForm'
+} from '../../../../redux/slices/productSlice';
+import { AppDispatch } from '../../../../redux/store';
+import { Delivery } from '../../../../redux/types/delivery';
+import { DeliveryForm } from './DeliveryForm';
+import { SellerInfo } from './Seller/SellerInfo';
 
 interface Props {
-  noti?: boolean
+  noti?: boolean;
 }
 
 export const FullProduct = (props: Props) => {
-  const { noti } = props
-  const data = useSelector(selectFullProduct)
-  const delivery = useSelector(selectDeliveries)
-  const { id } = useParams()
-  const [isFavorite, setIsFavorite] = useState<boolean>(false)
-  const [isBag, setIsBag] = useState<boolean>(false)
-  const dispatch: AppDispatch = useDispatch()
+  const { noti } = props;
+  const data = useSelector(selectFullProduct);
+  const delivery = useSelector(selectDeliveries);
+  const { id } = useParams();
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [isBag, setIsBag] = useState<boolean>(false);
+  const dispatch: AppDispatch = useDispatch();
 
   const toggleFavorite = () => {
-    if (!data) return
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+    if (!data) return;
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
 
     if (isFavorite) {
-      const newFavorites = favorites.filter((id: string) => id !== data._id)
-      localStorage.setItem('favorites', JSON.stringify(newFavorites))
+      const newFavorites = favorites.filter((id: string) => id !== data._id);
+      localStorage.setItem('favorites', JSON.stringify(newFavorites));
     } else {
-      favorites.push(data._id)
-      localStorage.setItem('favorites', JSON.stringify(favorites))
+      favorites.push(data._id);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
     }
 
-    setIsFavorite(!isFavorite)
-  }
+    setIsFavorite(!isFavorite);
+  };
 
   useEffect(() => {
     if (id) {
-      dispatch(getOneProduct(id))
+      dispatch(getOneProduct(id));
     }
-  }, [dispatch, id])
+  }, [dispatch, id]);
 
   useEffect(() => {
-    dispatch(getDelivery())
-  }, [dispatch])
+    dispatch(fetchDeliveryReq());
+  }, [dispatch]);
 
   const toggleBag = () => {
-    if (!data) return
-    const bag = JSON.parse(localStorage.getItem('bag') || '[]')
+    if (!data) return;
+    const bag = JSON.parse(localStorage.getItem('bag') || '[]');
 
     if (isBag) {
-      const newBag = bag.filter((id: string) => id !== data._id)
-      localStorage.setItem('bag', JSON.stringify(newBag))
+      const newBag = bag.filter((id: string) => id !== data._id);
+      localStorage.setItem('bag', JSON.stringify(newBag));
     } else {
-      bag.push(data._id)
-      localStorage.setItem('bag', JSON.stringify(bag))
+      bag.push(data._id);
+      localStorage.setItem('bag', JSON.stringify(bag));
     }
 
-    setIsBag(!isBag)
-  }
+    setIsBag(!isBag);
+  };
 
   useEffect(() => {
     if (data) {
-      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
-      setIsFavorite(favorites.includes(data._id))
+      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+      setIsFavorite(favorites.includes(data._id));
 
-      const bag = JSON.parse(localStorage.getItem('bag') || '[]')
-      setIsBag(bag.includes(data._id))
+      const bag = JSON.parse(localStorage.getItem('bag') || '[]');
+      setIsBag(bag.includes(data._id));
     }
-  }, [data])
+  }, [data]);
 
   if (!data) {
     return (
@@ -100,7 +99,7 @@ export const FullProduct = (props: Props) => {
           }}
         />
       </div>
-    )
+    );
   }
 
   return (
@@ -271,5 +270,5 @@ export const FullProduct = (props: Props) => {
         </div>
       </motion.div>
     </>
-  )
-}
+  );
+};

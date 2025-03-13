@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import UserModel from '../models/user.js'
 import bcrypt from 'bcrypt'
+import dotenv from 'dotenv'
 import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
-import dotenv from 'dotenv'
 import UnverifiedUserModel from '../models/unverified_user.js'
+import UserModel from '../models/user.js'
 import { generateVerificationCode } from '../utils/functions/generateVerificationCode.js'
 // import { sendVerificationCode } from '../utils/functions/sendMailToClient.js'
-import { UserEditDataModel } from '../models/editUserData.js'
 import cloudinary from 'cloudinary'
+import { UserEditDataModel } from '../models/editUserData.js'
 
 dotenv.config()
 
@@ -17,7 +17,7 @@ const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 15
 
 export const temporaryRegister = async (req, res) => {
   try {
-    const { fullName, email, password, phone, address } = req.body
+    const { fullName, email, password, phone, address, coordinates } = req.body
 
     const existingTempUser = await UnverifiedUserModel.findOne({ email })
     const existingTempPhone = await UnverifiedUserModel.findOne({ phone })
@@ -51,6 +51,7 @@ export const temporaryRegister = async (req, res) => {
       phone,
       address,
       verificationCode,
+      coordinates,
     })
 
     await doc.save()
@@ -91,6 +92,7 @@ export const completeRegistration = async (req, res) => {
       country: tempUser.country,
       passwordHash: tempUser.passwordHash,
       phone: tempUser.phone,
+      coordinates: tempUser.coordinates,
     })
 
     const user = await userDoc.save()
@@ -177,6 +179,7 @@ export const patchProfileData = async (req, res) => {
   try {
     const updateData = {
       address: req.body.address,
+      coordinates: req.body.coordinates,
       fullName: req.body.fullName,
     }
     await UserModel.updateOne({ _id: req.userId }, updateData)

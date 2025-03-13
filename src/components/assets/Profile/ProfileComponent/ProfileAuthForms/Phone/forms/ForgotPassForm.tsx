@@ -1,72 +1,72 @@
-import { useForm } from 'react-hook-form'
+import { motion } from 'framer-motion';
+import { Phone } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import {
   requestPhoneChange,
   selectUserProfile,
-} from '../../../../../../redux/slices/auth'
-import { useDispatch, useSelector } from 'react-redux'
-import { Phone } from 'lucide-react'
-import { useState } from 'react'
-import { AppDispatch } from '../../../../../../redux/store'
-import { toast } from 'react-toastify'
-import { motion } from 'framer-motion'
+} from '../../../../../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../../../../../redux/store';
 
 interface Formdata {
-  newPhone?: string
+  newPhone?: string;
 }
 interface Props {
-  setPPS: (state: 'default' | 'forgotPass' | 'code') => void
+  setPPS: (state: 'default' | 'forgotPass' | 'code') => void;
 }
 
 export const ForgotPassForm = (props: Props) => {
-  const userData = useSelector(selectUserProfile)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { setPPS } = props
+  const userData = useSelector(selectUserProfile);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setPPS } = props;
 
-  const dispatch: AppDispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch();
   const { reset, register, handleSubmit } = useForm<Formdata>({
     mode: 'onSubmit',
-  })
+  });
 
   const onSubmit = async (values: Formdata) => {
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
       const payload = {
         newPhone: values.newPhone || '',
-      }
-      const requestPC = await dispatch(requestPhoneChange(payload)).unwrap()
+      };
+      const requestPC = await dispatch(requestPhoneChange(payload)).unwrap();
       if (requestPC.success === true) {
-        reset({ ...userData, ...values })
+        reset({ ...userData, ...values });
         toast(requestPC.message, {
           type: 'success',
           position: 'bottom-right',
-        })
-        setPPS('code')
+        });
+        setPPS('code');
       } else if (requestPC.success === false) {
         toast(requestPC.message, {
           type: 'error',
           position: 'bottom-right',
-        })
+        });
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
       toast(String(error), {
         type: 'error',
         position: 'bottom-right',
-      })
+      });
       if (error === 'Phone change code already sent') {
-        setPPS('code')
+        setPPS('code');
       } else {
-        setPPS('default')
+        setPPS('default');
       }
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const inputClasses =
-    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 '
+    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 ';
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-black mb-1'
+    'flex items-center gap-2 text-sm font-medium text-black mb-1';
   return (
     <motion.form onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-4">
@@ -105,5 +105,5 @@ export const ForgotPassForm = (props: Props) => {
         </motion.span>
       </motion.button>
     </motion.form>
-  )
-}
+  );
+};

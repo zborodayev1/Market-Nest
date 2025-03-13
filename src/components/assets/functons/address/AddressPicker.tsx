@@ -1,8 +1,8 @@
-import React, {  useEffect, useRef, useMemo,  } from 'react'
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { MapPin } from 'lucide-react'
+import React, { useEffect, useMemo, useRef } from 'react'
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet'
 
 interface AddressPickerProps {
   address: string
@@ -17,7 +17,6 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
   coordinates,
   setCoordinates,
 }) => {
-
   const mapRef = useRef<L.Map | null>(null)
   const inputClasses =
     ' px-5 py-2 w-[300px] h-[50px] bg-[#fff] border border-[#212121]  rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 '
@@ -34,7 +33,6 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
     []
   )
 
-
   useEffect(() => {
     setTimeout(() => {
       mapRef.current?.invalidateSize()
@@ -50,11 +48,15 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
         const response = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
         )
+        if (!response.ok) {
+          console.error('Error fetching address:', response.status)
+          return
+        }
+
         const data = await response.json()
 
         if (data.display_name) {
           setAddress(data.display_name)
-          
         }
       },
     })
@@ -87,7 +89,7 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
             <MapPin size={18} /> Address
           </label>
           <input
-           readOnly
+            readOnly
             value={address}
             placeholder="Address"
             className={inputClasses}

@@ -1,36 +1,43 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { useDispatch } from 'react-redux'
-import { fetchTemporaryRegister } from '../../redux/slices/auth'
-import { Eye, EyeOff, Mail, RectangleEllipsis, User, Phone } from 'lucide-react'
-import { motion } from 'motion/react'
-import { AppDispatch } from '../../redux/store'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../../context/auth/useAuth'
-import { AddressPicker } from '../../assets/functons/address/AddressPicker'
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Phone,
+  RectangleEllipsis,
+  User,
+} from 'lucide-react';
+import { motion } from 'motion/react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../context/auth/useAuth';
+import { fetchTemporaryRegister } from '../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../redux/store';
+import { AddressPicker } from '../../assets/functons/address/AddressPicker';
 
 interface Props {
-  setLoading: (loading: boolean) => void
-  setErr: (value: string) => void
-  loading: boolean
-  code: boolean
-  onSuccess: () => void
+  setLoading: (loading: boolean) => void;
+  setErr: (value: string) => void;
+  loading: boolean;
+  code: boolean;
+  onSuccess: () => void;
 }
 
 export const RegisterForm = (props: Props) => {
   const inputClasses =
-    ' px-5 py-2 w-[300px] h-[50px] bg-[#fff] border border-[#212121]  rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 '
+    ' px-5 py-2 w-[300px] h-[50px] bg-[#fff] border border-[#212121]  rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 ';
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-[#212121] mb-1'
+    'flex items-center gap-2 text-sm font-medium text-[#212121] mb-1';
 
-  const [address, setAddress] = useState<string>('')
+  const [address, setAddress] = useState<string>('');
   const [coordinates, setCoordinates] = useState<[number, number]>([
     45.02626419993138, 78.38643193244936,
-  ])
-  const { setLoading, setErr, loading, onSuccess } = props
-  const dispatch: AppDispatch = useDispatch()
-  const { setEmail } = useAuth()
-  const navigate = useNavigate()
+  ]);
+  const { setLoading, setErr, loading, onSuccess } = props;
+  const dispatch: AppDispatch = useDispatch();
+  const { setEmail } = useAuth();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -44,17 +51,17 @@ export const RegisterForm = (props: Props) => {
       address: '',
     },
     mode: 'all',
-  })
+  });
 
   const onSubmit = async (values: {
-    fullName: string
-    email: string
-    password: string
-    phone: string
+    fullName: string;
+    email: string;
+    password: string;
+    phone: string;
   }) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      onSuccess()
+      onSuccess();
       await dispatch(
         fetchTemporaryRegister({
           fullName: values.fullName,
@@ -63,18 +70,18 @@ export const RegisterForm = (props: Props) => {
           phone: values.phone,
           address: address,
         })
-      ).unwrap()
-      setLoading(false)
-      setEmail(values.email)
-      navigate('/verify-email')
+      ).unwrap();
+      setLoading(false);
+      setEmail(values.email);
+      navigate('/verify-email');
     } catch (error) {
-      console.error(error)
-      setLoading(false)
-      setErr(error as string)
+      console.error(error);
+      setLoading(false);
+      setErr(error as string);
     }
-  }
+  };
 
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div>
@@ -191,5 +198,5 @@ export const RegisterForm = (props: Props) => {
         </div>
       </form>
     </div>
-  )
-}
+  );
+};

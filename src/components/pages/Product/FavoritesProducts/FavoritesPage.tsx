@@ -1,37 +1,37 @@
-import { useEffect, useState } from 'react'
+import { CircularProgress } from '@mui/material';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchProducts,
   Product,
   selectProducts,
-} from '../../../redux/slices/products'
-import { useDispatch, useSelector } from 'react-redux'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ProductForm } from '../ProductForm/ProductForm'
-import { AppDispatch } from '../../../redux/store'
-import { Helmet } from 'react-helmet-async'
-import { PageSettingsForm } from '../../../forms/pageSettingsForm'
-import { CircularProgress } from '@mui/material'
+} from '../../../../redux/slices/productSlice';
+import { AppDispatch } from '../../../../redux/store';
+import { PageSettingsForm } from '../../../forms/pageSettingsForm';
+import { ProductForm } from '../ProductForm/ProductForm';
 
 export const FavoritesPage = () => {
-  const { products, status } = useSelector(selectProducts)
-  const [favorites, setFavorites] = useState<string[]>([])
-  const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([])
-  const dispatch: AppDispatch = useDispatch()
+  const { products, status } = useSelector(selectProducts);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
+  const dispatch: AppDispatch = useDispatch();
   const [PGState, setPGState] = useState<{ limit: number; page: number }>({
     limit: 10,
     page: 1,
-  })
-  const [limitError, setLimitError] = useState<boolean>(false)
-  const [focusLimit, setFocusLimit] = useState<boolean>(false)
-  const [focusPage, setFocusPage] = useState<boolean>(false)
-  const [open, setOpen] = useState<boolean>(false)
+  });
+  const [limitError, setLimitError] = useState<boolean>(false);
+  const [focusLimit, setFocusLimit] = useState<boolean>(false);
+  const [focusPage, setFocusPage] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const storedFavorites = JSON.parse(
       localStorage.getItem('favorites') || '[]'
-    )
-    setFavorites(storedFavorites)
-  }, [])
+    );
+    setFavorites(storedFavorites);
+  }, []);
 
   useEffect(() => {
     dispatch(
@@ -39,8 +39,8 @@ export const FavoritesPage = () => {
         limit: PGState.limit,
         page: PGState.page,
       })
-    )
-  }, [dispatch, PGState])
+    );
+  }, [dispatch, PGState]);
 
   useEffect(() => {
     if (status === 'succeeded') {
@@ -48,25 +48,27 @@ export const FavoritesPage = () => {
         products.products.filter((product: Product) =>
           favorites.includes(product._id)
         )
-      )
+      );
     }
-  }, [status, products, favorites])
+  }, [status, products, favorites]);
 
   const handleRemoveFromFavorites = (id: string) => {
-    const updatedFavorites = favorites.filter((favoriteId) => favoriteId !== id)
-    setFavorites(updatedFavorites)
+    const updatedFavorites = favorites.filter(
+      (favoriteId) => favoriteId !== id
+    );
+    setFavorites(updatedFavorites);
 
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites))
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
 
     setFavoriteProducts((prevFavorites) =>
       prevFavorites.filter((product: Product) => product._id !== id)
-    )
+    );
     setTimeout(() => {
-      setFavorites(updatedFavorites)
-    }, 500)
-  }
+      setFavorites(updatedFavorites);
+    }, 500);
+  };
 
-  const totalCount = favoriteProducts.length
+  const totalCount = favoriteProducts.length;
 
   return (
     <>
@@ -178,5 +180,5 @@ export const FavoritesPage = () => {
         </AnimatePresence>
       </motion.div>
     </>
-  )
-}
+  );
+};

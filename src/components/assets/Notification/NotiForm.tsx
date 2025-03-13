@@ -1,31 +1,32 @@
-import React from 'react'
-import {
-  markNotificationAsRead,
-  Notification,
-} from '../../redux/slices/notifications'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '../../redux/store'
-import { ChevronRight } from 'lucide-react'
-
+import { ChevronRight } from 'lucide-react';
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { markNotificationAsReadReq } from '../../../redux/slices/notificationSlice';
+import { AppDispatch } from '../../../redux/store';
+import { Notification } from '../../../redux/types/notification';
 interface FullNoti {
-  state: string
-  id: string
+  state: string;
+  id: string;
 }
 
 interface Props {
-  notification: Notification
-  onSuccess: (state: FullNoti) => void
+  notification: Notification;
+  onSuccess: (state: FullNoti) => void;
 }
 
 const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
-  const dispatch: AppDispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch();
 
   const onClick = () => {
     if (!notification.isRead) {
-      dispatch(markNotificationAsRead(notification._id.toString()))
+      dispatch(
+        markNotificationAsReadReq({
+          notificationId: notification._id.toString(),
+        })
+      );
     }
-    onSuccess({ state: 'full', id: notification._id.toString() })
-  }
+    onSuccess({ state: 'full', id: notification._id.toString() });
+  };
 
   return (
     <>
@@ -67,7 +68,7 @@ const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
       </button>
       <hr className="my-2 bg-[#f0f0f0] h-[2px]" />
     </>
-  )
-}
+  );
+};
 
-export const NotiForm = React.memo(NotiFormMemo)
+export const NotiForm = React.memo(NotiFormMemo);

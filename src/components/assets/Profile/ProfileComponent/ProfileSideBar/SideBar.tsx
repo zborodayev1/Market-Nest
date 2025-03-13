@@ -1,54 +1,57 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { AppDispatch } from '../../../../redux/store'
-import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { logout, selectUserProfile } from '../../../../redux/slices/auth'
-import { ChevronDown, LogOut, PackageCheck } from 'lucide-react'
-import CloseIcon from '@mui/icons-material/Close'
-import { UserData } from '../ProfileAuthForms/UserData'
-import { Email } from '../ProfileAuthForms/Email'
-import { Password } from '../ProfileAuthForms/Password/Password'
-import { Link } from 'react-router-dom'
-import { ChangeAvatar } from './ChangeAvatar/ChangeAvatar'
-import { Phone } from '../ProfileAuthForms/Phone/Phone'
+import CloseIcon from '@mui/icons-material/Close';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronDown, LogOut, PackageCheck } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import {
+  logout,
+  selectUserProfile,
+} from '../../../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../../../redux/store';
+import { Email } from '../ProfileAuthForms/Email';
+import { Password } from '../ProfileAuthForms/Password/Password';
+import { Phone } from '../ProfileAuthForms/Phone/Phone';
+import { UserData } from '../ProfileAuthForms/UserData';
+import { ChangeAvatar } from './ChangeAvatar/ChangeAvatar';
 
 interface Props {
-  setOpen: (value: boolean) => void
-  open: boolean
+  setOpen: (value: boolean) => void;
+  open: boolean;
 }
 
 export const SideBar = (props: Props) => {
-  const [logOutState, setLogOutState] = useState<boolean>(false)
-  const dispatch = useDispatch<AppDispatch>()
-  const { setOpen, open } = props
-  const userData = useSelector(selectUserProfile)
+  const [logOutState, setLogOutState] = useState<boolean>(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const { setOpen, open } = props;
+  const userData = useSelector(selectUserProfile);
 
   const [state, setState] = useState<{
-    ChangeName: boolean
-    ChangePassword: boolean
-    ChangeEmail: boolean
-    ChangePhone: boolean
+    ChangeName: boolean;
+    ChangePassword: boolean;
+    ChangeEmail: boolean;
+    ChangePhone: boolean;
   }>({
     ChangeName: false,
     ChangePassword: false,
     ChangeEmail: false,
     ChangePhone: false,
-  })
+  });
 
   useEffect(() => {
     if (logOutState === true) {
-      dispatch(logout())
-      localStorage.removeItem('token')
-      setLogOutState(false)
+      dispatch(logout());
+      localStorage.removeItem('token');
+      setLogOutState(false);
     }
-  }, [logOutState, dispatch])
+  }, [logOutState, dispatch]);
 
   const onClickLogout = () => {
-    setLogOutState(true)
-    dispatch(logout())
-    localStorage.removeItem('token')
-    setOpen(false)
-  }
+    setLogOutState(true);
+    dispatch(logout());
+    localStorage.removeItem('token');
+    setOpen(false);
+  };
 
   const contentVariants = {
     initial: { opacity: 0, x: 20 },
@@ -58,7 +61,7 @@ export const SideBar = (props: Props) => {
       scale: 1.2,
       transition: { duration: 0.2 },
     },
-  }
+  };
 
   return (
     <div>
@@ -319,5 +322,5 @@ export const SideBar = (props: Props) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};

@@ -1,36 +1,36 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useForm } from 'react-hook-form'
-import { useDispatch, useSelector } from 'react-redux'
+import { AnimatePresence, motion } from 'framer-motion';
+import { User } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   RootState,
   selectUserProfile,
   updateProfileData,
-} from '../../../../redux/slices/auth'
-import { User } from 'lucide-react'
-import { AppDispatch } from '../../../../redux/store'
-import { AddressPicker } from '../../../functons/address/AddressPicker'
+} from '../../../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../../../redux/store';
+import { AddressPicker } from '../../../functons/address/AddressPicker';
 
 interface FormData {
-  fullName?: string
-  phone?: string
-  address?: string
+  fullName?: string;
+  phone?: string;
+  address?: string;
 }
 
 interface Props {
-  onSuccess: () => void
+  onSuccess: () => void;
 }
 
 export const UserData = ({ onSuccess }: Props) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const userData = useSelector(selectUserProfile)
-  const status = useSelector((state: RootState) => state.auth.status)
-  const error = useSelector((state: RootState) => state.auth.error)
-  const dispatch: AppDispatch = useDispatch()
-  const [address, setAddress] = useState<string>('')
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const userData = useSelector(selectUserProfile);
+  const status = useSelector((state: RootState) => state.auth.status);
+  const error = useSelector((state: RootState) => state.auth.error);
+  const dispatch: AppDispatch = useDispatch();
+  const [address, setAddress] = useState<string>('');
   const [coordinates, setCoordinates] = useState<[number, number]>([
     45.02626419993138, 78.38643193244936,
-  ])
+  ]);
   const {
     register,
     handleSubmit,
@@ -41,28 +41,28 @@ export const UserData = ({ onSuccess }: Props) => {
       fullName: userData?.fullName || '',
       address: userData?.address || '',
     },
-  })
+  });
 
   const onSubmit = (values: FormData) => {
     try {
-      setIsSubmitting(true)
-      dispatch(updateProfileData(values))
+      setIsSubmitting(true);
+      dispatch(updateProfileData(values));
 
       if (status === 'succeeded') {
-        reset({ ...userData, ...values })
-        onSuccess()
+        reset({ ...userData, ...values });
+        onSuccess();
       }
     } catch (error) {
-      console.error('Error:', error)
+      console.error('Error:', error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const inputClasses =
-    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 '
+    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 ';
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-black  mb-1'
+    'flex items-center gap-2 text-sm font-medium text-black  mb-1';
 
   return (
     <AnimatePresence>
@@ -85,13 +85,13 @@ export const UserData = ({ onSuccess }: Props) => {
               spellCheck="false"
             />
           </div>
-          
-            <AddressPicker
-                address={address}
-                setAddress={setAddress}
-                coordinates={coordinates}
-                setCoordinates={setCoordinates}
-              />
+
+          <AddressPicker
+            address={address}
+            setAddress={setAddress}
+            coordinates={coordinates}
+            setCoordinates={setCoordinates}
+          />
         </div>
 
         <motion.button
@@ -116,5 +116,5 @@ export const UserData = ({ onSuccess }: Props) => {
         )}
       </motion.form>
     </AnimatePresence>
-  )
-}
+  );
+};

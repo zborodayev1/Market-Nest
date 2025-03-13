@@ -1,28 +1,28 @@
-import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { fetchProducts } from '../redux/slices/products'
-import { AppDispatch } from '../redux/store'
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchProducts } from '../../redux/slices/productSlice';
+import { AppDispatch } from '../../redux/store';
 
 interface Props {
-  open: boolean
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
-  limitError: boolean
-  setLimitError: React.Dispatch<React.SetStateAction<boolean>>
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  limitError: boolean;
+  setLimitError: React.Dispatch<React.SetStateAction<boolean>>;
   PGState: {
-    limit: number
-    page: number
-  }
+    limit: number;
+    page: number;
+  };
   setPGState: React.Dispatch<
     React.SetStateAction<{ limit: number; page: number }>
-  >
+  >;
   products: {
-    totalPages: number
-  }
-  focusLimit: boolean
-  setFocusLimit: React.Dispatch<React.SetStateAction<boolean>>
-  focusPage: boolean
-  setFocusPage: React.Dispatch<React.SetStateAction<boolean>>
+    totalPages: number;
+  };
+  focusLimit: boolean;
+  setFocusLimit: React.Dispatch<React.SetStateAction<boolean>>;
+  focusPage: boolean;
+  setFocusPage: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const PageSettingsForm = (props: Props) => {
@@ -36,57 +36,57 @@ export const PageSettingsForm = (props: Props) => {
     focusPage,
     setFocusLimit,
     setFocusPage,
-  } = props
+  } = props;
 
-  const [buttonPage, setButtonPage] = useState<boolean>(false)
-  const dispatch: AppDispatch = useDispatch()
-  const [loading, setLoading] = useState<boolean>(false)
+  const [buttonPage, setButtonPage] = useState<boolean>(false);
+  const dispatch: AppDispatch = useDispatch();
+  const [loading, setLoading] = useState<boolean>(false);
   const [PGStateChange, setPGStateChange] = useState<{
-    limit: number
-    page: number
+    limit: number;
+    page: number;
   }>({
     limit: 10,
     page: 1,
-  })
+  });
 
   const changeLimit = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.target.value))) {
-      setLimitError(true)
+      setLimitError(true);
     } else {
-      setLimitError(false)
+      setLimitError(false);
       setPGStateChange((prevState) => ({
         ...prevState,
         limit: Number(e.target.value),
-      }))
+      }));
     }
-  }
+  };
 
   const changePage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const pageValue = Number(e.target.value)
+    const pageValue = Number(e.target.value);
 
     setPGStateChange((prevState) => ({
       ...prevState,
       page: pageValue,
-    }))
-  }
+    }));
+  };
 
   const onSubmit = () => {
     if (!loading) {
-      setLoading(true)
-      setButtonPage(true)
+      setLoading(true);
+      setButtonPage(true);
 
       if (PGStateChange.page > products.totalPages) {
         setPGState((prevState) => ({
           ...prevState,
           limit: PGStateChange.limit,
           page: products.totalPages,
-        }))
+        }));
       } else {
         setPGState((prevState) => ({
           ...prevState,
           limit: PGStateChange.limit,
           page: PGStateChange.page,
-        }))
+        }));
       }
 
       dispatch(
@@ -94,14 +94,14 @@ export const PageSettingsForm = (props: Props) => {
           limit: PGState.limit,
           page: PGState.page,
         })
-      )
+      );
 
       setTimeout(() => {
-        setLoading(false)
-        setButtonPage(false)
-      }, 1000)
+        setLoading(false);
+        setButtonPage(false);
+      }, 1000);
     }
-  }
+  };
 
   return (
     <div className="flex justify-center">
@@ -231,5 +231,5 @@ export const PageSettingsForm = (props: Props) => {
         </AnimatePresence>
       </div>
     </div>
-  )
-}
+  );
+};

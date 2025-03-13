@@ -1,11 +1,11 @@
-import { Delivery } from '../../../redux/slices/delivery'
+import { Delivery } from '../../../../redux/types/delivery';
 
 interface Props {
-  Delivery: Delivery
+  Delivery: Delivery;
 }
 
 export const DeliveryForm = (props: Props) => {
-  const { Delivery } = props
+  const { Delivery } = props;
   return (
     <button className="grid w-full text-start">
       <div className="flex gap-1 ml-2">
@@ -20,5 +20,5 @@ export const DeliveryForm = (props: Props) => {
         <hr />
       </div>
     </button>
-  )
-}
+  );
+};
