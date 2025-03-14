@@ -1,76 +1,76 @@
-import { Avatar } from '@mui/material'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useRef, useState } from 'react'
-import { AppDispatch, RootState } from '../../../../../redux/store'
-import { useDispatch, useSelector } from 'react-redux'
+import { Avatar } from '@mui/material';
+import { AnimatePresence, motion } from 'framer-motion';
+import { X } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import {
-  uploadAvatar,
+  deleteAvatar,
   fetchProfileData,
   selectUserProfile,
-  deleteAvatar,
-} from '../../../../../redux/slices/auth'
-import { X } from 'lucide-react'
-import { toast } from 'react-toastify'
+  uploadAvatar,
+} from '../../../../../../redux/slices/authSlice';
+import { AppDispatch, RootState } from '../../../../../../redux/store';
 
 export const ChangeAvatar = () => {
-  const [isHovered, setIsHovered] = useState(false)
-  const userData = useSelector(selectUserProfile)
-  const inputFileRef = useRef<HTMLInputElement | null>(null)
-  const [preview, setPreview] = useState<string | null>(null)
-  const [file, setFile] = useState<File | null>(null)
-  const dispatch: AppDispatch = useDispatch()
-  const error = useSelector((state: RootState) => state.auth.error)
+  const [isHovered, setIsHovered] = useState(false);
+  const userData = useSelector(selectUserProfile);
+  const inputFileRef = useRef<HTMLInputElement | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const dispatch: AppDispatch = useDispatch();
+  const error = useSelector((state: RootState) => state.auth.error);
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0] || null
+    const selectedFile = event.target.files?.[0] || null;
     if (selectedFile) {
-      setFile(selectedFile)
-      const reader = new FileReader()
+      setFile(selectedFile);
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setPreview(reader.result as string)
-      }
-      reader.readAsDataURL(selectedFile)
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
     }
-  }
+  };
 
   const handleUpload = async () => {
     if (file) {
-      const formData = new FormData()
-      formData.append('image', file)
+      const formData = new FormData();
+      formData.append('image', file);
 
-      const resultAction = await dispatch(uploadAvatar(formData))
+      const resultAction = await dispatch(uploadAvatar(formData));
       if (uploadAvatar.fulfilled.match(resultAction)) {
-        dispatch(fetchProfileData())
-        setPreview(null)
-        setFile(null)
+        dispatch(fetchProfileData());
+        setPreview(null);
+        setFile(null);
       }
     }
-  }
+  };
 
   const handleRemovePreview = () => {
-    setPreview(null)
-    setFile(null)
+    setPreview(null);
+    setFile(null);
     if (inputFileRef.current) {
-      inputFileRef.current.value = ''
+      inputFileRef.current.value = '';
     }
-  }
-  let resultAction: unknown
+  };
+  let resultAction: unknown;
   const handleDeleteAvatar = async () => {
     if (userData?._id) {
-      const formData = new FormData()
-      formData.append('userId', userData._id)
-      resultAction = await dispatch(deleteAvatar(formData))
+      const formData = new FormData();
+      formData.append('userId', userData._id);
+      resultAction = await dispatch(deleteAvatar(formData));
     }
     if (deleteAvatar.fulfilled.match(resultAction)) {
-      dispatch(fetchProfileData())
+      dispatch(fetchProfileData());
       toast('Successfully created!', {
         type: 'success',
-      })
+      });
     }
 
     toast(error, {
       type: 'error',
-    })
-  }
+    });
+  };
 
   return (
     <div className="flex items-center gap-3">
@@ -153,5 +153,5 @@ export const ChangeAvatar = () => {
         </>
       )}
     </div>
-  )
-}
+  );
+};

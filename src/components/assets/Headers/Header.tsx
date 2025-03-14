@@ -1,21 +1,24 @@
-import { Link } from 'react-router-dom'
-import { selectIsAuth, selectUserProfile } from '../../redux/slices/auth'
-import { useDispatch, useSelector } from 'react-redux'
-import { ProdileHeader } from '../Profile/ProfileComponent/ProfileHeaderComponents/ProfileHeader'
-import { SideBar } from '../Profile/ProfileComponent/ProfileSideBar/SideBar'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
 import {
+  Bell,
   Heart,
   IdCard,
   PackagePlus,
   PackageSearch,
-  Bell,
   ShoppingCart,
 } from 'lucide-react'
-import { getProductsBySearch, fetchProducts } from '../../redux/slices/products'
-import { AppDispatch, RootState } from '../../redux/store'
+import { AnimatePresence, motion } from 'motion/react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
+import { selectIsAuth, selectUserProfile } from '../../../redux/slices/authSlice'
+import {
+  fetchProducts,
+  getProductsBySearch,
+} from '../../../redux/slices/productSlice'
+import { AppDispatch, RootState } from '../../../redux/store'
 import { NotiHeaderDropDown } from '../Notification/NotiHeaderDropDown'
+import { ProdileHeader } from '../Profile/ProfileComponent/ProfileHeaderComponents/ProfileHeader'
+import { SideBar } from '../Profile/ProfileComponent/ProfileSideBar/SideBar'
 import { getWebSocketUrl } from './GetWebsoketUrl'
 
 interface Props {

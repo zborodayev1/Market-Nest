@@ -1,13 +1,13 @@
-import { Avatar } from '@mui/material'
-import { formatPhoneNumber } from '../../../../assets/functons/format/phone/PhoneFormat'
-import { UserProfile } from '../../../../redux/slices/auth'
+import { Avatar } from '@mui/material';
+import { UserProfile } from '../../../../../redux/slices/authSlice';
+import { formatPhoneNumber } from '../../../../assets/functons/format/phone/PhoneFormat';
 
 interface Props {
-  user: UserProfile | null
+  user: UserProfile | null;
 }
 
 export const SellerInfo = (props: Props) => {
-  const { user } = props
+  const { user } = props;
   return (
     <div>
       <div className="flex gap-3 mt-3 bg-[#e4e4e4] p-5 rounded-md">
@@ -36,5 +36,5 @@ export const SellerInfo = (props: Props) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

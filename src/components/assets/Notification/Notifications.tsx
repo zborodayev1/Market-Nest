@@ -1,290 +1,170 @@
-import React, { useCallback, useMemo, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '../../redux/store'
+import { CircularProgress } from '@mui/material';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
-  fetchNotifications,
-  markAllNotificationsAsRead,
-  deleteAllNotifications,
-  Notification,
-  getOneNotification,
+  deleteAllNotificationsReq,
+  fetchNotificationReq,
+  getOneNotificationReq,
+  markAllNotificationsAsReadReq,
   selectFullNotifi,
-} from '../../redux/slices/notifications'
-import { NotiForm } from './NotiForm'
-import { CircularProgress } from '@mui/material'
-import { AnimatePresence, motion } from 'framer-motion'
-import { FullNotiForm } from './FullNotiForm'
+} from '../../../redux/slices/notificationSlice';
+import { AppDispatch, RootState } from '../../../redux/store';
+import { Notification } from '../../../redux/types/notification';
+import { FullNotiForm } from './FullNotiForm';
+import { NotiForm } from './NotiForm';
 
 interface FullNoti {
-  state: string
-  id: string
+  state: string;
+  id: string;
 }
 
 interface Props {
-  onSuccess: () => void
+  onSuccess: () => void;
 }
 
 const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
-  const dispatch: AppDispatch = useDispatch()
-  const fullNotifi = useSelector(selectFullNotifi)
-  const [page, setPage] = useState(1)
-  const [filter, setFilter] = useState<string>('unread')
-  const limit = 4
-
-  const [fullNoti, setFullNoti] = useState<FullNoti>({
-    state: 'home',
-    id: '',
-  })
-  const [loadedData, setLoadedData] = useState<Record<string, Notification[]>>(
-    {}
-  )
-  const { status, totalPages } = useSelector(
-    (state: RootState) => state.notifications
-  )
-  const [message, setMessage] = useState('')
-  const cacheKey = useMemo(() => `${filter}-${page}`, [filter, page])
-  const notifications = useMemo(
-    () => loadedData[cacheKey] || [],
-    [loadedData, cacheKey]
-  )
-
-  const loadNotifications = useCallback(async () => {
-    if (loadedData[cacheKey]) return
-
-    try {
-      const response = await dispatch(
-        fetchNotifications({ page, limit, filter })
-      ).unwrap()
-
-      setLoadedData((prev) => ({
-        ...prev,
-        [cacheKey]: response.notifications,
-      }))
-    } catch (err) {
-      console.error('Failed to load notifications:', err)
-    }
-  }, [dispatch, page, filter, limit, loadedData, cacheKey])
+  const dispatch: AppDispatch = useDispatch();
+  const fullNotifi = useSelector(selectFullNotifi);
+  const [page, setPage] = useState(1);
+  const [filter, setFilter] = useState('unread');
+  const limit = 4;
+  const {
+    data: notifications,
+    status,
+    totalPages,
+  } = useSelector((state: RootState) => state.notifications);
+  const [fullNoti, setFullNoti] = useState<FullNoti>({ state: 'home', id: '' });
 
   useEffect(() => {
-    if (status !== 'loading') {
-      loadNotifications()
-    }
-  }, [loadNotifications, status])
+    dispatch(fetchNotificationReq({ page, limit, filter }));
+  }, [dispatch, page, filter]);
 
   useEffect(() => {
-    if (fullNoti.state && fullNoti.id !== '') {
-      dispatch(getOneNotification({ id: fullNoti.id }))
+    if (fullNoti.state === 'full' && fullNoti.id) {
+      dispatch(getOneNotificationReq({ id: fullNoti.id }));
     }
-  }, [dispatch, fullNoti])
+  }, [dispatch, fullNoti]);
 
-  const updatePage = useCallback(
-    (newPage: number) => {
-      if (newPage === page) return
-      setPage(newPage)
-    },
-    [page]
-  )
+  const markAsRead = () => {
+    dispatch(markAllNotificationsAsReadReq());
+    dispatch(fetchNotificationReq({ page, limit, filter }));
+  };
 
-  const updateFilter = useCallback(
-    (newFilter: string) => {
-      if (newFilter === filter) return
-      setFilter(newFilter)
-      setPage(1)
-    },
-    [filter]
-  )
-
-  const markAsRead = useCallback(async () => {
-    try {
-      const response = await dispatch(markAllNotificationsAsRead()).unwrap()
-
-      if (response.success) {
-        setLoadedData({})
-        setPage(1)
-        loadNotifications()
-      }
-    } catch (err: unknown) {
-      setMessage((err as { message: string }).message)
-    }
-  }, [dispatch, loadNotifications])
-
-  const deleteAll = useCallback(async () => {
-    try {
-      const response = await dispatch(deleteAllNotifications()).unwrap()
-
-      if (response.success) {
-        setLoadedData({})
-        setPage(1)
-        loadNotifications()
-      }
-    } catch (err: unknown) {
-      setMessage((err as { message: string }).message)
-    }
-  }, [dispatch, loadNotifications])
+  const deleteAll = () => {
+    dispatch(deleteAllNotificationsReq());
+    dispatch(fetchNotificationReq({ page, limit, filter }));
+  };
 
   const refresh = useCallback(() => {
-    dispatch(fetchNotifications({ page, limit, filter }))
-  }, [dispatch, page, limit, filter])
+    dispatch(fetchNotificationReq({ page, limit, filter }));
+  }, [dispatch, page, limit, filter]);
+
+  console.log({ status, notifications, fullNoti });
 
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, y: -5, filter: 'blur(5px)' }}
-        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        exit={{ opacity: 0, y: 5, filter: 'blur(5px)' }}
-        transition={{ duration: 0.2, delay: 0.5 }}
-        className="text-base"
+        initial={{ opacity: 0, y: -5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 5 }}
       >
-        <h1 className="flex mt-5 justify-center text-2xl font-bold">
-          Notifications
-        </h1>
-        <hr className="mt-5 bg-[#f0f0f0] w-[300px] h-[2px]" />
-
-        {status === 'failed' && fullNoti.state === 'home' && (
-          <div className="">
-            {message}. Try to
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              onClick={refresh}
-              className="z-20 mx-1"
-            >
-              <b>refresh</b>
-            </motion.button>
-            the page.
+        <h1 className="text-2xl font-bold text-center mt-5">Notifications</h1>
+        <hr className="mt-5 bg-gray-200 w-72 h-0.5 mx-auto" />
+        {status === 'succeeded' &&
+        notifications.length > 0 &&
+        fullNoti.state === 'home' ? (
+          <div className="col-3">
+            {notifications.map((notification: Notification) => (
+              <div key={notification._id} className="mt-3">
+                <NotiForm
+                  notification={notification}
+                  onSuccess={(state: FullNoti) => setFullNoti(state)}
+                />
+              </div>
+            ))}
           </div>
-        )}
-        <div
-          className={`flex gap-4 justify-center ${status === 'failed' ? '' : ''}`}
-        >
-          <AnimatePresence>
-            {status === 'succeeded' &&
-            notifications.length > 0 &&
-            fullNoti.state === 'home' ? (
-              <div className="col-3">
-                {notifications.map((notification: Notification) => (
-                  <div key={notification._id} className="mt-3">
-                    <NotiForm
-                      notification={notification}
-                      onSuccess={(state: FullNoti) => setFullNoti(state)}
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : status === 'succeeded' && fullNoti.state === 'home' ? (
-              <div className="flex mt-3">
-                <motion.div
-                  initial={{ opacity: 0, filter: 'blur(2px)' }}
-                  animate={{ opacity: 1, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, filter: 'blur(2px)' }}
-                  transition={{ duration: 0.2 }}
-                >
-                  No notifications available for this tag. Try to
-                  <motion.button
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    onClick={refresh}
-                    className="z-20 mx-1"
-                  >
-                    <b>refresh</b>
-                  </motion.button>
-                  the page.
-                </motion.div>
-              </div>
-            ) : (
-              fullNoti.state === 'home' &&
-              status === 'loading' && (
-                <CircularProgress color="inherit" style={{ marginTop: 12 }} />
-              )
-            )}
-            {fullNoti.state === 'full' && (
-              <div>
-                <div>
-                  <FullNotiForm
-                    setFullNoti={(state: FullNoti) => setFullNoti(state)}
-                    notification={fullNotifi}
-                    onSuccess={onSuccess}
-                  />
-                </div>
-              </div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <AnimatePresence>
-          {status !== 'loading' && fullNoti.state === 'home' && (
+        ) : status === 'succeeded' && fullNoti.state === 'home' ? (
+          <div className="flex mt-3">
             <motion.div
-              initial={{ opacity: 0, filter: 'blur(5px)' }}
+              initial={{ opacity: 0, filter: 'blur(2px)' }}
               animate={{ opacity: 1, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, filter: 'blur(5px)' }}
+              exit={{ opacity: 0, filter: 'blur(2px)' }}
               transition={{ duration: 0.2 }}
             >
-              {' '}
-              <div className="flex justify-center gap-4 mt-4">
-                <button
-                  onClick={() => updateFilter('read')}
-                  disabled={filter === 'read'}
-                  className={`py-1 px-4 rounded-xl transition-colors duration-200 ease-linear ${
-                    filter === 'read'
-                      ? 'bg-[#3C8737] text-white hover:bg-[#2B6128]'
-                      : 'bg-gray-200 hover:bg-gray-300 text-black'
-                  }`}
-                >
-                  Read
-                </button>
-                <button
-                  onClick={() => updateFilter('unread')}
-                  disabled={filter === 'unread'}
-                  className={`py-1 px-4 rounded-xl transition-colors duration-200 ease-linear ${
-                    filter === 'unread'
-                      ? 'bg-[#3C8737] text-white hover:bg-[#2B6128]'
-                      : 'bg-gray-200 hover:bg-gray-300 text-black'
-                  }`}
-                >
-                  Unread
-                </button>
-              </div>
-              <div className="flex justify-center mt-2 gap-2">
-                <button
-                  onClick={markAsRead}
-                  className="py-1 px-3 rounded-xl bg-gray-200 hover:bg-gray-300 text-black transition-colors duration-200 ease-linear"
-                >
-                  Read All
-                </button>
-                <button
-                  onClick={deleteAll}
-                  className="py-1 px-3 rounded-xl bg-gray-200 hover:bg-gray-300 text-black transition-colors duration-200 ease-linear"
-                >
-                  Delete All
-                </button>
-              </div>
+              No notifications available for this tag. Try to
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                onClick={refresh}
+                className="z-20 mx-1"
+              >
+                <b>refresh</b>
+              </motion.button>
+              the page.
             </motion.div>
-          )}
-        </AnimatePresence>
+          </div>
+        ) : (
+          fullNoti.state === 'home' &&
+          status === 'loading' && (
+            <CircularProgress color="inherit" style={{ marginTop: 12 }} />
+          )
+        )}
 
-        {notifications.length > 0 &&
+        {fullNoti.state === 'full' && (
+          <FullNotiForm
+            setFullNoti={setFullNoti}
+            notification={fullNotifi}
+            onSuccess={onSuccess}
+          />
+        )}
+
+        {status !== 'loading' && fullNoti.state === 'home' && (
+          <div className="flex justify-center gap-4 mt-4">
+            <button
+              onClick={() => setFilter('read')}
+              className="px-4 py-1 rounded-xl bg-gray-200"
+            >
+              Read
+            </button>
+            <button
+              onClick={() => setFilter('unread')}
+              className="px-4 py-1 rounded-xl bg-gray-200"
+            >
+              Unread
+            </button>
+          </div>
+        )}
+
+        {notifications &&
+          notifications.length > 0 &&
           fullNoti.state === 'home' &&
           status !== 'loading' && (
-            <div
-              style={
-                {
-                  overflowX: 'auto',
-                  maxWidth: '200px',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch',
-                } as React.CSSProperties
-              }
-              className="flex justify-start gap-2 mt-3 mb-5"
-            >
+            <div className="flex justify-center mt-2 gap-2">
+              <button
+                onClick={markAsRead}
+                className="py-1 px-3 rounded-xl bg-gray-200"
+              >
+                Read All
+              </button>
+              <button
+                onClick={deleteAll}
+                className="py-1 px-3 rounded-xl bg-gray-200"
+              >
+                Delete All
+              </button>
+            </div>
+          )}
+
+        {notifications &&
+          notifications.length > 0 &&
+          fullNoti.state === 'home' && (
+            <div className="flex justify-center gap-2 mt-3 mb-5">
               {[...Array(totalPages).keys()].map((number) => (
                 <button
                   key={number}
-                  onClick={() => updatePage(number + 1)}
-                  className={`min-w-7 min-h-7 flex items-center justify-center rounded-full transition-colors duration-300 ease-linear ${
-                    page === number + 1
-                      ? 'bg-[#3C8737] hover:bg-[#2B6128] text-white'
-                      : 'bg-gray-200 hover:bg-gray-300 text-black'
-                  }`}
+                  onClick={() => setPage(number + 1)}
+                  className="px-3 py-1 rounded-xl bg-gray-200"
                 >
                   {number + 1}
                 </button>
@@ -293,7 +173,7 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
           )}
       </motion.div>
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export const Notifications = React.memo(NotificationsComponent)
+export const Notifications = React.memo(NotificationsComponent);

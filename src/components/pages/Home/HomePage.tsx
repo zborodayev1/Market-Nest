@@ -1,30 +1,30 @@
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { CircularProgress } from '@mui/material';
+import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchNotificationCountReq } from '../../../redux/slices/notificationSlice';
 import {
   fetchProducts,
   Product,
   selectProducts,
-} from '../../redux/slices/products'
-import { ProductForm } from '../Product/ProductForm/ProductForm'
-import { AnimatePresence, motion } from 'motion/react'
-import { AppDispatch } from '../../redux/store'
-import { CircularProgress } from '@mui/material'
-import { PageSettingsForm } from '../../forms/pageSettingsForm'
-import { Helmet } from 'react-helmet-async'
-import { fetchNotificationCount } from '../../redux/slices/notifications'
+} from '../../../redux/slices/productSlice';
+import { AppDispatch } from '../../../redux/store';
+import { PageSettingsForm } from '../../forms/pageSettingsForm';
+import { ProductForm } from '../Product/ProductForm/ProductForm';
 
 export const HomePage = () => {
-  const dispatch: AppDispatch = useDispatch()
-  const { products, status } = useSelector(selectProducts)
+  const dispatch: AppDispatch = useDispatch();
+  const { products, status } = useSelector(selectProducts);
   const [PGState, setPGState] = useState<{ limit: number; page: number }>({
     limit: 10,
     page: 1,
-  })
-  const [limitError, setLimitError] = useState<boolean>(false)
-  const [focusLimit, setFocusLimit] = useState<boolean>(false)
-  const [focusPage, setFocusPage] = useState<boolean>(false)
-  const [open, setOpen] = useState<boolean>(false)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  });
+  const [limitError, setLimitError] = useState<boolean>(false);
+  const [focusLimit, setFocusLimit] = useState<boolean>(false);
+  const [focusPage, setFocusPage] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const availableTags = [
     'Clothes',
     'Electronics',
@@ -33,7 +33,7 @@ export const HomePage = () => {
     'Sport',
     "Children's products",
     'Decorations and luxury',
-  ]
+  ];
 
   const handleRefresh = () => {
     dispatch(
@@ -41,12 +41,12 @@ export const HomePage = () => {
         limit: PGState.limit,
         page: PGState.page,
       })
-    )
-  }
+    );
+  };
 
   const crearFilrers = () => {
-    setSelectedTags([])
-  }
+    setSelectedTags([]);
+  };
 
   useEffect(() => {
     dispatch(
@@ -54,35 +54,35 @@ export const HomePage = () => {
         limit: PGState.limit,
         page: PGState.page,
       })
-    )
-  }, [dispatch, PGState])
+    );
+  }, [dispatch, PGState]);
 
   useEffect(() => {
-    dispatch(fetchNotificationCount())
-  }, [dispatch])
+    dispatch(fetchNotificationCountReq());
+  }, [dispatch]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prevTags) =>
       prevTags.includes(tag)
         ? prevTags.filter((t) => t !== tag)
         : [...prevTags, tag]
-    )
-  }
+    );
+  };
 
   const getFilteredProducts = () => {
     if (!Array.isArray(products.products) || products.products.length === 0)
-      return []
+      return [];
 
     return products.products
       .filter((product: Product) => product.status !== 'pending')
       .filter((product: Product) => product.status !== 'rejected')
       .filter((product: Product) => {
-        if (selectedTags.length === 0) return true
-        return selectedTags.every((tag) => product.tags.includes(tag))
-      })
-  }
+        if (selectedTags.length === 0) return true;
+        return selectedTags.every((tag) => product.tags.includes(tag));
+      });
+  };
 
-  const filteredProducts = status === 'succeeded' ? getFilteredProducts() : []
+  const filteredProducts = status === 'succeeded' ? getFilteredProducts() : [];
 
   return (
     <>
@@ -239,5 +239,5 @@ export const HomePage = () => {
         </div>
       </motion.div>
     </>
-  )
-}
+  );
+};

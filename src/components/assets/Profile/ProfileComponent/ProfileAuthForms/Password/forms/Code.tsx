@@ -1,79 +1,79 @@
-import { useForm } from 'react-hook-form'
+import { motion } from 'framer-motion';
+import { Binary, Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import {
   confirmPasswordChange,
   selectUserProfile,
-} from '../../../../../../redux/slices/auth'
-import { useDispatch, useSelector } from 'react-redux'
-import { Binary, Eye, EyeOff } from 'lucide-react'
-import { useState } from 'react'
-import { AppDispatch } from '../../../../../../redux/store'
-import { toast } from 'react-toastify'
-import { motion } from 'framer-motion'
+} from '../../../../../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../../../../../redux/store';
 
 interface Formdata {
-  verificationCode?: string
+  verificationCode?: string;
 }
 interface Props {
-  onSuccess: () => void
-  setPPS: (state: 'default' | 'forgotPass' | 'code') => void
+  onSuccess: () => void;
+  setPPS: (state: 'default' | 'forgotPass' | 'code') => void;
 }
 
 export const Code = (props: Props) => {
-  const userData = useSelector(selectUserProfile)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { onSuccess, setPPS } = props
-  const dispatch: AppDispatch = useDispatch()
+  const userData = useSelector(selectUserProfile);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { onSuccess, setPPS } = props;
+  const dispatch: AppDispatch = useDispatch();
   const { reset, register, handleSubmit } = useForm<Formdata>({
     mode: 'onSubmit',
-  })
+  });
 
   const onSubmit = async (values: Formdata) => {
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
       const payload = {
         verificationCode: values.verificationCode || '',
-      }
-      const comfirmPC = await dispatch(confirmPasswordChange(payload)).unwrap()
+      };
+      const comfirmPC = await dispatch(confirmPasswordChange(payload)).unwrap();
       if (comfirmPC.success === true) {
-        reset({ ...userData, ...values })
-        onSuccess()
+        reset({ ...userData, ...values });
+        onSuccess();
 
         toast(comfirmPC.message, {
           type: 'success',
           position: 'bottom-right',
-        })
-        setPPS('default')
+        });
+        setPPS('default');
       } else if (comfirmPC.success === false) {
         toast(comfirmPC.message, {
           type: 'error',
           position: 'bottom-right',
-        })
+        });
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
       toast(String(error), {
         type: 'error',
         position: 'bottom-right',
-      })
+      });
       if (
         error === 'Password change code already sent' ||
         error === 'Invalid verification code'
       ) {
-        setPPS('code')
+        setPPS('code');
       } else {
-        setPPS('default')
+        setPPS('default');
       }
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   const inputClasses =
-    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 '
+    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 ';
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-black mb-1'
+    'flex items-center gap-2 text-sm font-medium text-black mb-1';
   return (
     <motion.form onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-4">
@@ -125,5 +125,5 @@ export const Code = (props: Props) => {
         </motion.span>
       </motion.button>
     </motion.form>
-  )
-}
+  );
+};

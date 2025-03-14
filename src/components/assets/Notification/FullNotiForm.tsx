@@ -1,11 +1,14 @@
-import React from 'react'
-import { clearFullNotifi, Notification } from '../../redux/slices/notifications'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import {
+  clearFullNotifi,
+  Notification,
+} from '../../../redux/slices/notificationSlice';
 interface Props {
-  notification?: Notification | null
-  setFullNoti: (noti: { state: string; id: string }) => void
-  onSuccess: () => void
+  notification?: Notification | null;
+  setFullNoti: (noti: { state: string; id: string }) => void;
+  onSuccess: () => void;
 }
 
 export const FullNotiForm: React.FC<Props> = ({
@@ -13,18 +16,18 @@ export const FullNotiForm: React.FC<Props> = ({
   onSuccess,
   setFullNoti,
 }) => {
-  const nav = useNavigate()
-  const dispatch = useDispatch()
+  const nav = useNavigate();
+  const dispatch = useDispatch();
 
   const handleBack = () => {
-    dispatch(clearFullNotifi())
-    setFullNoti({ state: 'home', id: '' })
-  }
+    dispatch(clearFullNotifi());
+    setFullNoti({ state: 'home', id: '' });
+  };
 
   const handleGTP = () => {
-    onSuccess()
-    nav(`/product/${notification?.productId}`)
-  }
+    onSuccess();
+    nav(`/product/${notification?.productId}`);
+  };
 
   return (
     <div className="mt-5">
@@ -54,5 +57,5 @@ export const FullNotiForm: React.FC<Props> = ({
         </button>
       </div>
     </div>
-  )
-}
+  );
+};

@@ -1,24 +1,24 @@
-import { deleteProduct, Product } from '../../../redux/slices/products'
-import { Link } from 'react-router-dom'
-import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined'
-import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
-import { useEffect, useState } from 'react'
-import { IconButton } from '@mui/material'
-import { Eye, X, Pencil } from 'lucide-react'
-import { BiSolidMessageSquare } from 'react-icons/bi'
-import { IoBag } from 'react-icons/io5'
-import { AnimatePresence, motion } from 'motion/react'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch } from '../../../redux/store'
-import { selectUserProfile } from '../../../redux/slices/auth'
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined';
+import { IconButton } from '@mui/material';
+import { Eye, Pencil, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { BiSolidMessageSquare } from 'react-icons/bi';
+import { IoBag } from 'react-icons/io5';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { selectUserProfile } from '../../../../redux/slices/authSlice';
+import { deleteProduct, Product } from '../../../../redux/slices/productSlice';
+import { AppDispatch } from '../../../../redux/store';
 
 interface ProductFormProps {
-  product: Product
-  onRemoveFavorite?: (id: string) => void
-  onRemoveBag?: (id: string) => void
-  Pending?: boolean
-  Rejected?: boolean
-  onSubmit?: () => void
+  product: Product;
+  onRemoveFavorite?: (id: string) => void;
+  onRemoveBag?: (id: string) => void;
+  Pending?: boolean;
+  Rejected?: boolean;
+  onSubmit?: () => void;
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -29,55 +29,55 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   Rejected,
   onSubmit,
 }) => {
-  const [isFavorite, setIsFavorite] = useState<boolean>(false)
-  const dispatch: AppDispatch = useDispatch()
-  const userData = useSelector(selectUserProfile)
-  const [isBag, setIsBag] = useState<boolean>(false)
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const dispatch: AppDispatch = useDispatch();
+  const userData = useSelector(selectUserProfile);
+  const [isBag, setIsBag] = useState<boolean>(false);
 
   const toggleFavorite = () => {
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
 
     if (isFavorite) {
-      const newFavorites = favorites.filter((id: string) => id !== product._id)
-      localStorage.setItem('favorites', JSON.stringify(newFavorites))
+      const newFavorites = favorites.filter((id: string) => id !== product._id);
+      localStorage.setItem('favorites', JSON.stringify(newFavorites));
 
-      if (onRemoveFavorite) onRemoveFavorite(product._id)
+      if (onRemoveFavorite) onRemoveFavorite(product._id);
     } else {
-      favorites.push(product._id)
-      localStorage.setItem('favorites', JSON.stringify(favorites))
+      favorites.push(product._id);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
     }
 
-    setIsFavorite(!isFavorite)
-  }
+    setIsFavorite(!isFavorite);
+  };
 
   const toggleBag = () => {
-    const bag = JSON.parse(localStorage.getItem('bag') || '[]')
+    const bag = JSON.parse(localStorage.getItem('bag') || '[]');
 
     if (isBag) {
-      const newBag = bag.filter((id: string) => id !== product._id)
-      localStorage.setItem('bag', JSON.stringify(newBag))
-      if (onRemoveBag) onRemoveBag(product._id)
+      const newBag = bag.filter((id: string) => id !== product._id);
+      localStorage.setItem('bag', JSON.stringify(newBag));
+      if (onRemoveBag) onRemoveBag(product._id);
     } else {
-      bag.push(product._id)
-      localStorage.setItem('bag', JSON.stringify(bag))
+      bag.push(product._id);
+      localStorage.setItem('bag', JSON.stringify(bag));
     }
 
-    setIsBag(!isBag)
-  }
+    setIsBag(!isBag);
+  };
 
   const handleDelete = async (productId: string) => {
-    dispatch(deleteProduct(productId))
-  }
+    dispatch(deleteProduct(productId));
+  };
 
   useEffect(() => {
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
-    setIsFavorite(favorites.includes(product._id))
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    setIsFavorite(favorites.includes(product._id));
 
-    const bag = JSON.parse(localStorage.getItem('bag') || '[]')
-    setIsBag(bag.includes(product._id))
-  }, [product._id])
+    const bag = JSON.parse(localStorage.getItem('bag') || '[]');
+    setIsBag(bag.includes(product._id));
+  }, [product._id]);
 
-  const [hovered, setHovered] = useState(false)
+  const [hovered, setHovered] = useState(false);
 
   return (
     <div
@@ -247,5 +247,5 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

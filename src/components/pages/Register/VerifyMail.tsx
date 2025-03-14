@@ -1,39 +1,38 @@
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion';
+import { Binary } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../context/auth/useAuth';
 import {
   fetchCompleteRegistration,
   selectIsAuth,
-} from '../../redux/slices/auth'
-import { AppDispatch } from '../../redux/store'
-import { Binary } from 'lucide-react'
-import { useForm } from 'react-hook-form'
-import { motion } from 'framer-motion'
-import { UserEmail } from '../../redux/slices/auth'
-import { Helmet } from 'react-helmet-async'
-import { useEffect } from 'react'
-import { useAuth } from '../../../context/auth/useAuth'
+  UserEmail,
+} from '../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../redux/store';
 
 interface Props {
-  code: boolean
-  onSuccess: () => void
+  code: boolean;
+  onSuccess: () => void;
 }
 
 export const VerifyMail = (props: Props) => {
   const inputClasses =
-    ' px-5 py-2 w-[300px] h-[50px] bg-[#fff]  border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4]  focus:border-transparent transition-all duration-200 '
+    ' px-5 py-2 w-[300px] h-[50px] bg-[#fff]  border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4]  focus:border-transparent transition-all duration-200 ';
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-[#212121]  mb-1'
-  const { onSuccess } = props
-  const navigate = useNavigate()
-  const dispatch: AppDispatch = useDispatch()
+    'flex items-center gap-2 text-sm font-medium text-[#212121]  mb-1';
+  const { onSuccess } = props;
+  const navigate = useNavigate();
+  const dispatch: AppDispatch = useDispatch();
   const user = useSelector(
     (state: { auth: { user: UserEmail } }) => state.auth.user
-  )
-  const isAuth = useSelector(selectIsAuth)
-  const [err, setErr] = useState<string | null>(null)
-  const { email } = useAuth()
-  const [loading, setLoading] = useState(false)
+  );
+  const isAuth = useSelector(selectIsAuth);
+  const [err, setErr] = useState<string | null>(null);
+  const { email } = useAuth();
+  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -44,33 +43,33 @@ export const VerifyMail = (props: Props) => {
       code: '',
     },
     mode: 'all',
-  })
+  });
 
   const onSubmit = async (values: { email: string; code: string }) => {
-    setLoading(true)
+    setLoading(true);
     try {
       const data = await dispatch(
         fetchCompleteRegistration({ code: values.code, email: email })
-      ).unwrap()
-      setLoading(false)
-      onSuccess()
-      navigate('/')
-      const token = data.token
+      ).unwrap();
+      setLoading(false);
+      onSuccess();
+      navigate('/');
+      const token = data.token;
       if (token) {
-        window.localStorage.setItem('token', token)
+        window.localStorage.setItem('token', token);
       }
     } catch (error) {
-      console.error(error)
-      setLoading(false)
-      setErr(error as string)
+      console.error(error);
+      setLoading(false);
+      setErr(error as string);
     }
-  }
+  };
 
   useEffect(() => {
     if (isAuth) {
-      setErr('You are already logged in')
+      setErr('You are already logged in');
     }
-  }, [isAuth])
+  }, [isAuth]);
   return (
     <>
       <Helmet>
@@ -145,5 +144,5 @@ export const VerifyMail = (props: Props) => {
         </div>
       </motion.div>
     </>
-  )
-}
+  );
+};

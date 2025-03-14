@@ -1,39 +1,39 @@
-import { useEffect, useState } from 'react'
+import CircularProgress from '@mui/material/CircularProgress';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchProducts,
   Product,
   selectProducts,
-} from '../../../redux/slices/products'
-import { useDispatch, useSelector } from 'react-redux'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ProductForm } from '../ProductForm/ProductForm'
-import { AppDispatch } from '../../../redux/store'
-import { Helmet } from 'react-helmet-async'
-import { PageSettingsForm } from '../../../forms/pageSettingsForm'
-import CircularProgress from '@mui/material/CircularProgress'
+} from '../../../../redux/slices/productSlice';
+import { AppDispatch } from '../../../../redux/store';
+import { PageSettingsForm } from '../../../forms/pageSettingsForm';
+import { ProductForm } from '../ProductForm/ProductForm';
 
 export const BagPage = () => {
-  const { products, status } = useSelector(selectProducts)
-  const [bag, setBag] = useState<string[]>([])
-  const [bagProducts, setBagProducts] = useState<Product[]>([])
-  const dispatch: AppDispatch = useDispatch()
+  const { products, status } = useSelector(selectProducts);
+  const [bag, setBag] = useState<string[]>([]);
+  const [bagProducts, setBagProducts] = useState<Product[]>([]);
+  const dispatch: AppDispatch = useDispatch();
   const [PGState, setPGState] = useState<{ limit: number; page: number }>({
     limit: 10,
     page: 1,
-  })
-  const [limitError, setLimitError] = useState<boolean>(false)
-  const [focusLimit, setFocusLimit] = useState<boolean>(false)
-  const [focusPage, setFocusPage] = useState<boolean>(false)
-  const [open, setOpen] = useState<boolean>(false)
+  });
+  const [limitError, setLimitError] = useState<boolean>(false);
+  const [focusLimit, setFocusLimit] = useState<boolean>(false);
+  const [focusPage, setFocusPage] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    const storedBag = JSON.parse(localStorage.getItem('bag') || '[]')
-    setBag(storedBag)
-  }, [])
+    const storedBag = JSON.parse(localStorage.getItem('bag') || '[]');
+    setBag(storedBag);
+  }, []);
 
   useEffect(() => {
-    dispatch(fetchProducts({ limit: 20, page: 1 }))
-  }, [dispatch])
+    dispatch(fetchProducts({ limit: 20, page: 1 }));
+  }, [dispatch]);
 
   useEffect(() => {
     if (status === 'succeeded') {
@@ -41,27 +41,27 @@ export const BagPage = () => {
         products.products.filter((product: Product) =>
           bag.includes(product._id)
         )
-      )
+      );
     }
-  }, [status, products, bag])
+  }, [status, products, bag]);
 
   const handleRemoveFromBag = (id: string) => {
     setBagProducts((prevBag) =>
       prevBag.filter((product: Product) => product._id !== id)
-    )
+    );
 
-    const updatedBag = bag.filter((bagId) => bagId !== id)
-    localStorage.setItem('bag', JSON.stringify(updatedBag))
+    const updatedBag = bag.filter((bagId) => bagId !== id);
+    localStorage.setItem('bag', JSON.stringify(updatedBag));
 
     setTimeout(() => {
-      setBag(updatedBag)
-    }, 500)
-  }
+      setBag(updatedBag);
+    }, 500);
+  };
   const totalPrice = bagProducts.reduce(
     (total, product) => total + product.price,
     0
-  )
-  const totalCount = bagProducts.length
+  );
+  const totalCount = bagProducts.length;
   return (
     <div className="w-screen ">
       <Helmet>
@@ -178,5 +178,5 @@ export const BagPage = () => {
         </motion.div>
       </AnimatePresence>
     </div>
-  )
-}
+  );
+};

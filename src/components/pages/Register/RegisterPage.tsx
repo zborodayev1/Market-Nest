@@ -1,24 +1,24 @@
-import { selectIsAuth } from '../../../components/redux/slices/auth'
-import { Link, Navigate } from 'react-router-dom'
-import LinearProgress from '@mui/material/LinearProgress'
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import { RegisterForm } from './RegisterForm'
-import { motion } from 'framer-motion'
-import { Helmet } from 'react-helmet-async'
+import LinearProgress from '@mui/material/LinearProgress';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useSelector } from 'react-redux';
+import { Link, Navigate } from 'react-router-dom';
+import { selectIsAuth } from '../../../redux/slices/authSlice';
+import { RegisterForm } from './RegisterForm';
 
 interface Props {
-  code: boolean
-  onSuccess: () => void
+  code: boolean;
+  onSuccess: () => void;
 }
 
 export const RegisterPage = (props: Props) => {
-  const { code, onSuccess } = props
-  const isAuth = useSelector(selectIsAuth)
-  const [err, setErr] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const { code, onSuccess } = props;
+  const isAuth = useSelector(selectIsAuth);
+  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   if (isAuth) {
-    return <Navigate to="/" />
+    return <Navigate to="/" />;
   }
 
   return (
@@ -94,5 +94,5 @@ export const RegisterPage = (props: Props) => {
         )}
       </motion.div>
     </>
-  )
-}
+  );
+};

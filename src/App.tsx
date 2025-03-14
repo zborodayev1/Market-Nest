@@ -1,26 +1,26 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
-import { HomePage } from './components/pages/Home/HomePage'
-import { Header } from './components/assets/Headers/Header'
-import { NotFound } from './components/assets/errors/NotFound'
-import { RegisterPage } from './components/pages/Register/RegisterPage'
-import { LogInPage } from './components/pages/LogIn/LogInPage'
-import { useSelector } from 'react-redux'
-import { selectIsAuth, selectUserProfile } from './components/redux/slices/auth'
-import { useRef, useState } from 'react'
-import { FullProduct } from './components/pages/Product/FullProduct/FullProduct'
-import { FavoritesPage } from './components/pages/Product/FavoritesProducts/FavoritesPage'
-import { BagPage } from './components/pages/Product/Bag/BagPage'
-import { CreatePage } from './components/pages/Product/CreateProduct/CreatePage'
-import { PendingProducts } from './components/pages/Product/ForAdmins/PendingProducts'
-import { ToastContainer } from 'react-toastify'
-import { VerifyMail } from './components/pages/Register/VerifyMail'
-import { EditProduct } from './components/pages/Product/EditProduct/EditProduct'
+import { useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import { Header } from './components/assets/Headers/Header';
+import { NotFound } from './components/assets/errors/NotFound';
+import { HomePage } from './components/pages/Home/HomePage';
+import { LogInPage } from './components/pages/LogIn/LogInPage';
+import { BagPage } from './components/pages/Product/Bag/BagPage';
+import { CreatePage } from './components/pages/Product/CreateProduct/CreatePage';
+import { EditProduct } from './components/pages/Product/EditProduct/EditProduct';
+import { FavoritesPage } from './components/pages/Product/FavoritesProducts/FavoritesPage';
+import { PendingProducts } from './components/pages/Product/ForAdmins/PendingProducts';
+import { FullProduct } from './components/pages/Product/FullProduct/FullProduct';
+import { RegisterPage } from './components/pages/Register/RegisterPage';
+import { VerifyMail } from './components/pages/Register/VerifyMail';
+import { selectIsAuth, selectUserProfile } from './redux/slices/authSlice';
 
 export const App = () => {
-  const isAuth = useSelector(selectIsAuth)
-  const toastRef = useRef<HTMLDivElement | null>(null)
-  const [code, setCode] = useState<boolean>(false)
-  const userData = useSelector(selectUserProfile)
+  const isAuth = useSelector(selectIsAuth);
+  const toastRef = useRef<HTMLDivElement | null>(null);
+  const [code, setCode] = useState<boolean>(false);
+  const userData = useSelector(selectUserProfile);
 
   return (
     <div>
@@ -76,5 +76,5 @@ export const App = () => {
         </Routes>
       </div>
     </div>
-  )
-}
+  );
+};

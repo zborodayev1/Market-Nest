@@ -1,20 +1,20 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { fetchLogin, selectIsAuth } from '../../../components/redux/slices/auth'
-import { Link, Navigate } from 'react-router-dom'
-import LinearProgress from '@mui/material/LinearProgress'
+import LinearProgress from '@mui/material/LinearProgress';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, Navigate } from 'react-router-dom';
+import { fetchLogin, selectIsAuth } from '../../../redux/slices/authSlice';
 
-import { motion } from 'motion/react'
-import { Eye, EyeOff, Mail, RectangleEllipsis } from 'lucide-react'
-import { AppDispatch } from '../../redux/store'
-import { Helmet } from 'react-helmet-async'
+import { Eye, EyeOff, Mail, RectangleEllipsis } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Helmet } from 'react-helmet-async';
+import { AppDispatch } from '../../../redux/store';
 
 export const LogInPage: React.FC = (): JSX.Element => {
-  const [err, setErr] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const isAuth = useSelector(selectIsAuth)
-  const dispatch: AppDispatch = useDispatch()
+  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const isAuth = useSelector(selectIsAuth);
+  const dispatch: AppDispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -25,42 +25,42 @@ export const LogInPage: React.FC = (): JSX.Element => {
       password: '',
     },
     mode: 'all',
-  })
+  });
 
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   const inputClasses =
-    'w-full px-5 py-2 w-[200px] h-[50px] bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 '
+    'w-full px-5 py-2 w-[200px] h-[50px] bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 ';
   const labelClasses =
-    'flex items-center gap-2 text-sm font-medium text-[#212121]  mb-1'
+    'flex items-center gap-2 text-sm font-medium text-[#212121]  mb-1';
 
   const onSubmit = async (values: {
-    email: string
-    password: string
+    email: string;
+    password: string;
   }): Promise<void> => {
-    setLoading(true)
+    setLoading(true);
 
     try {
-      const resultAction = await dispatch(fetchLogin(values))
-      setLoading(false)
+      const resultAction = await dispatch(fetchLogin(values));
+      setLoading(false);
 
       if (fetchLogin.fulfilled.match(resultAction)) {
-        const { token } = resultAction.payload
+        const { token } = resultAction.payload;
         if (token) {
-          window.localStorage.setItem('token', token)
+          window.localStorage.setItem('token', token);
         }
       } else {
-        setErr('Login failed!')
+        setErr('Login failed!');
       }
     } catch (error) {
-      console.error(error)
-      setLoading(false)
-      setErr('Something went wrong!')
+      console.error(error);
+      setLoading(false);
+      setErr('Something went wrong!');
     }
-  }
+  };
 
   if (isAuth) {
-    return <Navigate to="/" />
+    return <Navigate to="/" />;
   }
 
   return (
@@ -188,5 +188,5 @@ export const LogInPage: React.FC = (): JSX.Element => {
         </div>
       </motion.div>
     </>
-  )
-}
+  );
+};

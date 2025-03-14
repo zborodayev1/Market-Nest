@@ -1,41 +1,41 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useState, useRef, useEffect } from 'react'
-import { Package, Coins, Tags, ImagePlus, X } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { Coins, ImagePlus, Package, Tags, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { selectUserProfile } from '../../../../redux/slices/authSlice';
 import {
   editProduct,
+  getOneProduct,
   selectFullProduct,
   selectProducts,
-  getOneProduct,
-} from '../../../redux/slices/products'
-import { AppDispatch } from '../../../redux/store'
-import { AnimatePresence, motion } from 'motion/react'
-import { toast } from 'react-toastify'
-import { Helmet } from 'react-helmet-async'
-import { useNavigate, useParams } from 'react-router-dom'
-import { selectUserProfile } from '../../../redux/slices/auth'
+} from '../../../../redux/slices/productSlice';
+import { AppDispatch } from '../../../../redux/store';
 
 interface FormData {
-  name: string
-  price: number
-  tags: string[]
-  image: File | null
+  name: string;
+  price: number;
+  tags: string[];
+  image: File | null;
 }
 
 export const EditProduct = () => {
-  const dispatch: AppDispatch = useDispatch()
-  const { id } = useParams()
-  const product = useSelector(selectFullProduct)
-  const userData = useSelector(selectUserProfile)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const dispatch: AppDispatch = useDispatch();
+  const { id } = useParams();
+  const product = useSelector(selectFullProduct);
+  const userData = useSelector(selectUserProfile);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(
     product?.image || null
-  )
+  );
   const [selectedTags, setSelectedTags] = useState<string[]>(
     product?.tags || []
-  )
-  const { error } = useSelector(selectProducts)
-  const [message, setMessage] = useState<string>('')
+  );
+  const { error } = useSelector(selectProducts);
+  const [message, setMessage] = useState<string>('');
   const { register, handleSubmit, setValue } = useForm<FormData>({
     defaultValues: {
       name: product?.name || '',
@@ -43,92 +43,92 @@ export const EditProduct = () => {
       tags: product?.tags || [],
       image: product?.image || null,
     },
-  })
-  const inputRef = useRef<HTMLInputElement>(null)
-  const navigate = useNavigate()
+  });
+  const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (id && (!product || product?._id !== id)) {
-      dispatch(getOneProduct(id))
+      dispatch(getOneProduct(id));
     }
-  }, [id, dispatch, product])
+  }, [id, dispatch, product]);
 
   useEffect(() => {
     if (userData?.role !== 'admin' && product?.user.id !== userData?._id) {
-      navigate('/')
+      navigate('/');
     }
-  }, [navigate, product?.user, userData])
+  }, [navigate, product?.user, userData]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files ? event.target.files[0] : null
+    const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      setValue('image', file)
-      const reader = new FileReader()
+      setValue('image', file);
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleImageRemove = () => {
-    setImagePreview(null)
-    setValue('image', null)
+    setImagePreview(null);
+    setValue('image', null);
     if (inputRef.current) {
-      inputRef.current.value = ''
+      inputRef.current.value = '';
     }
-  }
+  };
 
   const onSubmit = async (values: FormData) => {
-    const formData = new FormData()
-    formData.append('name', values.name)
-    formData.append('price', values.price.toString())
-    formData.append('tags', JSON.stringify(selectedTags))
+    const formData = new FormData();
+    formData.append('name', values.name);
+    formData.append('price', values.price.toString());
+    formData.append('tags', JSON.stringify(selectedTags));
 
     if (values.image instanceof File) {
-      formData.append('image', values.image)
+      formData.append('image', values.image);
     }
 
     const isChanged =
       values.name !== product?.name ||
       values.price !== product?.price ||
       JSON.stringify(selectedTags) !== JSON.stringify(product?.tags) ||
-      values.image instanceof File
+      values.image instanceof File;
 
     if (!isChanged) {
-      return navigate('/')
+      return navigate('/');
     }
 
     try {
-      setIsSubmitting(true)
-      console.log('FormData:', Object.fromEntries(formData.entries()))
+      setIsSubmitting(true);
+      console.log('FormData:', Object.fromEntries(formData.entries()));
 
-      await dispatch(editProduct({ productData: formData, id: id })).unwrap()
+      await dispatch(editProduct({ productData: formData, id: id })).unwrap();
 
       toast('Successfully created!', {
         type: 'success',
         onClose: () => {
-          navigate('/')
-          setIsSubmitting(false)
+          navigate('/');
+          setIsSubmitting(false);
         },
-      })
+      });
     } catch (error) {
       const errorMessage =
-        (error as { message?: string }).message || 'An unknown error occurred'
-      setMessage(errorMessage)
-      setIsSubmitting(false)
+        (error as { message?: string }).message || 'An unknown error occurred';
+      setMessage(errorMessage);
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleTagClick = (tag: string) => {
     setSelectedTags((prevTags) => {
       if (prevTags.includes(tag)) {
-        return prevTags.filter((t) => t !== tag)
+        return prevTags.filter((t) => t !== tag);
       } else {
-        return [...prevTags, tag]
+        return [...prevTags, tag];
       }
-    })
-  }
+    });
+  };
 
   const availableTags = [
     'Clothes',
@@ -138,7 +138,7 @@ export const EditProduct = () => {
     'Sport',
     "Children's products",
     'Decorations and luxury',
-  ]
+  ];
 
   return (
     <>
@@ -292,5 +292,5 @@ export const EditProduct = () => {
         </div>
       </motion.div>
     </>
-  )
-}
+  );
+};
