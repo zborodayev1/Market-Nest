@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../store';
-import { Delivery } from '../types/delivery';
+import { Delivery } from '../types/delivery.type';
 
 interface DeliveryState {
   deliveries: Delivery[];
@@ -33,9 +32,13 @@ const deliverySlice = createSlice({
   },
 });
 
+export const deliveryReducer = deliverySlice.reducer;
+
+interface RootState {
+  delivery: DeliveryState;
+}
+
 export const { fetchDeliveryReq, fetchDeliverySuc, fetchDeliveryFail } =
   deliverySlice.actions;
-
-export const deliveryReducer = deliverySlice.reducer;
 
 export const selectDeliveries = (state: RootState) => state.delivery.deliveries;

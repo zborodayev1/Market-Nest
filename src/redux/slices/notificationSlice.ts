@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Notification } from '../types/notification';
+import { Notification } from '../types/notification.type';
 
 export const fetchNotificationReq = createAction<{
   page: number;
@@ -136,9 +136,12 @@ const notificationsSlice = createSlice({
 
 export const notificationsReducer = notificationsSlice.reducer;
 
-export const selectFullNotifi = (state: {
+interface RootState {
   notifications: NotificationsState;
-}) => state.notifications.fullNotifi;
+}
+
+export const selectFullNotifi = (state: { notifications: RootState }) =>
+  state.notifications.notifications.fullNotifi;
 
 export const clearFullNotifi = notificationsSlice.actions.clearFullNotifi;
 

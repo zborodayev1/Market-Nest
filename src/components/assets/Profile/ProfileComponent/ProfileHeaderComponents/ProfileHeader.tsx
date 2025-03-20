@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { CgProfile } from 'react-icons/cg';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  fetchProfileData,
+  fetchProfileDataReq,
   selectUserProfile,
 } from '../../../../../redux/slices/authSlice';
 import { AppDispatch } from '../../../../../redux/store';
@@ -20,7 +20,7 @@ export const ProdileHeader = (props: Props) => {
 
   useEffect(() => {
     const loadProfileData = () => {
-      dispatch(fetchProfileData());
+      dispatch(fetchProfileDataReq());
     };
 
     loadProfileData();

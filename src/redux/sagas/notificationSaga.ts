@@ -20,7 +20,7 @@ import {
   markNotificationAsReadReq,
   markNotificationAsReadSuc,
 } from '../slices/notificationSlice';
-import { Notification } from '../types/notification';
+import { Notification } from '../types/notification.type';
 
 function* fetchNotificationsSaga(action: {
   payload: { page: number; limit: number; filter: string };

@@ -10,7 +10,7 @@ import {
   selectFullNotifi,
 } from '../../../redux/slices/notificationSlice';
 import { AppDispatch, RootState } from '../../../redux/store';
-import { Notification } from '../../../redux/types/notification';
+import { Notification } from '../../../redux/types/notification.type';
 import { FullNotiForm } from './FullNotiForm';
 import { NotiForm } from './NotiForm';
 
@@ -29,11 +29,9 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState('unread');
   const limit = 4;
-  const {
-    data: notifications,
-    status,
-    totalPages,
-  } = useSelector((state: RootState) => state.notifications);
+  const { notifications, status, totalPages } = useSelector(
+    (state: RootState) => state.notifications
+  );
   const [fullNoti, setFullNoti] = useState<FullNoti>({ state: 'home', id: '' });
 
   useEffect(() => {
@@ -59,8 +57,6 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
   const refresh = useCallback(() => {
     dispatch(fetchNotificationReq({ page, limit, filter }));
   }, [dispatch, page, limit, filter]);
-
-  console.log({ status, notifications, fullNoti });
 
   return (
     <AnimatePresence>

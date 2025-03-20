@@ -5,15 +5,19 @@ import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchProducts,
-  Product,
   selectProducts,
 } from '../../../../redux/slices/productSlice';
-import { AppDispatch } from '../../../../redux/store';
+import { AppDispatch, RootState } from '../../../../redux/store';
+import { Product } from '../../../../redux/types/product.type';
 import { PageSettingsForm } from '../../../forms/pageSettingsForm';
 import { ProductForm } from '../ProductForm/ProductForm';
 
 export const FavoritesPage = () => {
-  const { products, status } = useSelector(selectProducts);
+  const { products } = useSelector(selectProducts);
+
+  const { totalPages, status } = useSelector(
+    (state: RootState) => state.products
+  );
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
   const dispatch: AppDispatch = useDispatch();
@@ -45,9 +49,7 @@ export const FavoritesPage = () => {
   useEffect(() => {
     if (status === 'succeeded') {
       setFavoriteProducts(
-        products.products.filter((product: Product) =>
-          favorites.includes(product._id)
-        )
+        products.filter((product: Product) => favorites.includes(product._id))
       );
     }
   }, [status, products, favorites]);
@@ -170,7 +172,7 @@ export const FavoritesPage = () => {
               setLimitError={setLimitError}
               PGState={PGState}
               setPGState={setPGState}
-              products={products}
+              totalPages={totalPages}
               focusLimit={focusLimit}
               setFocusLimit={setFocusLimit}
               focusPage={focusPage}

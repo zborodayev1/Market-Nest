@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   RootState,
   selectUserProfile,
-  updateProfileData,
+  updateProfileDataReq,
 } from '../../../../../redux/slices/authSlice';
 import { AppDispatch } from '../../../../../redux/store';
 import { AddressPicker } from '../../../functons/address/AddressPicker';
@@ -46,7 +46,7 @@ export const UserData = ({ onSuccess }: Props) => {
   const onSubmit = (values: FormData) => {
     try {
       setIsSubmitting(true);
-      dispatch(updateProfileData(values));
+      dispatch(updateProfileDataReq(values));
 
       if (status === 'succeeded') {
         reset({ ...userData, ...values });

@@ -5,10 +5,9 @@ import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import {
-  deleteAvatar,
-  fetchProfileData,
+  deleteAvatarReq,
+  fetchProfileDataReq,
   selectUserProfile,
-  uploadAvatar,
 } from '../../../../../../redux/slices/authSlice';
 import { AppDispatch, RootState } from '../../../../../../redux/store';
 
@@ -33,16 +32,19 @@ export const ChangeAvatar = () => {
   };
 
   const handleUpload = async () => {
-    if (file) {
-      const formData = new FormData();
-      formData.append('image', file);
+    try {
+      if (file) {
+        const formData = new FormData();
+        formData.append('image', file);
 
-      const resultAction = await dispatch(uploadAvatar(formData));
-      if (uploadAvatar.fulfilled.match(resultAction)) {
-        dispatch(fetchProfileData());
+        dispatch(deleteAvatarReq(formData));
+
+        dispatch(fetchProfileDataReq());
         setPreview(null);
         setFile(null);
       }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
@@ -53,23 +55,26 @@ export const ChangeAvatar = () => {
       inputFileRef.current.value = '';
     }
   };
-  let resultAction: unknown;
+
   const handleDeleteAvatar = async () => {
-    if (userData?._id) {
-      const formData = new FormData();
-      formData.append('userId', userData._id);
-      resultAction = await dispatch(deleteAvatar(formData));
-    }
-    if (deleteAvatar.fulfilled.match(resultAction)) {
-      dispatch(fetchProfileData());
+    try {
+      if (userData?._id) {
+        const formData = new FormData();
+        formData.append('userId', userData._id);
+        dispatch(deleteAvatarReq(formData));
+      }
+
+      dispatch(fetchProfileDataReq());
       toast('Successfully created!', {
         type: 'success',
       });
-    }
 
-    toast(error, {
-      type: 'error',
-    });
+      toast(error, {
+        type: 'error',
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (

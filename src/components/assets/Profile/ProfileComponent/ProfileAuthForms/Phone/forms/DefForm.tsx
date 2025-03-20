@@ -3,12 +3,11 @@ import { Eye, EyeOff, Phone, RectangleEllipsis } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import {
   selectUserProfile,
-  updateProfilePhone,
+  updateProfilePhoneReq,
 } from '../../../../../../../redux/slices/authSlice';
-import { AppDispatch } from '../../../../../../../redux/store';
+import { AppDispatch, RootState } from '../../../../../../../redux/store';
 
 interface Formdata {
   password?: string;
@@ -19,6 +18,7 @@ interface Props {
 }
 export const DefForm = (props: Props) => {
   const userData = useSelector(selectUserProfile);
+  const { status } = useSelector((state: RootState) => state.auth);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { onSuccess } = props;
   const dispatch: AppDispatch = useDispatch();
@@ -26,7 +26,7 @@ export const DefForm = (props: Props) => {
     mode: 'onSubmit',
   });
 
-  const onSubmit = async (values: Formdata) => {
+  const onSubmit = (values: Formdata) => {
     try {
       setIsSubmitting(true);
 
@@ -35,20 +35,14 @@ export const DefForm = (props: Props) => {
         phone: values.newPhone || '',
       };
 
-      const resultAction = await dispatch(updateProfilePhone(payload));
+      dispatch(updateProfilePhoneReq(payload));
 
-      if (updateProfilePhone.fulfilled.match(resultAction)) {
+      if (status === 'succeeded') {
         reset({ ...userData, ...values });
         onSuccess();
-      } else {
-        console.error('Ошибка:', resultAction.payload || 'Неизвестная ошибка');
-        toast(resultAction.payload || 'Неизвестная ошибка', {
-          type: 'error',
-          position: 'bottom-right',
-        });
       }
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (err) {
+      console.error('Error:', err);
     } finally {
       setIsSubmitting(false);
     }

@@ -16,9 +16,9 @@ interface Props {
   setPGState: React.Dispatch<
     React.SetStateAction<{ limit: number; page: number }>
   >;
-  products: {
-    totalPages: number;
-  };
+
+  totalPages: number;
+
   focusLimit: boolean;
   setFocusLimit: React.Dispatch<React.SetStateAction<boolean>>;
   focusPage: boolean;
@@ -31,7 +31,7 @@ export const PageSettingsForm = (props: Props) => {
     setLimitError,
     PGState,
     setPGState,
-    products,
+    totalPages,
     focusLimit,
     focusPage,
     setFocusLimit,
@@ -75,11 +75,11 @@ export const PageSettingsForm = (props: Props) => {
       setLoading(true);
       setButtonPage(true);
 
-      if (PGStateChange.page > products.totalPages) {
+      if (PGStateChange.page > totalPages) {
         setPGState((prevState) => ({
           ...prevState,
           limit: PGStateChange.limit,
-          page: products.totalPages,
+          page: totalPages,
         }));
       } else {
         setPGState((prevState) => ({

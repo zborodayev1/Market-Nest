@@ -9,8 +9,9 @@ import { IoBag } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { selectUserProfile } from '../../../../redux/slices/authSlice';
-import { deleteProduct, Product } from '../../../../redux/slices/productSlice';
+import { deleteProduct } from '../../../../redux/slices/productSlice';
 import { AppDispatch } from '../../../../redux/store';
+import { Product } from '../../../../redux/types/product.type';
 
 interface ProductFormProps {
   product: Product;

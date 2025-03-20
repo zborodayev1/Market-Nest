@@ -41,7 +41,6 @@ export const SideBar = (props: Props) => {
   useEffect(() => {
     if (logOutState === true) {
       dispatch(logout());
-      localStorage.removeItem('token');
       setLogOutState(false);
     }
   }, [logOutState, dispatch]);
@@ -49,7 +48,6 @@ export const SideBar = (props: Props) => {
   const onClickLogout = () => {
     setLogOutState(true);
     dispatch(logout());
-    localStorage.removeItem('token');
     setOpen(false);
   };
 
