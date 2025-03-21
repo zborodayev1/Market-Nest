@@ -7,11 +7,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/auth/useAuth';
 import {
-  fetchCompleteRegistration,
+  completeRegistrationReq,
   selectIsAuth,
-  UserEmail,
 } from '../../../redux/slices/authSlice';
 import { AppDispatch } from '../../../redux/store';
+import { UserProfile } from '../../../redux/types/auth.type';
 
 interface Props {
   code: boolean;
@@ -27,7 +27,7 @@ export const VerifyMail = (props: Props) => {
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector(
-    (state: { auth: { user: UserEmail } }) => state.auth.user
+    (state: { auth: { user: UserProfile } }) => state.auth.user
   );
   const isAuth = useSelector(selectIsAuth);
   const [err, setErr] = useState<string | null>(null);
@@ -48,16 +48,10 @@ export const VerifyMail = (props: Props) => {
   const onSubmit = async (values: { email: string; code: string }) => {
     setLoading(true);
     try {
-      const data = await dispatch(
-        fetchCompleteRegistration({ code: values.code, email: email })
-      ).unwrap();
+      dispatch(completeRegistrationReq({ code: values.code, email: email }));
       setLoading(false);
       onSuccess();
       navigate('/');
-      const token = data.token;
-      if (token) {
-        window.localStorage.setItem('token', token);
-      }
     } catch (error) {
       console.error(error);
       setLoading(false);

@@ -5,15 +5,18 @@ import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchProducts,
-  Product,
   selectProducts,
 } from '../../../../redux/slices/productSlice';
-import { AppDispatch } from '../../../../redux/store';
+import { AppDispatch, RootState } from '../../../../redux/store';
+import { Product } from '../../../../redux/types/product.type';
 import { PageSettingsForm } from '../../../forms/pageSettingsForm';
 import { ProductForm } from '../ProductForm/ProductForm';
 
 export const BagPage = () => {
-  const { products, status } = useSelector(selectProducts);
+  const { products } = useSelector(selectProducts);
+  const { status, totalPages } = useSelector(
+    (state: RootState) => state.products
+  );
   const [bag, setBag] = useState<string[]>([]);
   const [bagProducts, setBagProducts] = useState<Product[]>([]);
   const dispatch: AppDispatch = useDispatch();
@@ -38,24 +41,21 @@ export const BagPage = () => {
   useEffect(() => {
     if (status === 'succeeded') {
       setBagProducts(
-        products.products.filter((product: Product) =>
-          bag.includes(product._id)
-        )
+        products.filter((product: Product) => bag.includes(product._id))
       );
     }
   }, [status, products, bag]);
 
   const handleRemoveFromBag = (id: string) => {
+    const updatedBag = bag.filter((bagId) => bagId !== id);
+
     setBagProducts((prevBag) =>
       prevBag.filter((product: Product) => product._id !== id)
     );
 
-    const updatedBag = bag.filter((bagId) => bagId !== id);
     localStorage.setItem('bag', JSON.stringify(updatedBag));
 
-    setTimeout(() => {
-      setBag(updatedBag);
-    }, 500);
+    setBag(updatedBag);
   };
   const totalPrice = bagProducts.reduce(
     (total, product) => total + product.price,
@@ -99,15 +99,15 @@ export const BagPage = () => {
               className="flex flex-col"
             >
               <span className="text-2xl text-[#212121]">
-                <span className="font-bold">Total: </span>
+                <span className="font-bold">Total Price: </span>
                 <span className="bg-[#3C8737] text-white px-2 p-1 rounded-md">
                   {totalPrice}$
                 </span>
               </span>
 
-              <span className="text-xl text-[#212121]">
-                <span className="font-bold">Count: </span>
-                <span>{totalCount} items</span>
+              <span className="text-xl mt-1 text-[#212121]">
+                <span className="font-bold">Product Count: </span>
+                <span>{totalCount} products</span>
               </span>
             </motion.div>
           )}
@@ -160,7 +160,7 @@ export const BagPage = () => {
               )
             )}
           </div>
-          {status !== 'loading' && (
+          <div className="absolute left-120 top-165">
             <PageSettingsForm
               open={open}
               setOpen={setOpen}
@@ -168,13 +168,13 @@ export const BagPage = () => {
               setLimitError={setLimitError}
               PGState={PGState}
               setPGState={setPGState}
-              products={products}
+              totalPages={totalPages}
               focusLimit={focusLimit}
               setFocusLimit={setFocusLimit}
               focusPage={focusPage}
               setFocusPage={setFocusPage}
             />
-          )}
+          </div>
         </motion.div>
       </AnimatePresence>
     </div>

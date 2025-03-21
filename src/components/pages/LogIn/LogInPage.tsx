@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
-import { fetchLogin, selectIsAuth } from '../../../redux/slices/authSlice';
+import { loginReq, selectIsAuth } from '../../../redux/slices/authSlice';
 
 import { Eye, EyeOff, Mail, RectangleEllipsis } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -41,17 +41,8 @@ export const LogInPage: React.FC = (): JSX.Element => {
     setLoading(true);
 
     try {
-      const resultAction = await dispatch(fetchLogin(values));
+      dispatch(loginReq(values));
       setLoading(false);
-
-      if (fetchLogin.fulfilled.match(resultAction)) {
-        const { token } = resultAction.payload;
-        if (token) {
-          window.localStorage.setItem('token', token);
-        }
-      } else {
-        setErr('Login failed!');
-      }
     } catch (error) {
       console.error(error);
       setLoading(false);

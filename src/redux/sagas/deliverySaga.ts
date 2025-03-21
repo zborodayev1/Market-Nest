@@ -5,7 +5,7 @@ import {
   fetchDeliveryReq,
   fetchDeliverySuc,
 } from '../slices/deliverySlice';
-import { Delivery } from '../types/delivery';
+import { Delivery } from '../types/delivery.type';
 
 function* fetchDeliverySaga() {
   try {

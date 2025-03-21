@@ -5,10 +5,10 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import {
-  requestPhoneChange,
+  requestPhoneChangeReq,
   selectUserProfile,
 } from '../../../../../../../redux/slices/authSlice';
-import { AppDispatch } from '../../../../../../../redux/store';
+import { AppDispatch, RootState } from '../../../../../../../redux/store';
 
 interface Formdata {
   newPhone?: string;
@@ -21,7 +21,9 @@ export const ForgotPassForm = (props: Props) => {
   const userData = useSelector(selectUserProfile);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setPPS } = props;
-
+  const { error, message, status } = useSelector(
+    (state: RootState) => state.auth
+  );
   const dispatch: AppDispatch = useDispatch();
   const { reset, register, handleSubmit } = useForm<Formdata>({
     mode: 'onSubmit',
@@ -33,16 +35,16 @@ export const ForgotPassForm = (props: Props) => {
       const payload = {
         newPhone: values.newPhone || '',
       };
-      const requestPC = await dispatch(requestPhoneChange(payload)).unwrap();
-      if (requestPC.success === true) {
-        reset({ ...userData, ...values });
-        toast(requestPC.message, {
-          type: 'success',
-          position: 'bottom-right',
-        });
-        setPPS('code');
-      } else if (requestPC.success === false) {
-        toast(requestPC.message, {
+      dispatch(requestPhoneChangeReq(payload));
+
+      reset({ ...userData, ...values });
+      toast(message, {
+        type: 'success',
+        position: 'bottom-right',
+      });
+      setPPS('code');
+      if (status === 'failed') {
+        toast(error, {
           type: 'error',
           position: 'bottom-right',
         });

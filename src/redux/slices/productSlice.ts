@@ -1,8 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
-import { RootState } from '../store';
-import { UserProfile } from './authSlice';
+import { Product } from '../types/product.type';
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
@@ -162,25 +161,6 @@ export const getOneProduct = createAsyncThunk<Product, string>(
     }
   }
 );
-
-export interface Product {
-  saveAmount: number;
-  discount: number | null;
-  save: number;
-  oldPrice: number;
-  _id: string;
-  name: string;
-  tags: string[];
-  price: number;
-  description?: string;
-  viewsCount: number;
-  createdAt: string;
-  image: null | File;
-  user: UserProfile | null;
-  commentsCount: number;
-  favorite: boolean;
-  status: string;
-}
 
 interface ProductsState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -354,7 +334,11 @@ const productSlice = createSlice({
 
 export const productReducer = productSlice.reducer;
 
-export const selectProducts = (state: RootState) => state.products;
+interface RootState {
+  products: ProductsState;
+}
+
+export const selectProducts = (state: RootState) => state.products.products;
 
 export const { setProducts, setFullProduct } = productSlice.actions;
 

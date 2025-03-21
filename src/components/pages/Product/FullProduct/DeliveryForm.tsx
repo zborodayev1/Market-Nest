@@ -1,4 +1,4 @@
-import { Delivery } from '../../../../redux/types/delivery';
+import { Delivery } from '../../../../redux/types/delivery.type';
 
 interface Props {
   Delivery: Delivery;

@@ -1,521 +1,454 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from '../../axios'
+import { createAction, createSlice } from '@reduxjs/toolkit';
+import { UserProfile } from '../types/auth.type';
 
-interface AuthResponse {
-  token: string
-  user: UserProfile
-}
+export const temporaryRegisterReq = createAction<{
+  fullName: string;
+  email: string;
+  password: string;
+  phone: string;
+  address: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+}>('auth/temporaryRegisterReq');
 
-interface UpdateProfileResponse {
-  user: UserProfile
-}
+export const completeRegistrationReq = createAction<{
+  email: string;
+  code: string;
+}>('auth/completeRegistrationReq');
 
-export interface UserProfile {
-  _id: string
-  fullName?: string
-  avatarUrl?: string
-  phone?: string
-  address?: string
+export const requestPasswordChangeReq = createAction<{
+  newPassword: string;
+}>('auth/requestPasswordChangeReq');
+
+export const confirmPasswordChangeReq = createAction<{
+  verificationCode: string;
+}>('auth/confirmPasswordChangeReq');
+
+export const uploadAvatarReq = createAction<FormData>('auth/uploadAvatar');
+
+export const deleteAvatarReq = createAction<FormData>('auth/deleteAvatar');
+
+export const loginReq = createAction<{
+  email: string;
+  password: string;
+}>('auth/loginReq');
+
+export const getUserProfileReq = createAction<{
+  userId: string;
+}>('auth/getUserProfileReq');
+
+export const updateProfileDataReq = createAction<{
+  fullName?: string;
+  address?: string;
   coordinates?: {
-    lat: number
-    lng: number
-  }
-  email?: string
-  password?: string
-  role?: string
-}
+    lat: number;
+    lng: number;
+  };
+}>('auth/updateProfileDataReq');
 
-interface UserData {
-  fullName?: string
-  address?: string
-  coordinates?: {
-    lat: number
-    lng: number
-  }
-}
+export const updateProfileEmailReq = createAction<{
+  email: string;
+  password: string;
+}>('auth/updateProfileEmailReq');
 
-interface UserPassword {
-  oldPassword: string
-  password: string
-}
+export const updateProfilePasswordReq = createAction<{
+  oldPassword: string;
+  password: string;
+}>('auth/updateProfilePasswordReq');
 
-export interface UserEmail {
-  email: string
-  password: string
-}
+export const updateProfilePhoneReq = createAction(
+  'auth/updateProfilePhoneReq',
+  (payload: { phone: string; password: string }) => ({
+    payload,
+  })
+);
 
-interface UserPhone {
-  phone: string
-  password: string
-}
+export const requestPhoneChangeReq = createAction<{
+  newPhone: string;
+}>('auth/requestPhoneChangeReq');
+
+export const confirmPhoneChangeReq = createAction<{
+  verificationCode: string;
+}>('auth/confirmPhoneChangeReq');
 
 interface AuthState {
-  user: UserProfile | null
-  isAuth: boolean
-  productUser: UserProfile | null
-  status: 'idle' | 'loading' | 'succeeded' | 'failed'
-  error: string | null
-  loading: boolean
+  user: UserProfile | null;
+  isAuth: boolean;
+  productUser: UserProfile | null;
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  reqStatus: {
+    updateProfilePhone: 'idle' | 'loading' | 'succeeded' | 'failed';
+  };
+  error: string | null;
+  loading: boolean;
+  message: string;
+  token: string | null;
 }
 
-export const fetchTemporaryRegister = createAsyncThunk<
-  { message: string },
-  {
-    fullName: string
-    email: string
-    password: string
-    phone: string
-    address: string
-  },
-  { rejectValue: string }
->('auth/fetchTemporaryRegister', async (params, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.post('/auth/temporary-register', params)
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const fetchCompleteRegistration = createAsyncThunk<
-  { message: string; token: string },
-  { email: string; code: string },
-  { rejectValue: string }
->('auth/fetchCompleteRegistration', async (params, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.post('/auth/complete-register', params)
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const requestPasswordChange = createAsyncThunk<
-  { message: string; success: boolean },
-  {
-    newPassword: string
-  },
-  { rejectValue: string }
->('auth/requestPasswordChange', async (params, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.post(
-      '/auth/request-password-change-code',
-      params
-    )
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const confirmPasswordChange = createAsyncThunk<
-  { message: string; success: boolean },
-  { verificationCode: string },
-  { rejectValue: string }
->('auth/confirmPasswordChange', async (params, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.post('/auth/confirm-password-change', params)
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const uploadAvatar = createAsyncThunk<
-  { avatarUrl: string },
-  FormData,
-  { rejectValue: string }
->('user/uploadAvatar', async (formData, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.patch('/auth/user/avatar', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const deleteAvatar = createAsyncThunk<
-  { avatarUrl: string },
-  FormData,
-  { rejectValue: string }
->('user/deleteAvatar', async (formData, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.delete('/auth/user/avatar', {
-      data: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const fetchLogin = createAsyncThunk<
-  AuthResponse,
-  { email: string; password: string },
-  { rejectValue: string }
->('auth/fetchLogin', async (params, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.post('/auth/login', params)
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const fetchProfileData = createAsyncThunk<UserProfile>(
-  'auth/fetchProfileData',
-  async () => {
-    const { data } = await axios.get('/auth/profile')
-    return data
-  }
-)
-
-export const getUserProfile = createAsyncThunk<
-  UserProfile,
-  string,
-  { rejectValue: string; productUser: string | null }
->('auth/fetchUserProfile', async (userId, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.get(`/auth/user/${userId}`)
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'Failed to fetch user profile'
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const updateProfileData = createAsyncThunk<
-  UpdateProfileResponse,
-  UserData,
-  { rejectValue: string }
->('auth/updateProfile', async (params, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.patch('/auth/profile/data', params)
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const updateProfileEmail = createAsyncThunk<
-  UpdateProfileResponse,
-  UserEmail,
-  { rejectValue: string }
->('auth/updateProfileEmail', async (params, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.patch('/auth/profile/email', params)
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const updateProfilePassword = createAsyncThunk<
-  UpdateProfileResponse,
-  UserPassword,
-  { rejectValue: string }
->('auth/updateProfilePassword', async (params, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.patch('/auth/profile/password', params)
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const updateProfilePhone = createAsyncThunk<
-  UpdateProfileResponse,
-  UserPhone,
-  { rejectValue: string }
->('auth/updateProfilePhone', async (params, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.patch('/auth/profile/phone', params)
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-
-    return rejectWithValue(errorMessage)
-  }
-})
-export const requestPhoneChange = createAsyncThunk<
-  { message: string; success: boolean },
-  {
-    newPhone: string
-  },
-  { rejectValue: string }
->('auth/requestPhoneChange', async (params, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.post('/auth/request-phone-change-code', params)
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const confirmPhoneChange = createAsyncThunk<
-  { message: string; success: boolean },
-  { verificationCode: string },
-  { rejectValue: string }
->('auth/confirmPhoneChange', async (params, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.post('/auth/confirm-phone-change', params)
-    return data
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'An unknown error occurred'
-    return rejectWithValue(errorMessage)
-  }
-})
 const initialState: AuthState = {
   user: null,
   isAuth: false,
   productUser: null,
   status: 'idle',
+  reqStatus: {
+    updateProfilePhone: 'idle',
+  },
   error: null,
   loading: false,
-}
+  message: '',
+  token: localStorage.getItem('token') || null,
+};
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
     logout: (state) => {
-      state.user = null
-      state.isAuth = false
-      state.error = null
+      state.user = null;
+      state.isAuth = false;
+      state.error = null;
+      state.token = null;
+      localStorage.removeItem('token');
+    },
+
+    temporaryRegisterSuc: (state) => {
+      state.status = 'succeeded';
+      state.loading = false;
+    },
+    temporaryRegisterFail: (state, action: any) => {
+      state.status = 'failed';
+      state.error = action.payload;
+      state.loading = false;
+    },
+    fetchProfileDataReq: (state) => {
+      state.status = 'loading';
+      state.error = null;
+      state.loading = true;
+    },
+    fetchProfileDataSuc: (state) => {
+      state.status = 'succeeded';
+      state.loading = false;
+    },
+    fetchProfileDataFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload;
+      state.loading = false;
+    },
+    completeRegistrationSuc: (state, action) => {
+      state.status = 'succeeded';
+      state.user = action.payload.user || (action.payload as UserProfile);
+      state.isAuth = true;
+      state.error = null;
+      state.loading = false;
+      state.token = action.payload.token;
+    },
+    completeRegistrationFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload || 'Error occurred';
+      state.loading = false;
+    },
+    requestPasswordChangeSuc: (state, action) => {
+      state.status = 'succeeded';
+      state.loading = false;
+      if (action.payload.message) {
+        state.message = action.payload.message;
+      }
+    },
+    requestPasswordChangeFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload || 'Error occurred';
+      state.loading = false;
+      if (state.isAuth && state.user) {
+        state.user = { ...state.user };
+      }
+    },
+    confirmPasswordChangeSuc: (state, action) => {
+      state.status = 'succeeded';
+      state.loading = false;
+      if (action.payload.message) {
+        state.message = action.payload.message;
+      }
+    },
+    confirmPasswordChangeFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload || 'Error occurred';
+      state.loading = false;
+      if (state.isAuth && state.user) {
+        state.user = { ...state.user };
+      }
+    },
+    uploadAvatarSuc: (state, action) => {
+      if (state.user) {
+        state.user.avatarUrl = action.payload.avatarUrl;
+      }
+      state.loading = false;
+      state.status = 'succeeded';
+    },
+    uploadAvatarFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload || 'Error occurred';
+      state.loading = false;
+      if (state.isAuth && state.user) {
+        state.user = { ...state.user };
+      }
+    },
+    deleteAvatarSuc: (state, action) => {
+      if (state.user) {
+        state.user.avatarUrl = action.payload.avatarUrl;
+      }
+      state.loading = false;
+      state.status = 'succeeded';
+    },
+    deleteAvatarFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload || 'Error occurred';
+      state.loading = false;
+      if (state.isAuth && state.user) {
+        state.user = { ...state.user };
+      }
+    },
+    loginSuc: (state, action) => {
+      state.status = 'succeeded';
+      state.user = action.payload.user || (action.payload as UserProfile);
+      state.token = action.payload.token;
+      state.isAuth = true;
+      state.error = null;
+      state.loading = false;
+      localStorage.setItem('token', action.payload.token);
+    },
+    loginFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload;
+      state.loading = false;
+    },
+    getUserProfileSuc: (state, action) => {
+      state.status = 'succeeded';
+      state.productUser = action.payload;
+      state.loading = false;
+    },
+    getUserProfileFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload;
+      state.loading = false;
+    },
+    updateProfileDataSuc: (state, action) => {
+      state.status = 'succeeded';
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload.user };
+      } else {
+        state.user = action.payload.user;
+      }
+      state.loading = false;
+    },
+    updateProfileDataFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload || 'Error occurred';
+      state.loading = false;
+      if (state.isAuth && state.user) {
+        state.user = { ...state.user };
+      }
+    },
+    updateProfileEmailSuc: (state, action) => {
+      state.status = 'succeeded';
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload.user };
+      } else {
+        state.user = action.payload.user;
+      }
+      state.loading = false;
+    },
+    updateProfileEmailFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload || 'Error occurred';
+      state.loading = false;
+      if (state.isAuth && state.user) {
+        state.user = { ...state.user };
+      }
+    },
+    updateProfilePasswordSuc: (state) => {
+      state.status = 'succeeded';
+      state.loading = false;
+    },
+    updateProfilePasswordFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload || 'Error occurred';
+      state.loading = false;
+      if (state.isAuth && state.user) {
+        state.user = { ...state.user };
+      }
+    },
+    updateProfilePhoneSuc: (state, action) => {
+      state.loading = false;
+      state.status = 'succeeded';
+      state.reqStatus.updateProfilePhone = 'succeeded';
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload.user };
+      } else {
+        state.user = action.payload.user;
+      }
+    },
+    updateProfilePhoneFail: (state, action) => {
+      state.status = 'failed';
+      state.reqStatus.updateProfilePhone = 'failed';
+      state.error = action.payload || 'Error occurred';
+      state.loading = false;
+      if (state.isAuth && state.user) {
+        state.user = { ...state.user };
+      }
+    },
+    requestPhoneChangeSuc: (state, action) => {
+      state.status = 'succeeded';
+      state.loading = false;
+      if (action.payload.message) {
+        state.message = action.payload.message;
+      }
+    },
+    requestPhoneChangeFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload || 'Error occurred';
+      state.loading = false;
+      if (state.isAuth && state.user) {
+        state.user = { ...state.user };
+      }
+    },
+    confirmPhoneChangeSuc: (state, action) => {
+      state.status = 'succeeded';
+      state.loading = false;
+      if (action.payload.message) {
+        state.message = action.payload.message;
+      }
+    },
+    confirmPhoneChangeFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload || 'Error occurred';
+      state.loading = false;
+      if (state.isAuth && state.user) {
+        state.user = { ...state.user };
+      }
     },
   },
   extraReducers: (builder) => {
-    const handlePending = (state: AuthState) => {
-      if (!state.loading) {
-        state.loading = true
-        state.status = 'loading'
-        state.error = null
-      } else {
-        state.error = 'Second request in progress!'
-      }
-    }
-    const handleFulfilled = (state: AuthState, action: any) => {
-      state.status = 'succeeded'
-      state.user = action.payload.user || (action.payload as UserProfile)
-      state.isAuth = true
-      state.error = null
-      state.loading = false
-    }
-    const handleRejected = (state: AuthState, action: any) => {
-      state.status = 'failed'
-      state.error = action.payload || 'Error occurred'
-      state.loading = false
-      if (state.isAuth && state.user) {
-        state.user = { ...state.user }
-      }
-    }
-
     builder
-      .addCase(fetchTemporaryRegister.pending, handlePending)
-      .addCase(fetchTemporaryRegister.fulfilled, (state: AuthState) => {
-        state.status = 'succeeded'
-        state.loading = false
+      .addCase(temporaryRegisterReq, (state) => {
+        state.loading = true;
+        state.status = 'loading';
+        state.error = null;
       })
-      .addCase(fetchTemporaryRegister.rejected, handleRejected)
-      .addCase(fetchCompleteRegistration.pending, handlePending)
-      .addCase(fetchCompleteRegistration.fulfilled, handleFulfilled)
-      .addCase(fetchCompleteRegistration.rejected, handleRejected)
-      .addCase(fetchLogin.pending, handlePending)
-      .addCase(fetchLogin.fulfilled, handleFulfilled)
-      .addCase(fetchLogin.rejected, handleRejected)
-      .addCase(fetchProfileData.pending, handlePending)
-      .addCase(fetchProfileData.fulfilled, handleFulfilled)
-      .addCase(fetchProfileData.rejected, handleRejected)
-      .addCase(updateProfileData.pending, handlePending)
-      .addCase(updateProfileData.fulfilled, (state, action) => {
-        state.status = 'succeeded'
-        if (state.user) {
-          state.user = { ...state.user, ...action.payload.user }
-        } else {
-          state.user = action.payload.user
-        }
-        state.loading = false
+      .addCase(completeRegistrationReq, (state) => {
+        state.loading = true;
+        state.status = 'loading';
+        state.error = null;
       })
-      .addCase(updateProfileData.rejected, handleRejected)
-      .addCase(updateProfileEmail.pending, handlePending)
-      .addCase(updateProfileEmail.fulfilled, (state, action) => {
-        state.status = 'succeeded'
-        if (state.user) {
-          state.user = { ...state.user, ...action.payload.user }
-        } else {
-          state.user = action.payload.user
-        }
-        state.loading = false
+      .addCase(requestPasswordChangeReq, (state) => {
+        state.loading = true;
+        state.status = 'loading';
+        state.error = null;
       })
-      .addCase(updateProfileEmail.rejected, handleRejected)
-      .addCase(updateProfilePassword.pending, handlePending)
-      .addCase(updateProfilePassword.fulfilled, (state) => {
-        state.status = 'succeeded'
-        state.loading = false
+      .addCase(confirmPasswordChangeReq, (state) => {
+        state.loading = true;
+        state.status = 'loading';
+        state.error = null;
       })
-      .addCase(updateProfilePassword.rejected, handleRejected)
-
-      .addCase(updateProfilePhone.pending, handlePending)
-      .addCase(updateProfilePhone.fulfilled, (state) => {
-        state.status = 'succeeded'
-        state.loading = false
+      .addCase(uploadAvatarReq, (state) => {
+        state.loading = true;
+        state.status = 'loading';
+        state.error = null;
       })
-      .addCase(updateProfilePhone.rejected, handleRejected)
-
-      .addCase(requestPasswordChange.pending, handlePending)
-      .addCase(requestPasswordChange.fulfilled, (state) => {
-        state.status = 'succeeded'
-        state.loading = false
+      .addCase(deleteAvatarReq, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.status = 'loading';
       })
-      .addCase(requestPasswordChange.rejected, handleRejected)
-      .addCase(confirmPasswordChange.pending, handlePending)
-      .addCase(confirmPasswordChange.fulfilled, (state) => {
-        state.status = 'succeeded'
-        state.loading = false
+      .addCase(loginReq, (state) => {
+        state.loading = true;
+        state.status = 'loading';
+        state.error = null;
       })
-      .addCase(confirmPasswordChange.rejected, handleRejected)
-      .addCase(uploadAvatar.pending, (state) => {
-        state.loading = true
-        state.status = 'loading'
+      .addCase(getUserProfileReq, (state) => {
+        state.status = 'loading';
+        state.error = null;
+        state.loading = true;
       })
-      .addCase(uploadAvatar.fulfilled, (state, action) => {
-        if (state.user) {
-          state.user.avatarUrl = action.payload.avatarUrl
-        }
-        state.loading = false
-        state.status = 'succeeded'
+      .addCase(updateProfileDataReq, (state) => {
+        state.status = 'loading';
+        state.error = null;
+        state.loading = true;
       })
-      .addCase(uploadAvatar.rejected, (state, action) => {
-        state.loading = false
-        state.status = 'failed'
-        state.error = action.payload || 'Error while update avatar'
+      .addCase(updateProfileEmailReq, (state) => {
+        state.status = 'loading';
+        state.error = null;
+        state.loading = true;
       })
-
-      .addCase(deleteAvatar.pending, (state) => {
-        state.loading = true
-        state.status = 'loading'
+      .addCase(updateProfilePasswordReq, (state) => {
+        state.status = 'loading';
+        state.error = null;
+        state.loading = true;
       })
-      .addCase(deleteAvatar.fulfilled, (state, action) => {
-        if (state.user) {
-          state.user.avatarUrl = action.payload.avatarUrl
-        }
-        state.loading = false
-        state.status = 'succeeded'
+      .addCase(updateProfilePhoneReq, (state) => {
+        state.status = 'loading';
+        state.reqStatus.updateProfilePhone = 'loading';
+        state.error = null;
+        state.loading = true;
       })
-      .addCase(deleteAvatar.rejected, (state, action) => {
-        state.loading = false
-        state.status = 'failed'
-        state.error = action.payload || 'Error while update avatar'
+      .addCase(requestPhoneChangeReq, (state) => {
+        state.status = 'loading';
+        state.error = null;
+        state.loading = true;
       })
-
-      .addCase(getUserProfile.pending, (state) => {
-        state.status = 'loading'
-        state.error = null
-        state.loading = true
-      })
-      .addCase(getUserProfile.fulfilled, (state, action) => {
-        state.status = 'succeeded'
-        state.productUser = action.payload
-        state.loading = false
-      })
-      .addCase(getUserProfile.rejected, (state, action) => {
-        state.status = 'failed'
-        state.error = action.payload || 'Error occurred'
-        state.loading = false
-      })
-      .addCase(requestPhoneChange.pending, handlePending)
-      .addCase(requestPhoneChange.fulfilled, (state) => {
-        state.status = 'succeeded'
-        state.loading = false
-      })
-      .addCase(requestPhoneChange.rejected, handleRejected)
-      .addCase(confirmPhoneChange.pending, handlePending)
-      .addCase(confirmPhoneChange.fulfilled, (state) => {
-        state.status = 'succeeded'
-        state.loading = false
-      })
-      .addCase(confirmPhoneChange.rejected, handleRejected)
+      .addCase(confirmPhoneChangeReq, (state) => {
+        state.status = 'loading';
+        state.error = null;
+        state.loading = true;
+      });
   },
-})
+});
 
-export const authReducer = authSlice.reducer
+export const authReducer = authSlice.reducer;
 
-export interface RootState {
-  auth: AuthState
+interface RootState {
+  auth: AuthState;
 }
 
 export const selectIsAuth = (state: RootState): boolean => {
-  return state.auth.isAuth
-}
+  return state.auth.isAuth;
+};
 
-export const selectUserProfile = (state: RootState) => state.auth.user
+export const selectUserProfile = (state: RootState) => state.auth.user;
 
-export const { logout } = authSlice.actions
+export const {
+  logout,
+  temporaryRegisterSuc,
+  temporaryRegisterFail,
+  fetchProfileDataReq,
+  fetchProfileDataSuc,
+  fetchProfileDataFail,
+  completeRegistrationFail,
+  completeRegistrationSuc,
+  requestPasswordChangeSuc,
+  requestPasswordChangeFail,
+  confirmPasswordChangeSuc,
+  confirmPasswordChangeFail,
+  uploadAvatarSuc,
+  uploadAvatarFail,
+  deleteAvatarSuc,
+  deleteAvatarFail,
+  loginSuc,
+  loginFail,
+  getUserProfileSuc,
+  getUserProfileFail,
+  updateProfileDataSuc,
+  updateProfileDataFail,
+  updateProfileEmailSuc,
+  updateProfileEmailFail,
+  updateProfilePasswordSuc,
+  updateProfilePasswordFail,
+  updateProfilePhoneSuc,
+  updateProfilePhoneFail,
+  requestPhoneChangeSuc,
+  requestPhoneChangeFail,
+  confirmPhoneChangeSuc,
+  confirmPhoneChangeFail,
+} = authSlice.actions;

@@ -11,9 +11,8 @@ import {
   editProduct,
   getOneProduct,
   selectFullProduct,
-  selectProducts,
 } from '../../../../redux/slices/productSlice';
-import { AppDispatch } from '../../../../redux/store';
+import { AppDispatch, RootState } from '../../../../redux/store';
 
 interface FormData {
   name: string;
@@ -34,14 +33,14 @@ export const EditProduct = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>(
     product?.tags || []
   );
-  const { error } = useSelector(selectProducts);
+  const { error } = useSelector((state: RootState) => state.products.error);
   const [message, setMessage] = useState<string>('');
   const { register, handleSubmit, setValue } = useForm<FormData>({
     defaultValues: {
       name: product?.name || '',
       price: product?.price || 0,
       tags: product?.tags || [],
-      image: product?.image || null,
+      image: null,
     },
   });
   const inputRef = useRef<HTMLInputElement>(null);
@@ -54,7 +53,7 @@ export const EditProduct = () => {
   }, [id, dispatch, product]);
 
   useEffect(() => {
-    if (userData?.role !== 'admin' && product?.user.id !== userData?._id) {
+    if (userData?.role !== 'admin' && product?.user?._id !== userData?._id) {
       navigate('/');
     }
   }, [navigate, product?.user, userData]);

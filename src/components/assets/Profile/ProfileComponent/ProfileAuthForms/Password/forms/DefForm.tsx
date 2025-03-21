@@ -6,9 +6,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import {
   selectUserProfile,
-  updateProfilePassword,
+  updateProfilePasswordReq,
 } from '../../../../../../../redux/slices/authSlice';
-import { AppDispatch } from '../../../../../../../redux/store';
+import { AppDispatch, RootState } from '../../../../../../../redux/store';
 
 interface Formdata {
   password?: string;
@@ -19,6 +19,8 @@ interface Props {
 }
 export const DefForm = (props: Props) => {
   const userData = useSelector(selectUserProfile);
+  const err = useSelector((state: RootState) => state.auth.error);
+  const status = useSelector((state: RootState) => state.auth.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { onSuccess } = props;
   const dispatch: AppDispatch = useDispatch();
@@ -35,14 +37,12 @@ export const DefForm = (props: Props) => {
         password: values.newPassword || '',
       };
 
-      const resultAction = await dispatch(updateProfilePassword(payload));
+      dispatch(updateProfilePasswordReq(payload));
 
-      if (updateProfilePassword.fulfilled.match(resultAction)) {
-        reset({ ...userData, ...values });
-        onSuccess();
-      } else {
-        console.error('Ошибка:', resultAction.payload || 'Неизвестная ошибка');
-        toast(resultAction.payload || 'Неизвестная ошибка', {
+      reset({ ...userData, ...values });
+      onSuccess();
+      if (status === 'failed') {
+        toast(err, {
           type: 'error',
           position: 'bottom-right',
         });

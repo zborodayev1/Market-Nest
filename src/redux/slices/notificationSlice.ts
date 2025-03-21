@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Notification } from '../types/notification';
+import { Notification } from '../types/notification.type';
 
 export const fetchNotificationReq = createAction<{
   page: number;
@@ -24,7 +24,6 @@ interface NotificationsState {
   page: number;
   filter: string;
   fullNotifi: Notification | null;
-  unread: number;
 }
 
 const initialState: NotificationsState = {
@@ -36,7 +35,6 @@ const initialState: NotificationsState = {
   page: 1,
   fullNotifi: null,
   filter: 'read',
-  unread: 0,
 };
 
 const notificationsSlice = createSlice({
@@ -83,9 +81,8 @@ const notificationsSlice = createSlice({
     fetchNotificationCountReq: (state) => {
       state.status = 'loading';
     },
-    fetchNotificationCountSuc: (state, action: PayloadAction<number>) => {
+    fetchNotificationCountSuc: (state) => {
       state.status = 'succeeded';
-      state.unread = action.payload;
     },
     fetchNotificationCountFail: (state, action: PayloadAction<string>) => {
       state.status = 'failed';
@@ -136,9 +133,12 @@ const notificationsSlice = createSlice({
 
 export const notificationsReducer = notificationsSlice.reducer;
 
-export const selectFullNotifi = (state: {
+interface RootState {
   notifications: NotificationsState;
-}) => state.notifications.fullNotifi;
+}
+
+export const selectFullNotifi = (state: { notifications: RootState }) =>
+  state.notifications.notifications.fullNotifi;
 
 export const clearFullNotifi = notificationsSlice.actions.clearFullNotifi;
 
