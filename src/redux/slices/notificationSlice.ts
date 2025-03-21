@@ -24,7 +24,6 @@ interface NotificationsState {
   page: number;
   filter: string;
   fullNotifi: Notification | null;
-  unread: number;
 }
 
 const initialState: NotificationsState = {
@@ -36,7 +35,6 @@ const initialState: NotificationsState = {
   page: 1,
   fullNotifi: null,
   filter: 'read',
-  unread: 0,
 };
 
 const notificationsSlice = createSlice({
@@ -83,9 +81,8 @@ const notificationsSlice = createSlice({
     fetchNotificationCountReq: (state) => {
       state.status = 'loading';
     },
-    fetchNotificationCountSuc: (state, action: PayloadAction<number>) => {
+    fetchNotificationCountSuc: (state) => {
       state.status = 'succeeded';
-      state.unread = action.payload;
     },
     fetchNotificationCountFail: (state, action: PayloadAction<string>) => {
       state.status = 'failed';

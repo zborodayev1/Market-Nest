@@ -16,7 +16,7 @@ import { ProductForm } from '../Product/ProductForm/ProductForm';
 export const HomePage = () => {
   const dispatch: AppDispatch = useDispatch();
   const { totalPages, products } = useSelector(selectProducts);
-  const { status } = useSelector((state: RootState) => state.products.status);
+  const { status } = useSelector((state: RootState) => state.products);
   const [PGState, setPGState] = useState<{ limit: number; page: number }>({
     limit: 10,
     page: 1,
@@ -220,7 +220,7 @@ export const HomePage = () => {
                   ))}
               </div>
             </AnimatePresence>
-            {status !== 'loading' && (
+            <div className="absolute left-120 top-155">
               <PageSettingsForm
                 open={open}
                 setOpen={setOpen}
@@ -234,7 +234,7 @@ export const HomePage = () => {
                 focusPage={focusPage}
                 setFocusPage={setFocusPage}
               />
-            )}
+            </div>
           </div>
         </div>
       </motion.div>

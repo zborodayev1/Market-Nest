@@ -103,7 +103,9 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
         ) : (
           fullNoti.state === 'home' &&
           status === 'loading' && (
-            <CircularProgress color="inherit" style={{ marginTop: 12 }} />
+            <div className="flex justify-center">
+              <CircularProgress color="inherit" style={{ marginTop: 12 }} />
+            </div>
           )
         )}
 

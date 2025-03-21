@@ -79,6 +79,9 @@ interface AuthState {
   isAuth: boolean;
   productUser: UserProfile | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  reqStatus: {
+    updateProfilePhone: 'idle' | 'loading' | 'succeeded' | 'failed';
+  };
   error: string | null;
   loading: boolean;
   message: string;
@@ -90,6 +93,9 @@ const initialState: AuthState = {
   isAuth: false,
   productUser: null,
   status: 'idle',
+  reqStatus: {
+    updateProfilePhone: 'idle',
+  },
   error: null,
   loading: false,
   message: '',
@@ -275,16 +281,18 @@ const authSlice = createSlice({
       }
     },
     updateProfilePhoneSuc: (state, action) => {
+      state.loading = false;
+      state.status = 'succeeded';
+      state.reqStatus.updateProfilePhone = 'succeeded';
       if (state.user) {
         state.user = { ...state.user, ...action.payload.user };
       } else {
         state.user = action.payload.user;
       }
-      state.loading = false;
-      state.status = 'succeeded';
     },
     updateProfilePhoneFail: (state, action) => {
       state.status = 'failed';
+      state.reqStatus.updateProfilePhone = 'failed';
       state.error = action.payload || 'Error occurred';
       state.loading = false;
       if (state.isAuth && state.user) {
@@ -381,6 +389,7 @@ const authSlice = createSlice({
       })
       .addCase(updateProfilePhoneReq, (state) => {
         state.status = 'loading';
+        state.reqStatus.updateProfilePhone = 'loading';
         state.error = null;
         state.loading = true;
       })

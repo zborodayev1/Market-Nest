@@ -3,13 +3,12 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import {
   deleteAvatarReq,
   fetchProfileDataReq,
   selectUserProfile,
 } from '../../../../../../redux/slices/authSlice';
-import { AppDispatch, RootState } from '../../../../../../redux/store';
+import { AppDispatch } from '../../../../../../redux/store';
 
 export const ChangeAvatar = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -18,7 +17,6 @@ export const ChangeAvatar = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const dispatch: AppDispatch = useDispatch();
-  const error = useSelector((state: RootState) => state.auth.error);
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0] || null;
     if (selectedFile) {
@@ -65,13 +63,6 @@ export const ChangeAvatar = () => {
       }
 
       dispatch(fetchProfileDataReq());
-      toast('Successfully created!', {
-        type: 'success',
-      });
-
-      toast(error, {
-        type: 'error',
-      });
     } catch (error) {
       console.error('Error:', error);
     }
@@ -104,11 +95,11 @@ export const ChangeAvatar = () => {
         </div>
       </button>
 
-      <button className="z-30" onClick={handleDeleteAvatar}>
+      <button className="z-30 " onClick={handleDeleteAvatar}>
         <X
           size={18}
           onClick={handleRemovePreview}
-          className="absolute top-6 left-[60px] bg-red-500 text-white rounded-full p-1 cursor-pointer hover:bg-red-600 transition-colors"
+          className="absolute top-6 left-[60px] bg-[#e4e4e4] text-black rounded-md p-[2px] cursor-pointer"
         />
       </button>
 

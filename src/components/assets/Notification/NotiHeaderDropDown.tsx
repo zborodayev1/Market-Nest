@@ -1,15 +1,15 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { Notifications } from '../Notification/Notifications'
-import React, { RefObject } from 'react'
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { RefObject } from 'react';
+import { Notifications } from '../Notification/Notifications';
 
 interface Props {
-  notiOpen: boolean
-  notificationRef: RefObject<HTMLDivElement>
-  onSuccess: () => void
+  isNotiOpen: boolean;
+  notificationRef: RefObject<HTMLDivElement>;
+  onSuccess: () => void;
 }
 
 export const NotiHeaderDropDown: React.FC<Props> = ({
-  notiOpen,
+  isNotiOpen,
   notificationRef,
   onSuccess,
 }) => {
@@ -17,7 +17,7 @@ export const NotiHeaderDropDown: React.FC<Props> = ({
     <div>
       <div className="absolute top-[70px] right-[350px]">
         <AnimatePresence>
-          {notiOpen && (
+          {isNotiOpen && (
             <motion.div
               ref={notificationRef}
               initial={{ opacity: 0, y: -40 }}
@@ -34,5 +34,5 @@ export const NotiHeaderDropDown: React.FC<Props> = ({
         </AnimatePresence>
       </div>
     </div>
-  )
-}
+  );
+};

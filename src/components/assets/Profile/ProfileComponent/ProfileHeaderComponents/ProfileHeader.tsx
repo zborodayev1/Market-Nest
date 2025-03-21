@@ -1,5 +1,4 @@
 import { Avatar } from '@mui/material';
-import { motion } from 'motion/react';
 import { useEffect } from 'react';
 import { CgProfile } from 'react-icons/cg';
 import { useDispatch, useSelector } from 'react-redux';
@@ -34,20 +33,20 @@ export const ProdileHeader = (props: Props) => {
     <div className="group px-3">
       <button
         onClick={handleCLick}
-        className="mx-2 flex gap-2 items-center   right-0 rounded-full duration-300 ease-in-out group mt-1"
+        className="mx-2 flex gap-2 items-center right-0 rounded-full duration-300 ease-in-out group mt-1"
       >
         <div
           className="shadow-lg rounded-full  relative flex items-center justify-center"
           style={{ width: 40, height: 40 }}
         >
           {userData?.avatarUrl ? (
-            <motion.div className="rounded-full hover:shadow-xl transition-shadow duration-300 ease-in-out">
+            <div className="rounded-full hover:shadow-xl transition-shadow duration-300 ease-in-out">
               <Avatar src={userData.avatarUrl} />
-            </motion.div>
+            </div>
           ) : (
             <div>
               <CgProfile
-                className="rounded-full hover:shadow-xl transition-shadow duration-300 ease-in-out"
+                className="rounded-full  duration-300 ease-in-out"
                 style={{ width: 35, height: 40 }}
               />
             </div>

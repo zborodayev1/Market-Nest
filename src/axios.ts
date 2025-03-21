@@ -1,14 +1,8 @@
 import axios from 'axios';
-
-const getBaseUrl = () => {
-  if (window.location.hostname === 'localhost') {
-    return 'http://localhost:3000/api';
-  }
-  return `${window.location.origin}/api`;
-};
+import { getApiUrl } from './config';
 
 const instance = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: getApiUrl(),
 });
 
 instance.interceptors.request.use(

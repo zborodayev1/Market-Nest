@@ -109,7 +109,7 @@ export const PageSettingsForm = (props: Props) => {
         <AnimatePresence>
           <div className="flex gap-7 items-center">
             <div className="flex items-center gap-2">
-              <h1>products p.p:</h1>
+              <h1>products per page:</h1>
               <motion.input
                 initial={{ opacity: 0 }}
                 animate={{
@@ -190,7 +190,7 @@ export const PageSettingsForm = (props: Props) => {
                 className="w-20 px-3 py-1 border rounded-md focus:outline-none focus:ring-1"
                 type="text"
                 onChange={changePage}
-                defaultValue={PGState.limit}
+                defaultValue={PGState.page}
               />
             </div>
             <div className="flex items-center gap-2">

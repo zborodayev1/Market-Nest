@@ -4,19 +4,22 @@ import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchPendingProducts,
-  Product,
   selectProducts,
   updateProductStatus,
 } from '../../../../redux/slices/productSlice';
-import { AppDispatch } from '../../../../redux/store';
+import { AppDispatch, RootState } from '../../../../redux/store';
 import { PageSettingsForm } from '../../../forms/pageSettingsForm';
 import { ProductForm } from '../ProductForm/ProductForm';
 
 import { toast } from 'react-toastify';
+import { Product } from '../../../../redux/types/product.type';
 
 export const PendingProducts = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { products, status } = useSelector(selectProducts);
+  const { products } = useSelector(selectProducts);
+  const { status, totalPages } = useSelector(
+    (state: RootState) => state.products
+  );
   const [PGState, setPGState] = useState<{ limit: number; page: number }>({
     limit: 10,
     page: 1,
@@ -32,7 +35,7 @@ export const PendingProducts = () => {
     );
   }, [dispatch, PGState]);
 
-  const filteredProducts = (products.products || []).filter(
+  const filteredProducts = (products || []).filter(
     (product: Product) => product.status === 'pending'
   );
 
@@ -104,22 +107,20 @@ export const PendingProducts = () => {
             )}
           </div>
         </div>
-        <div className="mb-[20px]">
-          {status !== 'loading' && (
-            <PageSettingsForm
-              open={open}
-              setOpen={setOpen}
-              limitError={limitError}
-              setLimitError={setLimitError}
-              PGState={PGState}
-              setPGState={setPGState}
-              products={products}
-              focusLimit={focusLimit}
-              setFocusLimit={setFocusLimit}
-              focusPage={focusPage}
-              setFocusPage={setFocusPage}
-            />
-          )}
+        <div className="absolute left-120 top-155">
+          <PageSettingsForm
+            open={open}
+            setOpen={setOpen}
+            limitError={limitError}
+            setLimitError={setLimitError}
+            PGState={PGState}
+            setPGState={setPGState}
+            totalPages={totalPages}
+            focusLimit={focusLimit}
+            setFocusLimit={setFocusLimit}
+            focusPage={focusPage}
+            setFocusPage={setFocusPage}
+          />
         </div>
       </motion.div>
     </>

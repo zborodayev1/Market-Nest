@@ -4,11 +4,10 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  RootState,
   selectUserProfile,
   updateProfileDataReq,
 } from '../../../../../redux/slices/authSlice';
-import { AppDispatch } from '../../../../../redux/store';
+import { AppDispatch, RootState } from '../../../../../redux/store';
 import { AddressPicker } from '../../../functons/address/AddressPicker';
 
 interface FormData {

@@ -14,7 +14,6 @@ import { ProductForm } from '../ProductForm/ProductForm';
 
 export const FavoritesPage = () => {
   const { products } = useSelector(selectProducts);
-
   const { totalPages, status } = useSelector(
     (state: RootState) => state.products
   );
@@ -58,20 +57,22 @@ export const FavoritesPage = () => {
     const updatedFavorites = favorites.filter(
       (favoriteId) => favoriteId !== id
     );
-    setFavorites(updatedFavorites);
 
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
 
-    setFavoriteProducts((prevFavorites) =>
-      prevFavorites.filter((product: Product) => product._id !== id)
+    setFavorites(updatedFavorites);
+
+    setFavoriteProducts(
+      products.filter((product) => updatedFavorites.includes(product._id))
     );
-    setTimeout(() => {
-      setFavorites(updatedFavorites);
-    }, 500);
   };
 
   const totalCount = favoriteProducts.length;
 
+  const totalPrice = favoriteProducts.reduce(
+    (total, product) => total + product.price,
+    0
+  );
   return (
     <>
       {' '}
@@ -108,14 +109,36 @@ export const FavoritesPage = () => {
           </motion.span>
         </div>
 
-        {favoriteProducts.length > 0 && (
-          <div className="flex justify-center">
-            <span className="text-2xl text-[#212121]">
-              <span className="font-bold">Count: </span>
-              <span>{totalCount} items</span>
-            </span>
-          </div>
-        )}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: 1,
+          }}
+          className="flex flex-col w-full text-center items-center justify-center mt-2"
+        >
+          <AnimatePresence>
+            {favoriteProducts.length !== 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col"
+              >
+                <span className="text-2xl text-[#212121]">
+                  <span className="font-bold">Total Price: </span>
+                  <span className="bg-[#3C8737] text-white px-2 p-1 rounded-md">
+                    {totalPrice}$
+                  </span>
+                </span>
+
+                <span className="text-xl mt-1 text-[#212121]">
+                  <span className="font-bold">Product Count: </span>
+                  <span>{totalCount} products</span>
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {status === 'loading' && (
           <div className="flex justify-center m-5">
@@ -164,7 +187,7 @@ export const FavoritesPage = () => {
               )}
             </div>
           </motion.div>
-          {status !== 'loading' && (
+          <div className="absolute left-120 top-165">
             <PageSettingsForm
               open={open}
               setOpen={setOpen}
@@ -178,7 +201,7 @@ export const FavoritesPage = () => {
               focusPage={focusPage}
               setFocusPage={setFocusPage}
             />
-          )}
+          </div>
         </AnimatePresence>
       </motion.div>
     </>

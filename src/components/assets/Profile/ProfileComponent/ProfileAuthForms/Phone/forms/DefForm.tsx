@@ -7,7 +7,7 @@ import {
   selectUserProfile,
   updateProfilePhoneReq,
 } from '../../../../../../../redux/slices/authSlice';
-import { AppDispatch, RootState } from '../../../../../../../redux/store';
+import { AppDispatch } from '../../../../../../../redux/store';
 
 interface Formdata {
   password?: string;
@@ -18,7 +18,8 @@ interface Props {
 }
 export const DefForm = (props: Props) => {
   const userData = useSelector(selectUserProfile);
-  const { status } = useSelector((state: RootState) => state.auth);
+
+  const [formValues, setFormValues] = useState<Formdata>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { onSuccess } = props;
   const dispatch: AppDispatch = useDispatch();
@@ -29,7 +30,7 @@ export const DefForm = (props: Props) => {
   const onSubmit = (values: Formdata) => {
     try {
       setIsSubmitting(true);
-
+      setFormValues(values);
       const payload = {
         password: values.password || '',
         phone: values.newPhone || '',
@@ -37,16 +38,19 @@ export const DefForm = (props: Props) => {
 
       dispatch(updateProfilePhoneReq(payload));
 
-      if (status === 'succeeded') {
-        reset({ ...userData, ...values });
-        onSuccess();
-      }
+      reset({ ...userData, ...formValues });
+      onSuccess();
     } catch (err) {
       console.error('Error:', err);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // useEffect(() => {
+  //   if (reqStatus === 'succeeded') {
+  //   }
+  // }, [reqStatus]);
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -66,8 +70,7 @@ export const DefForm = (props: Props) => {
             <input
               type={showPassword ? 'text' : 'password'}
               spellCheck="false"
-              placeholder="12345678Test"
-              id="password"
+              placeholder="12345678"
               {...register('password', {
                 required: 'Password is required',
                 minLength: {
@@ -102,7 +105,6 @@ export const DefForm = (props: Props) => {
               type={'text'}
               spellCheck="false"
               placeholder="77777777777"
-              id="password"
               {...register('newPhone', {
                 required: 'Password is required',
                 minLength: {
