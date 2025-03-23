@@ -6,16 +6,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchNotificationCountReq } from '../../../redux/slices/notificationSlice';
 import {
   fetchProducts,
-  Product,
   selectProducts,
 } from '../../../redux/slices/productSlice';
-import { AppDispatch } from '../../../redux/store';
+import { AppDispatch, RootState } from '../../../redux/store';
+import { Product } from '../../../redux/types/product.type';
 import { PageSettingsForm } from '../../forms/pageSettingsForm';
 import { ProductForm } from '../Product/ProductForm/ProductForm';
 
 export const HomePage = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { products, status } = useSelector(selectProducts);
+  const { totalPages, products } = useSelector(selectProducts);
+  const { status } = useSelector((state: RootState) => state.products);
   const [PGState, setPGState] = useState<{ limit: number; page: number }>({
     limit: 10,
     page: 1,
@@ -70,10 +71,9 @@ export const HomePage = () => {
   };
 
   const getFilteredProducts = () => {
-    if (!Array.isArray(products.products) || products.products.length === 0)
-      return [];
+    if (!Array.isArray(products) || products.length === 0) return [];
 
-    return products.products
+    return products
       .filter((product: Product) => product.status !== 'pending')
       .filter((product: Product) => product.status !== 'rejected')
       .filter((product: Product) => {
@@ -220,7 +220,7 @@ export const HomePage = () => {
                   ))}
               </div>
             </AnimatePresence>
-            {status !== 'loading' && (
+            <div className="absolute left-120 top-155">
               <PageSettingsForm
                 open={open}
                 setOpen={setOpen}
@@ -228,13 +228,13 @@ export const HomePage = () => {
                 setLimitError={setLimitError}
                 PGState={PGState}
                 setPGState={setPGState}
-                products={products}
+                totalPages={totalPages}
                 focusLimit={focusLimit}
                 setFocusLimit={setFocusLimit}
                 focusPage={focusPage}
                 setFocusPage={setFocusPage}
               />
-            )}
+            </div>
           </div>
         </div>
       </motion.div>

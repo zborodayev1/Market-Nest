@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 const ProductSchema = new mongoose.Schema(
   {
@@ -67,7 +67,6 @@ const ProductSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-
       enum: ['pending', 'approved'],
       default: 'pending',
     },
@@ -75,6 +74,6 @@ const ProductSchema = new mongoose.Schema(
   {
     timestamps: true,
   }
-)
+);
 
-export default mongoose.model('Product', ProductSchema)
+export default mongoose.model('Product', ProductSchema);

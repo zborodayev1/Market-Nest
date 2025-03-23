@@ -5,10 +5,10 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import {
-  confirmPasswordChange,
+  confirmPasswordChangeReq,
   selectUserProfile,
 } from '../../../../../../../redux/slices/authSlice';
-import { AppDispatch } from '../../../../../../../redux/store';
+import { AppDispatch, RootState } from '../../../../../../../redux/store';
 
 interface Formdata {
   verificationCode?: string;
@@ -26,6 +26,9 @@ export const Code = (props: Props) => {
   const { reset, register, handleSubmit } = useForm<Formdata>({
     mode: 'onSubmit',
   });
+  const { status, message, error } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const onSubmit = async (values: Formdata) => {
     try {
@@ -33,18 +36,18 @@ export const Code = (props: Props) => {
       const payload = {
         verificationCode: values.verificationCode || '',
       };
-      const comfirmPC = await dispatch(confirmPasswordChange(payload)).unwrap();
-      if (comfirmPC.success === true) {
-        reset({ ...userData, ...values });
-        onSuccess();
+      dispatch(confirmPasswordChangeReq(payload));
 
-        toast(comfirmPC.message, {
-          type: 'success',
-          position: 'bottom-right',
-        });
-        setPPS('default');
-      } else if (comfirmPC.success === false) {
-        toast(comfirmPC.message, {
+      reset({ ...userData, ...values });
+      onSuccess();
+      toast(message, {
+        type: 'success',
+        position: 'bottom-right',
+      });
+      setPPS('default');
+
+      if (status === 'failed') {
+        toast(error, {
           type: 'error',
           position: 'bottom-right',
         });

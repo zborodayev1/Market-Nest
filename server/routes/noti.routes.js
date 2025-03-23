@@ -1,22 +1,26 @@
-import express from 'express'
-import { NotiController } from '../controllers/index.js'
-import { checkAuth } from '../utils/checkAuth.js'
+import express from 'express';
+import { NotiController } from '../controllers/index.js';
+import { checkAuth } from '../utils/checkAuth.js';
 
-const router = express.Router()
+const router = express.Router();
 
 router.patch(
   '/mark-all-read',
   checkAuth,
   NotiController.markAllNotificationsAsRead
-)
-router.get('/unread-count', checkAuth, NotiController.getNotificationCount)
-router.get('/', checkAuth, NotiController.getNotifications)
+);
+router.get(
+  '/unread-count',
+  checkAuth,
+  NotiController.getNotificationUnreadCount
+);
+router.get('/', checkAuth, NotiController.getNotifications);
 router.delete(
   '/delete-all-noti',
   checkAuth,
   NotiController.deleteAllNotifications
-)
-router.get('/:id', checkAuth, NotiController.getOneNotification)
-router.patch('/:id', checkAuth, NotiController.markNotificationAsRead)
+);
+router.get('/:id', checkAuth, NotiController.getOneNotification);
+router.patch('/:id', checkAuth, NotiController.markNotificationAsRead);
 
-export default router
+export default router;

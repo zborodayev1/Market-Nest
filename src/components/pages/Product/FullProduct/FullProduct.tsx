@@ -19,7 +19,7 @@ import {
   selectFullProduct,
 } from '../../../../redux/slices/productSlice';
 import { AppDispatch } from '../../../../redux/store';
-import { Delivery } from '../../../../redux/types/delivery';
+import { Delivery } from '../../../../redux/types/delivery.type';
 import { DeliveryForm } from './DeliveryForm';
 import { SellerInfo } from './Seller/SellerInfo';
 

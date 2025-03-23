@@ -3,10 +3,9 @@ import { Eye, EyeOff, Phone, RectangleEllipsis } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import {
   selectUserProfile,
-  updateProfilePhone,
+  updateProfilePhoneReq,
 } from '../../../../../../../redux/slices/authSlice';
 import { AppDispatch } from '../../../../../../../redux/store';
 
@@ -19,6 +18,8 @@ interface Props {
 }
 export const DefForm = (props: Props) => {
   const userData = useSelector(selectUserProfile);
+
+  const [formValues, setFormValues] = useState<Formdata>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { onSuccess } = props;
   const dispatch: AppDispatch = useDispatch();
@@ -26,33 +27,30 @@ export const DefForm = (props: Props) => {
     mode: 'onSubmit',
   });
 
-  const onSubmit = async (values: Formdata) => {
+  const onSubmit = (values: Formdata) => {
     try {
       setIsSubmitting(true);
-
+      setFormValues(values);
       const payload = {
         password: values.password || '',
         phone: values.newPhone || '',
       };
 
-      const resultAction = await dispatch(updateProfilePhone(payload));
+      dispatch(updateProfilePhoneReq(payload));
 
-      if (updateProfilePhone.fulfilled.match(resultAction)) {
-        reset({ ...userData, ...values });
-        onSuccess();
-      } else {
-        console.error('Ошибка:', resultAction.payload || 'Неизвестная ошибка');
-        toast(resultAction.payload || 'Неизвестная ошибка', {
-          type: 'error',
-          position: 'bottom-right',
-        });
-      }
-    } catch (error) {
-      console.error('Error:', error);
+      reset({ ...userData, ...formValues });
+      onSuccess();
+    } catch (err) {
+      console.error('Error:', err);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // useEffect(() => {
+  //   if (reqStatus === 'succeeded') {
+  //   }
+  // }, [reqStatus]);
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -72,8 +70,7 @@ export const DefForm = (props: Props) => {
             <input
               type={showPassword ? 'text' : 'password'}
               spellCheck="false"
-              placeholder="12345678Test"
-              id="password"
+              placeholder="12345678"
               {...register('password', {
                 required: 'Password is required',
                 minLength: {
@@ -108,7 +105,6 @@ export const DefForm = (props: Props) => {
               type={'text'}
               spellCheck="false"
               placeholder="77777777777"
-              id="password"
               {...register('newPhone', {
                 required: 'Password is required',
                 minLength: {

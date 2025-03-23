@@ -21,9 +21,9 @@ import { productReducer } from './slices/productSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  products: productReducer,
   notifications: notificationsReducer,
   delivery: deliveryReducer,
+  products: productReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();

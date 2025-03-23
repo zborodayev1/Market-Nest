@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   RootState,
   selectUserProfile,
-  updateProfileEmail,
+  updateProfileEmailReq,
 } from '../../../../../redux/slices/authSlice';
 import { AppDispatch } from '../../../../../redux/store';
 
@@ -48,7 +48,7 @@ export const Email = (props: Props) => {
       }
 
       dispatch(
-        updateProfileEmail({
+        updateProfileEmailReq({
           email: values.email ?? '',
           password: values.password ?? '',
         })

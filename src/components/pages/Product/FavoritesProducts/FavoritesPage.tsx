@@ -5,15 +5,18 @@ import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchProducts,
-  Product,
   selectProducts,
 } from '../../../../redux/slices/productSlice';
-import { AppDispatch } from '../../../../redux/store';
+import { AppDispatch, RootState } from '../../../../redux/store';
+import { Product } from '../../../../redux/types/product.type';
 import { PageSettingsForm } from '../../../forms/pageSettingsForm';
 import { ProductForm } from '../ProductForm/ProductForm';
 
 export const FavoritesPage = () => {
-  const { products, status } = useSelector(selectProducts);
+  const { products } = useSelector(selectProducts);
+  const { totalPages, status } = useSelector(
+    (state: RootState) => state.products
+  );
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
   const dispatch: AppDispatch = useDispatch();
@@ -45,9 +48,7 @@ export const FavoritesPage = () => {
   useEffect(() => {
     if (status === 'succeeded') {
       setFavoriteProducts(
-        products.products.filter((product: Product) =>
-          favorites.includes(product._id)
-        )
+        products.filter((product: Product) => favorites.includes(product._id))
       );
     }
   }, [status, products, favorites]);
@@ -56,20 +57,22 @@ export const FavoritesPage = () => {
     const updatedFavorites = favorites.filter(
       (favoriteId) => favoriteId !== id
     );
-    setFavorites(updatedFavorites);
 
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
 
-    setFavoriteProducts((prevFavorites) =>
-      prevFavorites.filter((product: Product) => product._id !== id)
+    setFavorites(updatedFavorites);
+
+    setFavoriteProducts(
+      products.filter((product) => updatedFavorites.includes(product._id))
     );
-    setTimeout(() => {
-      setFavorites(updatedFavorites);
-    }, 500);
   };
 
   const totalCount = favoriteProducts.length;
 
+  const totalPrice = favoriteProducts.reduce(
+    (total, product) => total + product.price,
+    0
+  );
   return (
     <>
       {' '}
@@ -106,14 +109,36 @@ export const FavoritesPage = () => {
           </motion.span>
         </div>
 
-        {favoriteProducts.length > 0 && (
-          <div className="flex justify-center">
-            <span className="text-2xl text-[#212121]">
-              <span className="font-bold">Count: </span>
-              <span>{totalCount} items</span>
-            </span>
-          </div>
-        )}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: 1,
+          }}
+          className="flex flex-col w-full text-center items-center justify-center mt-2"
+        >
+          <AnimatePresence>
+            {favoriteProducts.length !== 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col"
+              >
+                <span className="text-2xl text-[#212121]">
+                  <span className="font-bold">Total Price: </span>
+                  <span className="bg-[#3C8737] text-white px-2 p-1 rounded-md">
+                    {totalPrice}$
+                  </span>
+                </span>
+
+                <span className="text-xl mt-1 text-[#212121]">
+                  <span className="font-bold">Product Count: </span>
+                  <span>{totalCount} products</span>
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {status === 'loading' && (
           <div className="flex justify-center m-5">
@@ -162,7 +187,7 @@ export const FavoritesPage = () => {
               )}
             </div>
           </motion.div>
-          {status !== 'loading' && (
+          <div className="absolute left-120 top-165">
             <PageSettingsForm
               open={open}
               setOpen={setOpen}
@@ -170,13 +195,13 @@ export const FavoritesPage = () => {
               setLimitError={setLimitError}
               PGState={PGState}
               setPGState={setPGState}
-              products={products}
+              totalPages={totalPages}
               focusLimit={focusLimit}
               setFocusLimit={setFocusLimit}
               focusPage={focusPage}
               setFocusPage={setFocusPage}
             />
-          )}
+          </div>
         </AnimatePresence>
       </motion.div>
     </>

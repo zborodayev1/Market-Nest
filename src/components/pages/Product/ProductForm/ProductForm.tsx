@@ -9,8 +9,9 @@ import { IoBag } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { selectUserProfile } from '../../../../redux/slices/authSlice';
-import { deleteProduct, Product } from '../../../../redux/slices/productSlice';
+import { deleteProduct } from '../../../../redux/slices/productSlice';
 import { AppDispatch } from '../../../../redux/store';
+import { Product } from '../../../../redux/types/product.type';
 
 interface ProductFormProps {
   product: Product;
@@ -83,7 +84,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="p-[2px] text-base shadow-xl border border-gray-950 rounded-lg hover:-translate-y-1 duration-300 bg-transparent"
+      className="p-[2px] text-base  border border-gray-950 rounded-lg shadow-[5px_5px_10px_rgba(0,0,0,0.5)] duration-300 bg-transparent"
     >
       <div className="shadow-sm p-2 rounded-md min-w-[260px] max-w-[264px] min-h-[100px] max-h-[450px] bg-[#f5f5f5] bg-clip-padding">
         <div className="ml-1 min-h-[200px]">

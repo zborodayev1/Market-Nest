@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/auth/useAuth';
-import { fetchTemporaryRegister } from '../../../redux/slices/authSlice';
+import { temporaryRegisterReq } from '../../../redux/slices/authSlice';
 import { AppDispatch } from '../../../redux/store';
 import { AddressPicker } from '../../assets/functons/address/AddressPicker';
 
@@ -62,15 +62,19 @@ export const RegisterForm = (props: Props) => {
     setLoading(true);
     try {
       onSuccess();
-      await dispatch(
-        fetchTemporaryRegister({
+      dispatch(
+        temporaryRegisterReq({
           fullName: values.fullName,
           email: values.email,
           password: values.password,
           phone: values.phone,
           address: address,
+          coordinates: {
+            lat: coordinates[0],
+            lng: coordinates[1],
+          },
         })
-      ).unwrap();
+      );
       setLoading(false);
       setEmail(values.email);
       navigate('/verify-email');

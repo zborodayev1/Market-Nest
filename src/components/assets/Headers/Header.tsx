@@ -5,116 +5,53 @@ import {
   PackagePlus,
   PackageSearch,
   ShoppingCart,
-} from 'lucide-react'
-import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { selectIsAuth, selectUserProfile } from '../../../redux/slices/authSlice'
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { useDebounce } from 'use-debounce';
+import {
+  selectIsAuth,
+  selectUserProfile,
+} from '../../../redux/slices/authSlice';
 import {
   fetchProducts,
   getProductsBySearch,
-} from '../../../redux/slices/productSlice'
-import { AppDispatch, RootState } from '../../../redux/store'
-import { NotiHeaderDropDown } from '../Notification/NotiHeaderDropDown'
-import { ProdileHeader } from '../Profile/ProfileComponent/ProfileHeaderComponents/ProfileHeader'
-import { SideBar } from '../Profile/ProfileComponent/ProfileSideBar/SideBar'
-import { getWebSocketUrl } from './GetWebsoketUrl'
+} from '../../../redux/slices/productSlice';
+import { AppDispatch } from '../../../redux/store';
+import { useClickOutside } from '../hooks/useClickOutside';
+import { useWebSocket } from '../hooks/useWebSocket';
+import { NotiHeaderDropDown } from '../Notification/NotiHeaderDropDown';
+import { ProdileHeader } from '../Profile/ProfileComponent/ProfileHeaderComponents/ProfileHeader';
+import { SideBar } from '../Profile/ProfileComponent/ProfileSideBar/SidaBar/SideBar';
 
 interface Props {
-  toastRef?: React.RefObject<HTMLDivElement>
+  toastRef?: React.RefObject<HTMLDivElement>;
 }
 
 export const Header = (props: Props) => {
-  const { toastRef } = props
-  const isAuth = useSelector(selectIsAuth)
-  const unreadNotiCount = useSelector(
-    (state: RootState) => state.notifications.unread
-  )
-  const [open, setOpen] = useState(false)
-  const [notiOpen, setNotiOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement | null>(null)
-  const buttonRef = useRef<HTMLButtonElement | null>(null)
-  const notificationRef = useRef<HTMLDivElement | null>(null)
-  const [unreadCount, setUnreadCount] = useState<number | null>(
-    unreadNotiCount.count
-  )
-  const [searchITem, setSearchITem] = useState('')
-  const userData = useSelector(selectUserProfile)
-  const dispatch: AppDispatch = useDispatch()
+  const { toastRef } = props;
+  const isAuth = useSelector(selectIsAuth);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNotiOpen, setIsNotiOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const notificationRef = useRef<HTMLDivElement | null>(null);
+  const [searchItem, setSearchItem] = useState('');
+  const previousSearchItem = useRef<string | null>(null);
+  const [debouncedSearch] = useDebounce(searchItem, 1000);
+  const userData = useSelector(selectUserProfile);
+  const dispatch: AppDispatch = useDispatch();
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        !(toastRef?.current && toastRef.current.contains(event.target as Node))
-      ) {
-        setOpen(false)
-      }
-    }
+  const { unreadCount } = useWebSocket({ userId: userData?._id });
 
-    document.addEventListener('mousedown', handleClickOutside)
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [toastRef])
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(target)
-      ) {
-        setNotiOpen(false)
-      }
-    }
-
-    if (notiOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [notiOpen])
-
-  const socket = useMemo(() => new WebSocket(getWebSocketUrl()), [])
-
-  useEffect(() => {
-    socket.onopen = () => {
-      console.log('WebSocket подключен')
-
-      socket.send(JSON.stringify({ type: 'auth', userId: userData?._id }))
-    }
-
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      if (
-        data.type === 'notificationUpdate' &&
-        data.profileId === userData?._id &&
-        data.increment !== 0
-      ) {
-        setUnreadCount((unreadCount) => (unreadCount += data.increment))
-      } else if (data.increment === 0) {
-        setUnreadCount(null)
-      }
-    }
-
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error)
-    }
-
-    socket.onclose = () => {
-      console.log('WebSocket соединение закрыто')
-    }
-  }, [socket, userData, unreadCount])
+  useClickOutside([dropdownRef, toastRef], () => setIsDropdownOpen(false));
+  useClickOutside(
+    [notificationRef, buttonRef],
+    () => setIsNotiOpen(false),
+    isNotiOpen
+  );
 
   const sidebarVariants = {
     initial: {
@@ -122,9 +59,9 @@ export const Header = (props: Props) => {
       opacity: 0,
     },
     animate: {
-      x: open ? 0 : 250,
+      x: isDropdownOpen ? 0 : 250,
       y: -3,
-      opacity: open ? 1 : 0,
+      opacity: isDropdownOpen ? 1 : 0,
       transition: {
         type: 'spring',
         stiffness: 200,
@@ -143,25 +80,23 @@ export const Header = (props: Props) => {
         delay: 0.05,
       },
     },
-  }
+  };
 
-  const previousSearchItem = useRef<string | null>(null)
-
-  const handleSearch = async () => {
-    const trimmedSearchItem = searchITem.trim()
+  useEffect(() => {
+    const trimmedSearchItem = debouncedSearch.trim();
 
     if (previousSearchItem.current === trimmedSearchItem) {
-      return
+      return;
     }
 
-    previousSearchItem.current = trimmedSearchItem
+    previousSearchItem.current = trimmedSearchItem;
 
     if (trimmedSearchItem === '') {
-      dispatch(fetchProducts({ limit: 20, page: 1 }))
+      dispatch(fetchProducts({ limit: 20, page: 1 }));
     } else {
-      dispatch(getProductsBySearch(trimmedSearchItem))
+      dispatch(getProductsBySearch(trimmedSearchItem));
     }
-  }
+  }, [debouncedSearch, dispatch]);
 
   return (
     <div>
@@ -172,15 +107,12 @@ export const Header = (props: Props) => {
               <div className="hover:bg-[#e4e4e4] transition-colors duration-300 rounded-[15px] ease-in-out flex items-center p-2 px-3 ml-[50px]">
                 <input
                   type="text"
-                  onChange={(e) => setSearchITem(e.target.value)}
-                  value={searchITem}
+                  onChange={(e) => setSearchItem(e.target.value)}
+                  value={searchItem}
                   placeholder="Search"
-                  className=" w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-[10px] bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:border-transparent transition-all duration-200"
                 />
-                <button
-                  className="items-center absolute z-20 right-[35px]"
-                  onClick={handleSearch}
-                >
+                <button className="items-center absolute z-20 right-[35px]">
                   <PackageSearch
                     style={{ strokeWidth: 1.8 }}
                     className="w-7 h-7 ml-2 text-[#212121]"
@@ -220,10 +152,13 @@ export const Header = (props: Props) => {
                 <div className="flex">
                   <button
                     ref={buttonRef}
-                    className="relative z-10 mx-1 flex gap-2 stroke items-center hover:bg-[#E4E4E4] p-2 px-3 rounded-full duration-500 ease-in-out group"
-                    onClick={() => setNotiOpen(!notiOpen)}
+                    className="relative z-10 mx-1 flex gap-2 stroke items-center hover:bg-[#E4E4E4] p-2 px-3 rounded-full duration-300 ease-in-out "
+                    onClick={() => setIsNotiOpen(!isNotiOpen)}
                   >
-                    <Bell className="w-8 h-8  text-[#212121]" />
+                    <Bell
+                      style={{ strokeWidth: 2 }}
+                      className="w-8 h-8 text-[#212121]"
+                    />
                     {unreadCount != null && unreadCount > 0 && (
                       <span className="absolute -top-[2px] -right-[2px] bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
                         {unreadCount}
@@ -231,24 +166,31 @@ export const Header = (props: Props) => {
                     )}
                   </button>
                   <NotiHeaderDropDown
-                    notiOpen={notiOpen}
+                    isNotiOpen={isNotiOpen}
                     notificationRef={notificationRef}
-                    onSuccess={() => setNotiOpen(!notiOpen)}
+                    onSuccess={() => setIsNotiOpen(!isNotiOpen)}
                   />
+
                   <Link
                     className="mx-1 ml-3 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                     to="/create-product"
                   >
-                    <h1 className="text-md font-bold text-[#212121]">Create</h1>
-                    <PackagePlus className="w-9 h-9 text-[#212121]" />
+                    <h1 className="text-base font-bold text-[#212121]">
+                      Create
+                    </h1>
+                    <PackagePlus
+                      style={{ strokeWidth: 1.8 }}
+                      className="w-9 h-9 text-[#212121]"
+                    />
                   </Link>
+
                   <Link
                     className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                     to="/bag"
                   >
-                    <h1 className="text-md font-bold text-[#212121]">Bag</h1>
+                    <h1 className="text-base font-bold text-[#212121]">Bag</h1>
                     <ShoppingCart
-                      style={{ strokeWidth: 1.8 }}
+                      style={{ strokeWidth: 2 }}
                       className="w-8 h-8 text-[#212121] stroke-1 "
                     />
                   </Link>
@@ -256,16 +198,18 @@ export const Header = (props: Props) => {
                     className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                     to="/favorites"
                   >
-                    <h1 className="text-md font-bold text-[#212121]">
+                    <h1 className="text-base font-bold text-[#212121]">
                       Favorite
                     </h1>
                     <Heart
                       className="w-7 h-9 text-[#212121]"
-                      style={{ strokeWidth: 2.5 }}
+                      style={{ strokeWidth: 2 }}
                     />
                   </Link>
                   <div>
-                    <ProdileHeader onSuccess={() => setOpen(!open)} />
+                    <ProdileHeader
+                      onSuccess={() => setIsDropdownOpen(!isDropdownOpen)}
+                    />
                   </div>
                 </div>
               </div>
@@ -275,7 +219,7 @@ export const Header = (props: Props) => {
                   className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                   to="/bag"
                 >
-                  <h1 className="text-md font-bold text-[#212121]">Bag</h1>
+                  <h1 className="text-base font-bold text-[#212121]">Bag</h1>
                   <ShoppingCart
                     style={{ strokeWidth: 1.8 }}
                     className="w-8 h-8 text-[#212121] "
@@ -285,14 +229,16 @@ export const Header = (props: Props) => {
                   className="mx-2 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
                   to="/favorites"
                 >
-                  <h1 className="text-md font-bold text-[#212121]">Favorite</h1>
+                  <h1 className="text-base font-bold text-[#212121]">
+                    Favorite
+                  </h1>
                   <Heart className="w-7 h-9 text-[#212121]" />
                 </Link>
                 <Link
                   to="/signIn"
                   className="mx-2 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-3 rounded-full duration-300 ease-in-out group mt-1"
                 >
-                  <h1 className="text-md font-bold text-[#212121] transition-colors duration-300">
+                  <h1 className="text-base font-bold text-[#212121] transition-colors duration-300">
                     Sign in
                   </h1>
                   <IdCard
@@ -305,14 +251,17 @@ export const Header = (props: Props) => {
 
             <div ref={dropdownRef} className="fixed right-0 top-0">
               <AnimatePresence>
-                {open && (
+                {isDropdownOpen && (
                   <motion.div
                     initial="initial"
                     animate="animate"
                     exit="exit"
                     variants={sidebarVariants}
                   >
-                    <SideBar setOpen={setOpen} open={open} />
+                    <SideBar
+                      setIsDropdownOpen={setIsDropdownOpen}
+                      isDropdownOpen={isDropdownOpen}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -323,5 +272,5 @@ export const Header = (props: Props) => {
         <div className="h-[1px] bg-[#E5E7EB]"></div>
       </div>
     </div>
-  )
-}
+  );
+};

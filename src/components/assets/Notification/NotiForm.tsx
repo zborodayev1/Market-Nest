@@ -3,7 +3,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { markNotificationAsReadReq } from '../../../redux/slices/notificationSlice';
 import { AppDispatch } from '../../../redux/store';
-import { Notification } from '../../../redux/types/notification';
+import { Notification } from '../../../redux/types/notification.type';
 interface FullNoti {
   state: string;
   id: string;
