@@ -9,6 +9,7 @@ import { WebSocketServer } from 'ws';
 
 dotenv.config();
 
+import cookieParser from 'cookie-parser';
 import { connectDB } from './server/config/database.js';
 import authRoutes from './server/routes/auth.routes.js';
 import deliveryRoutes from './server/routes/delivery.routes.js';
@@ -22,17 +23,26 @@ connectDB();
 
 const app = express();
 
+const allowedOrigins = ['http://localhost:5173', 'https://aircheck.kz'];
+
 app.use(
   cors({
-    origin: '*',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   })
 );
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '15mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(multer().none());
+app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);

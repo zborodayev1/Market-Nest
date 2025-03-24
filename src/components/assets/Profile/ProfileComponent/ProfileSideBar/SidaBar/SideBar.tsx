@@ -2,10 +2,10 @@ import { motion } from 'framer-motion';
 import { LogOut, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { logout } from '../../../../../../redux/slices/authSlice';
+import { logoutReq } from '../../../../../../redux/slices/authSlice';
 import { AppDispatch } from '../../../../../../redux/store';
 import { ChangeAvatar } from '../ChangeAvatar/ChangeAvatar';
-import { SideBarEmalForm } from './Forms/SIdeBarEmalForm';
+import { SideBarEmalForm } from './Forms/SideBarEmalForm';
 import { SideBarPasswordForm } from './Forms/SideBarPasswordForm';
 import { SideBarPemdingProductsForm } from './Forms/SideBarPemdingProductsForm';
 import { SideBarPhoneForm } from './Forms/SideBarPhoneForm';
@@ -35,14 +35,14 @@ export const SideBar = (props: Props) => {
 
   useEffect(() => {
     if (logOutState === true) {
-      dispatch(logout());
+      dispatch(logoutReq());
       setLogOutState(false);
     }
   }, [logOutState, dispatch]);
 
   const onClickLogout = () => {
     setLogOutState(true);
-    dispatch(logout());
+    dispatch(logoutReq());
     setIsDropdownOpen(false);
   };
 

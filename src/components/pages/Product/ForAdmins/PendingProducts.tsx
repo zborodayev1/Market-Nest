@@ -8,7 +8,7 @@ import {
   updateProductStatus,
 } from '../../../../redux/slices/productSlice';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { PageSettingsForm } from '../../../forms/pageSettingsForm';
+import { PageSettingsForm } from '../../../assets/forms/pageSettingsForm';
 import { ProductForm } from '../ProductForm/ProductForm';
 
 import { toast } from 'react-toastify';

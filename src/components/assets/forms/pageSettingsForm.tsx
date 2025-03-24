@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchProducts } from '../../redux/slices/productSlice';
-import { AppDispatch } from '../../redux/store';
+import { fetchProducts } from '../../../redux/slices/productSlice';
+import { AppDispatch } from '../../../redux/store';
 
 interface Props {
   open: boolean;

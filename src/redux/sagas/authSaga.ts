@@ -21,6 +21,9 @@ import {
   loginFail,
   loginReq,
   loginSuc,
+  logoutFail,
+  logoutReq,
+  logoutSuc,
   requestPasswordChangeFail,
   requestPasswordChangeSuc,
   requestPhoneChangeFail,
@@ -81,6 +84,15 @@ function* completeRegistrationSaga(
         error.response?.data || 'Failed to completeRegistration'
       )
     );
+  }
+}
+
+function* logoutSaga() {
+  try {
+    const { data } = yield call(() => axios.post(`/auth/logout`));
+    yield put(logoutSuc(data));
+  } catch (error: any) {
+    yield put(logoutFail(error.response?.data || 'Failed to logout'));
   }
 }
 
@@ -282,6 +294,7 @@ function* confirmPhoneChangeSaga(
 
 export function* watchAuthSaga() {
   yield takeLatest(temporaryRegisterReq, temporaryRegisterSaga);
+  yield takeLatest(logoutReq.type, logoutSaga);
   yield takeLatest(fetchProfileDataReq.type, fetchProfileDataSaga);
   yield takeLatest(completeRegistrationReq, completeRegistrationSaga);
   yield takeLatest(requestPasswordChangeReq, requestPasswordChangeSaga);

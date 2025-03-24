@@ -3,14 +3,13 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchNotificationCountReq } from '../../../redux/slices/notificationSlice';
 import {
   fetchProducts,
   selectProducts,
 } from '../../../redux/slices/productSlice';
 import { AppDispatch, RootState } from '../../../redux/store';
 import { Product } from '../../../redux/types/product.type';
-import { PageSettingsForm } from '../../forms/pageSettingsForm';
+import { PageSettingsForm } from '../../assets/forms/pageSettingsForm';
 import { ProductForm } from '../Product/ProductForm/ProductForm';
 
 export const HomePage = () => {
@@ -58,10 +57,6 @@ export const HomePage = () => {
     );
   }, [dispatch, PGState]);
 
-  useEffect(() => {
-    dispatch(fetchNotificationCountReq());
-  }, [dispatch]);
-
   const toggleTag = (tag: string) => {
     setSelectedTags((prevTags) =>
       prevTags.includes(tag)
@@ -88,13 +83,10 @@ export const HomePage = () => {
     <>
       <Helmet>
         <title>Market Nest</title>
-        <meta
-          name="description"
-          content="Welcome to the homepage of Market Nest"
-        />
+        <meta name="description" content="Welcome to Market Nest!" />
         <meta
           name="keywords"
-          content="market, shop, market nest, market nests, homepage"
+          content="market, shop, market nest, market nests"
         />
       </Helmet>
       <motion.div
