@@ -1,13 +1,12 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-  clearFullNotifi,
-  Notification,
-} from '../../../redux/slices/notificationSlice';
+import { NotificationType } from '../../../redux/types/notification.type';
 interface Props {
-  notification?: Notification | null;
-  setFullNoti: (noti: { state: string; id: string }) => void;
+  notification?: { state: string; notification: NotificationType | null };
+  setFullNoti: (noti: {
+    state: string;
+    notification: NotificationType | null;
+  }) => void;
   onSuccess: () => void;
 }
 
@@ -17,29 +16,21 @@ export const FullNotiForm: React.FC<Props> = ({
   setFullNoti,
 }) => {
   const nav = useNavigate();
-  const dispatch = useDispatch();
-
+  console.log(notification);
   const handleBack = () => {
-    dispatch(clearFullNotifi());
-    setFullNoti({ state: 'home', id: '' });
+    setFullNoti({ state: 'home', notification: null });
   };
 
   const handleGTP = () => {
     onSuccess();
-    nav(`/product/${notification?.productId}`);
+    nav(`/product/${notification?.notification?.productId}`);
   };
 
   return (
     <div className="mt-5">
-      <div className="flex gap-2 items-center">
-        <img
-          className="w-8 h-8 p-1 pt-[6px] bg-gradient-to-r from-gray-500 to-[#fafafa] rounded-full"
-          src={'http://localhost:5173/icon.svg'}
-        />
-      </div>
-      <div className="flex  items-center">
+      <div className="flex items-center">
         <div className="flex justify-center">
-          <h1 className="">{notification?.title}</h1>
+          <h1 className="text-black">{notification?.notification?.title}</h1>
         </div>
       </div>
       <div className="flex justify-center relative top-5 gap-4">

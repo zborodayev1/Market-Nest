@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Notification } from '../types/notification.type';
+import { NotificationType } from '../types/notification.type';
 
 export const fetchNotificationReq = createAction<{
   page: number;
@@ -11,19 +11,14 @@ export const markNotificationAsReadReq = createAction<{
   notificationId: string;
 }>('notifications/markNotificationAsReadReq');
 
-export const getOneNotificationReq = createAction<{
-  id: string;
-}>('notifications/getOneNotificationReq');
-
 interface NotificationsState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
-  notifications: Notification[];
+  notifications: NotificationType[];
   total: number;
   totalPages: number;
   page: number;
   filter: string;
-  fullNotifi: Notification | null;
 }
 
 const initialState: NotificationsState = {
@@ -33,7 +28,7 @@ const initialState: NotificationsState = {
   total: 0,
   totalPages: 0,
   page: 1,
-  fullNotifi: null,
+
   filter: 'read',
 };
 
@@ -46,13 +41,11 @@ const notificationsSlice = createSlice({
         (notif) => notif._id !== action.payload
       );
     },
-    clearFullNotifi: (state) => {
-      state.fullNotifi = null;
-    },
+
     fetchNotificationSuc: (
       state,
       action: PayloadAction<{
-        notifications: Notification[];
+        notifications: NotificationType[];
         total: number;
         totalPages: number;
       }>
@@ -66,7 +59,10 @@ const notificationsSlice = createSlice({
       state.status = 'failed';
       state.error = action.payload ?? 'Something went wrong';
     },
-    markNotificationAsReadSuc: (state, action: PayloadAction<Notification>) => {
+    markNotificationAsReadSuc: (
+      state,
+      action: PayloadAction<NotificationType>
+    ) => {
       const index = state.notifications.findIndex(
         (notif) => notif._id === action.payload._id
       );
@@ -114,14 +110,6 @@ const notificationsSlice = createSlice({
       state.status = 'failed';
       state.error = action.payload ?? 'Failed to mark notifications as read';
     },
-    getOneNotificationSuc: (state, action: PayloadAction<Notification>) => {
-      state.status = 'succeeded';
-      state.fullNotifi = action.payload;
-    },
-    getOneNotificationFail: (state, action: PayloadAction<string>) => {
-      state.status = 'failed';
-      state.error = action.payload ?? 'Failed to get notification';
-    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchNotificationReq, (state) => {
@@ -132,15 +120,6 @@ const notificationsSlice = createSlice({
 });
 
 export const notificationsReducer = notificationsSlice.reducer;
-
-interface RootState {
-  notifications: NotificationsState;
-}
-
-export const selectFullNotifi = (state: { notifications: RootState }) =>
-  state.notifications.notifications.fullNotifi;
-
-export const clearFullNotifi = notificationsSlice.actions.clearFullNotifi;
 
 export const {
   fetchNotificationFail,
@@ -156,6 +135,4 @@ export const {
   markAllNotificationsAsReadReq,
   markAllNotificationsAsReadSuc,
   markAllNotificationsAsReadFail,
-  getOneNotificationSuc,
-  getOneNotificationFail,
 } = notificationsSlice.actions;

@@ -44,7 +44,8 @@ export const Header = (props: Props) => {
   const [debouncedSearch] = useDebounce(searchItem, 1000);
   const userData = useSelector(selectUserProfile);
   const dispatch: AppDispatch = useDispatch();
-
+  const headerButtonStyles =
+    'mx-2 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1 border-2 border-transparent hover:border-black';
   const { unreadCount } = useWebSocket({ userId: userData?._id });
 
   useClickOutside([dropdownRef, toastRef], () => setIsDropdownOpen(false));
@@ -107,22 +108,22 @@ export const Header = (props: Props) => {
       <div className="">
         <div className="relative items-center flex bg-[#F5F5F5] z-30 w-full h-[100px]">
           <div className="absolute left-[120px] transform -translate-x-1/2 flex justify-center items-center z-10">
-            <div className="flex justify-center py-4 px-4 w-full cursor-pointer ">
-              <div className="hover:bg-[#e4e4e4] transition-colors duration-300 rounded-[15px] ease-in-out flex items-center p-2 px-3 ml-[50px]">
+            <div className="flex justify-center items-center p-2 px-3 ml-[90px]">
+              <div>
                 <input
                   type="text"
                   onChange={(e) => setSearchItem(e.target.value)}
                   value={searchItem}
                   placeholder="Search"
-                  className="w-full px-4 py-[10px] bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:border-transparent transition-all duration-200"
+                  className="w-[240px] px-5 py-[10px] bg-[#fff] border border-[#D1D5DB] hover:border-2 hover:border-black rounded-2xl focus:outline-none focus:border-2 focus:border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-200"
                 />
-                <button className="items-center absolute z-20 right-[35px]">
-                  <PackageSearch
-                    style={{ strokeWidth: 1.8 }}
-                    className="w-7 h-7 ml-2 text-[#212121]"
-                  />
-                </button>
               </div>
+              <button className="items-center absolute z-20 right-[25px]">
+                <PackageSearch
+                  style={{ strokeWidth: 1.8 }}
+                  className="w-7 h-7 ml-2 text-[#353535]"
+                />
+              </button>
             </div>
           </div>
 
@@ -154,32 +155,31 @@ export const Header = (props: Props) => {
             {isAuth ? (
               <div>
                 <div className="flex">
-                  <button
-                    ref={buttonRef}
-                    className="relative z-10 mx-1 flex gap-2 stroke items-center hover:bg-[#E4E4E4] p-2 px-3 rounded-full duration-300 ease-in-out "
-                    onClick={() => setIsNotiOpen(!isNotiOpen)}
-                  >
-                    <Bell
-                      style={{ strokeWidth: 2 }}
-                      className="w-8 h-8 text-[#212121]"
+                  <div className="relative">
+                    <button
+                      ref={buttonRef}
+                      className="relative z-10 mx-1 border-2 border-transparent hover:border-black  flex gap-2  items-center hover:bg-[#E4E4E4] p-3 rounded-full duration-300 ease-in-out "
+                      onClick={() => setIsNotiOpen(!isNotiOpen)}
+                    >
+                      <Bell
+                        style={{ strokeWidth: 2 }}
+                        className="w-8 h-8 text-[#212121]"
+                      />
+                      {unreadCount != null && unreadCount > 0 && (
+                        <span className="absolute -top-[2px] -right-[2px] bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </button>
+                    <NotiHeaderDropDown
+                      isNotiOpen={isNotiOpen}
+                      notificationRef={notificationRef}
+                      onSuccess={() => setIsNotiOpen(!isNotiOpen)}
+                      buttonRef={buttonRef}
                     />
-                    {unreadCount != null && unreadCount > 0 && (
-                      <span className="absolute -top-[2px] -right-[2px] bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
-                        {unreadCount}
-                      </span>
-                    )}
-                  </button>
-                  <NotiHeaderDropDown
-                    isNotiOpen={isNotiOpen}
-                    notificationRef={notificationRef}
-                    onSuccess={() => setIsNotiOpen(!isNotiOpen)}
-                  />
-
-                  <Link
-                    className="mx-1 ml-3 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
-                    to="/create-product"
-                  >
-                    <h1 className="text-base font-bold text-[#212121]">
+                  </div>
+                  <Link className={headerButtonStyles} to="/create-product">
+                    <h1 className="text-base  font-bold text-[#212121]">
                       Create
                     </h1>
                     <PackagePlus
@@ -188,20 +188,14 @@ export const Header = (props: Props) => {
                     />
                   </Link>
 
-                  <Link
-                    className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
-                    to="/bag"
-                  >
+                  <Link className={headerButtonStyles} to="/bag">
                     <h1 className="text-base font-bold text-[#212121]">Bag</h1>
                     <ShoppingCart
                       style={{ strokeWidth: 2 }}
                       className="w-8 h-8 text-[#212121] stroke-1 "
                     />
                   </Link>
-                  <Link
-                    className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
-                    to="/favorites"
-                  >
+                  <Link className={headerButtonStyles} to="/favorites">
                     <h1 className="text-base font-bold text-[#212121]">
                       Favorite
                     </h1>
@@ -210,7 +204,7 @@ export const Header = (props: Props) => {
                       style={{ strokeWidth: 2 }}
                     />
                   </Link>
-                  <div>
+                  <div className="my-auto">
                     <ProdileHeader
                       onSuccess={() => setIsDropdownOpen(!isDropdownOpen)}
                     />
@@ -219,29 +213,20 @@ export const Header = (props: Props) => {
               </div>
             ) : (
               <div className="flex">
-                <Link
-                  className="mx-1 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
-                  to="/bag"
-                >
+                <Link className={headerButtonStyles} to="/bag">
                   <h1 className="text-base font-bold text-[#212121]">Bag</h1>
                   <ShoppingCart
                     style={{ strokeWidth: 1.8 }}
                     className="w-8 h-8 text-[#212121] "
                   />
                 </Link>
-                <Link
-                  className="mx-2 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-5 rounded-full duration-300 ease-in-out group mt-1"
-                  to="/favorites"
-                >
+                <Link className={headerButtonStyles} to="/favorites">
                   <h1 className="text-base font-bold text-[#212121]">
                     Favorite
                   </h1>
                   <Heart className="w-7 h-9 text-[#212121]" />
                 </Link>
-                <Link
-                  to="/signIn"
-                  className="mx-2 flex gap-2 items-center hover:bg-[#E4E4E4] p-2 px-3 rounded-full duration-300 ease-in-out group mt-1"
-                >
+                <Link to="/signIn" className={headerButtonStyles}>
                   <h1 className="text-base font-bold text-[#212121] transition-colors duration-300">
                     Sign in
                   </h1>

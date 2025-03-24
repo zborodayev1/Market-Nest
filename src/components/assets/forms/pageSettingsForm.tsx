@@ -109,7 +109,7 @@ export const PageSettingsForm = (props: Props) => {
         <AnimatePresence>
           <div className="flex gap-7 items-center">
             <div className="flex items-center gap-2">
-              <h1>products per page:</h1>
+              <h1>limit:</h1>
               <motion.input
                 initial={{ opacity: 0 }}
                 animate={{

@@ -149,21 +149,3 @@ export const deleteAllNotifications = async (req, res) => {
     });
   }
 };
-
-export const getOneNotification = async (req, res) => {
-  const userId = req.userId;
-  const { id } = req.params;
-
-  try {
-    const notification = await NotiModel.findOne({ _id: id, userId });
-
-    if (!notification) {
-      return res.status(404).json({ message: 'Notification not found' });
-    }
-
-    res.json(notification);
-  } catch (error) {
-    console.error('Error getting notification:', error);
-    res.status(500).json({ message: 'Failed to get notification' });
-  }
-};

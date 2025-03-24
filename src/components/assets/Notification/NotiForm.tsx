@@ -3,14 +3,14 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { markNotificationAsReadReq } from '../../../redux/slices/notificationSlice';
 import { AppDispatch } from '../../../redux/store';
-import { Notification } from '../../../redux/types/notification.type';
+import { NotificationType } from '../../../redux/types/notification.type';
 interface FullNoti {
   state: string;
-  id: string;
+  notification: NotificationType;
 }
 
 interface Props {
-  notification: Notification;
+  notification: NotificationType;
   onSuccess: (state: FullNoti) => void;
 }
 
@@ -18,27 +18,34 @@ const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
   const dispatch: AppDispatch = useDispatch();
 
   const onClick = () => {
-    if (!notification.isRead) {
+    if (!notification?.isRead) {
       dispatch(
         markNotificationAsReadReq({
           notificationId: notification._id.toString(),
         })
       );
     }
-    onSuccess({ state: 'full', id: notification._id.toString() });
+    onSuccess({ state: 'full', notification: notification });
   };
 
   return (
     <>
       <button
         onClick={onClick}
-        className={`w-[300px] h-[50px] p-3 px-3 bg-[#fafafa] text-sm duration-300 relative`}
+        className={`w-[340px] h-[60px] p-3 px-5 bg-[#fafafa] hover:bg-[#e4e4e4] text-sm duration-300 relative`}
       >
         <div className="flex gap-2 items-center">
-          <img
-            className="w-7 h-7 p-1 bg-gradient-to-r from-gray-500 to-[#fafafa] rounded-full"
-            src={'http://localhost:5173/icon.svg'}
-          />
+          {!notification.isRead ? (
+            <div>
+              <div className="absolute top-[25px] left-3 w-2 h-2 bg-blue-500 rounded-full animate-ping z-10"></div>
+              <div className="absolute top-[25px] left-3 w-2 h-2 bg-blue-500 rounded-full z-10"></div>
+            </div>
+          ) : (
+            <div>
+              <div className="absolute top-[25px] left-3 w-2 h-2 bg-blue-500 rounded-full z-10"></div>
+            </div>
+          )}
+
           <div className="flex z-20 items-center">
             <div className="flex justify-center">
               <h1
@@ -58,15 +65,7 @@ const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
             <ChevronRight className={`h-5 w-5 absolute right-2 top-[15px] }`} />
           </div>
         </div>
-
-        {!notification.isRead && (
-          <div>
-            <div className="absolute w-2 h-2 bg-emerald-500/50 rounded-full animate-ping top-0 right-0 z-10"></div>
-            <div className="absolute w-2 h-2 bg-emerald-500/50 rounded-full top-0 right-0 z-10"></div>
-          </div>
-        )}
       </button>
-      <hr className="my-2 bg-[#f0f0f0] h-[2px]" />
     </>
   );
 };
