@@ -79,13 +79,10 @@ interface AuthState {
   isAuth: boolean;
   productUser: UserProfile | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  reqStatus: {
-    updateProfilePhone: 'idle' | 'loading' | 'succeeded' | 'failed';
-  };
+
   error: string | null;
   loading: boolean;
   message: string;
-  token: string | null;
 }
 
 const initialState: AuthState = {
@@ -93,27 +90,31 @@ const initialState: AuthState = {
   isAuth: false,
   productUser: null,
   status: 'idle',
-  reqStatus: {
-    updateProfilePhone: 'idle',
-  },
+
   error: null,
   loading: false,
   message: '',
-  token: localStorage.getItem('token') || null,
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    logout: (state) => {
+    logoutReq: (state) => {
+      state.loading = true;
+      state.status = 'loading';
+      state.error = null;
+    },
+    logoutSuc: (state) => {
       state.user = null;
       state.isAuth = false;
       state.error = null;
-      state.token = null;
-      localStorage.removeItem('token');
     },
-
+    logoutFail: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload;
+      state.loading = false;
+    },
     temporaryRegisterSuc: (state) => {
       state.status = 'succeeded';
       state.loading = false;
@@ -143,7 +144,6 @@ const authSlice = createSlice({
       state.isAuth = true;
       state.error = null;
       state.loading = false;
-      state.token = action.payload.token;
     },
     completeRegistrationFail: (state, action) => {
       state.status = 'failed';
@@ -213,11 +213,9 @@ const authSlice = createSlice({
     loginSuc: (state, action) => {
       state.status = 'succeeded';
       state.user = action.payload.user || (action.payload as UserProfile);
-      state.token = action.payload.token;
       state.isAuth = true;
       state.error = null;
       state.loading = false;
-      localStorage.setItem('token', action.payload.token);
     },
     loginFail: (state, action) => {
       state.status = 'failed';
@@ -283,7 +281,6 @@ const authSlice = createSlice({
     updateProfilePhoneSuc: (state, action) => {
       state.loading = false;
       state.status = 'succeeded';
-      state.reqStatus.updateProfilePhone = 'succeeded';
       if (state.user) {
         state.user = { ...state.user, ...action.payload.user };
       } else {
@@ -292,7 +289,6 @@ const authSlice = createSlice({
     },
     updateProfilePhoneFail: (state, action) => {
       state.status = 'failed';
-      state.reqStatus.updateProfilePhone = 'failed';
       state.error = action.payload || 'Error occurred';
       state.loading = false;
       if (state.isAuth && state.user) {
@@ -389,7 +385,6 @@ const authSlice = createSlice({
       })
       .addCase(updateProfilePhoneReq, (state) => {
         state.status = 'loading';
-        state.reqStatus.updateProfilePhone = 'loading';
         state.error = null;
         state.loading = true;
       })
@@ -419,7 +414,9 @@ export const selectIsAuth = (state: RootState): boolean => {
 export const selectUserProfile = (state: RootState) => state.auth.user;
 
 export const {
-  logout,
+  logoutReq,
+  logoutSuc,
+  logoutFail,
   temporaryRegisterSuc,
   temporaryRegisterFail,
   fetchProfileDataReq,

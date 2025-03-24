@@ -9,7 +9,7 @@ import {
 } from '../../../../redux/slices/productSlice';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { Product } from '../../../../redux/types/product.type';
-import { PageSettingsForm } from '../../../forms/pageSettingsForm';
+import { PageSettingsForm } from '../../../assets/forms/pageSettingsForm';
 import { ProductForm } from '../ProductForm/ProductForm';
 
 export const FavoritesPage = () => {

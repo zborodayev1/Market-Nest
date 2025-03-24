@@ -2,8 +2,8 @@ import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { Header } from './components/assets/Headers/Header';
-import { NotFound } from './components/assets/errors/NotFound';
+import { Header } from './components/assets/Header/Header';
+import { NotFoundErr } from './components/assets/errors/NotFoundErr';
 import { HomePage } from './components/pages/Home/HomePage';
 import { LogInPage } from './components/pages/LogIn/LogInPage';
 import { BagPage } from './components/pages/Product/Bag/BagPage';
@@ -32,7 +32,7 @@ export const App = () => {
       </div>
       <div>
         <Routes>
-          <Route element={<NotFound />} path="*" />
+          <Route element={<NotFoundErr />} path="*" />
           <Route element={<HomePage />} path="/" />
           <Route
             element={isAuth ? <Navigate to="/" /> : <LogInPage />}
@@ -65,7 +65,7 @@ export const App = () => {
           <Route element={<FavoritesPage />} path="/favorites" />
           <Route
             element={
-              userData?.role === 'admin' ? <PendingProducts /> : <NotFound />
+              userData?.role === 'admin' ? <PendingProducts /> : <NotFoundErr />
             }
             path="/products-pending"
           />

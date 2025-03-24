@@ -12,7 +12,10 @@ import { AddressPicker } from '../../../functons/address/AddressPicker';
 
 interface FormData {
   fullName?: string;
-  phone?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
   address?: string;
 }
 
@@ -28,33 +31,42 @@ export const UserData = ({ onSuccess }: Props) => {
   const dispatch: AppDispatch = useDispatch();
   const [address, setAddress] = useState<string>('');
   const [coordinates, setCoordinates] = useState<[number, number]>([
-    45.02626419993138, 78.38643193244936,
+    userData?.coordinates ? userData.coordinates.lat : 45.02626419993138,
+    userData?.coordinates ? userData.coordinates.lng : 78.38643193244936,
   ]);
-  const {
-    register,
-    handleSubmit,
-
-    reset,
-  } = useForm<FormData>({
+  const { register, handleSubmit, reset } = useForm<FormData>({
     defaultValues: {
       fullName: userData?.fullName || '',
       address: userData?.address || '',
+      coordinates: userData?.coordinates || {
+        lat: 45.02626419993138,
+        lng: 78.38643193244936,
+      },
     },
   });
 
   const onSubmit = (values: FormData) => {
     try {
       setIsSubmitting(true);
-      dispatch(updateProfileDataReq(values));
+      dispatch(
+        updateProfileDataReq({
+          fullName: values.fullName,
+          address: address,
+          coordinates: {
+            lat: coordinates[0],
+            lng: coordinates[1],
+          },
+        })
+      );
 
       if (status === 'succeeded') {
         reset({ ...userData, ...values });
-        onSuccess();
       }
     } catch (error) {
       console.error('Error:', error);
     } finally {
       setIsSubmitting(false);
+      onSuccess();
     }
   };
 
@@ -86,6 +98,7 @@ export const UserData = ({ onSuccess }: Props) => {
           </div>
 
           <AddressPicker
+            isUserProfileOpen={true}
             address={address}
             setAddress={setAddress}
             coordinates={coordinates}
@@ -110,7 +123,9 @@ export const UserData = ({ onSuccess }: Props) => {
             animate={{ opacity: 1 }}
             className="text-red-500 text-sm text-center mt-2"
           >
-            {error}
+            {typeof error === 'string'
+              ? error
+              : error.message || 'An error occurred'}
           </motion.p>
         )}
       </motion.form>

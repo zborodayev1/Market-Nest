@@ -1,8 +1,8 @@
-import { House } from 'lucide-react'
-import { motion } from 'motion/react'
-import { Link } from 'react-router-dom'
+import { House } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
 
-export const NotFound = () => {
+export const NotFoundErr = () => {
   return (
     <div className="h-screen bg-[#FFFFFF]">
       <motion.div
@@ -23,5 +23,5 @@ export const NotFound = () => {
         </div>
       </motion.div>
     </div>
-  )
-}
+  );
+};

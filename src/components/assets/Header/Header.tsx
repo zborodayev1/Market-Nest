@@ -15,6 +15,7 @@ import {
   selectIsAuth,
   selectUserProfile,
 } from '../../../redux/slices/authSlice';
+import { fetchNotificationCountReq } from '../../../redux/slices/notificationSlice';
 import {
   fetchProducts,
   getProductsBySearch,
@@ -98,12 +99,15 @@ export const Header = (props: Props) => {
     }
   }, [debouncedSearch, dispatch]);
 
+  useEffect(() => {
+    dispatch(fetchNotificationCountReq());
+  }, [dispatch]);
   return (
     <div>
       <div className="">
         <div className="relative items-center flex bg-[#F5F5F5] z-30 w-full h-[100px]">
           <div className="absolute left-[120px] transform -translate-x-1/2 flex justify-center items-center z-10">
-            <motion.div className="flex justify-center py-4 px-4 w-full cursor-pointer ">
+            <div className="flex justify-center py-4 px-4 w-full cursor-pointer ">
               <div className="hover:bg-[#e4e4e4] transition-colors duration-300 rounded-[15px] ease-in-out flex items-center p-2 px-3 ml-[50px]">
                 <input
                   type="text"
@@ -119,7 +123,7 @@ export const Header = (props: Props) => {
                   />
                 </button>
               </div>
-            </motion.div>
+            </div>
           </div>
 
           <div className="absolute inset-x-0 flex justify-center items-center">
@@ -269,7 +273,7 @@ export const Header = (props: Props) => {
           </motion.div>
         </div>
 
-        <div className="h-[1px] bg-[#E5E7EB]"></div>
+        <div className="h-[1px] bg-[#E5E7EB]" />
       </div>
     </div>
   );
