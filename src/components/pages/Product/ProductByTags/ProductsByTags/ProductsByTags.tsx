@@ -74,7 +74,7 @@ export const ProductsByTags = () => {
       ) : (
         <div className="mt-5 flex justify-start ml-10 text-2xl font-bold">
           <Link
-            className="flex items-center gap-2 mx-2 underline text-[#1266CD] hover:text-[#1266CD]/75 transition-colors duration-150 ease-linear"
+            className="flex items-center gap-2 mx-2 underline text-[#1266CD] hover:text-[#1266CD]/75 transition-colors duration-150 ease-linear delay-50"
             to="/products/All"
           >
             <MoveLeft />

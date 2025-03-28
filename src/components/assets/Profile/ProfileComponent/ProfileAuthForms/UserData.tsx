@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { User } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -8,7 +8,7 @@ import {
   updateProfileDataReq,
 } from '../../../../../redux/slices/authSlice';
 import { AppDispatch, RootState } from '../../../../../redux/store';
-import { AddressPicker } from '../../../functons/address/AddressPicker';
+import { AddressPicker } from '../../../functons/Address/AddressPicker';
 
 interface FormData {
   fullName?: string;
@@ -29,7 +29,7 @@ export const UserData = ({ onSuccess }: Props) => {
   const status = useSelector((state: RootState) => state.auth.status);
   const error = useSelector((state: RootState) => state.auth.error);
   const dispatch: AppDispatch = useDispatch();
-  const [address, setAddress] = useState<string>('');
+  const [address, setAddress] = useState<string>(userData?.address || '');
   const [coordinates, setCoordinates] = useState<[number, number]>([
     userData?.coordinates ? userData.coordinates.lat : 45.02626419993138,
     userData?.coordinates ? userData.coordinates.lng : 78.38643193244936,
@@ -44,6 +44,12 @@ export const UserData = ({ onSuccess }: Props) => {
       },
     },
   });
+
+  useEffect(() => {
+    if (userData) {
+      reset(userData);
+    }
+  }, [userData, reset]);
 
   const onSubmit = (values: FormData) => {
     try {
@@ -110,9 +116,9 @@ export const UserData = ({ onSuccess }: Props) => {
           type="submit"
           disabled={isSubmitting}
           whileTap={{ scale: 0.99 }}
-          className={` w-full p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128]  transition-all duration-300 ease-in-out    `}
+          className={` w-full p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128]  transition-all duration-300 ease-in-out   delay-50  `}
         >
-          <motion.span className="  text-[#fff] font-bold  duration-300 transition-colors ease-in-out group-hover:text-white  ">
+          <motion.span className="  text-[#fff] font-bold  duration-300 transition-colors ease-in-out   delay-50 ">
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </motion.span>
         </motion.button>

@@ -1,5 +1,6 @@
 import express from 'express';
-import { ProductController, UserController } from '../controllers/index.js';
+import upload from '../config/cloudinaryConfig.js';
+import { UserController } from '../controllers/index.js';
 import { checkAuth } from '../utils/checkAuth.js';
 import handleValidErr from '../utils/hanldeValidErr.js';
 import { loginValidation, registerValidation } from '../utils/validations.js';
@@ -18,7 +19,7 @@ router.post('/logout', UserController.logout);
 router.patch(
   '/user/avatar',
   checkAuth,
-  ProductController.handleUploadImage,
+  upload.single('image'),
   UserController.uploadAvatar
 );
 

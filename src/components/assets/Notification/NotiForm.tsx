@@ -32,38 +32,27 @@ const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
     <>
       <button
         onClick={onClick}
-        className={`w-[340px] h-[60px] p-3 px-5 bg-[#fafafa] hover:bg-[#e4e4e4] text-sm duration-300 relative`}
+        className="w-[340px] min-h-[80px] relative flex items-start text-sm p-3 pt-[30px] px-5 bg-[#fafafa] hover:bg-[#e4e4e4] duration-300 delay-50"
       >
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 w-full">
           {!notification.isRead ? (
             <div>
-              <div className="absolute top-[25px] left-3 w-2 h-2 bg-blue-500 rounded-full animate-ping z-10"></div>
-              <div className="absolute top-[25px] left-3 w-2 h-2 bg-blue-500 rounded-full z-10"></div>
+              <div className="absolute top-[36px] left-3 w-2 h-2 bg-blue-500 rounded-full animate-ping z-10"></div>
+              <div className="absolute top-[36px] left-3 w-2 h-2 bg-blue-500 rounded-full z-10"></div>
             </div>
           ) : (
             <div>
-              <div className="absolute top-[25px] left-3 w-2 h-2 bg-blue-500 rounded-full z-10"></div>
+              <div className="absolute top-[36px] left-3 w-2 h-2 bg-blue-500 rounded-full z-10"></div>
             </div>
           )}
 
-          <div className="flex z-20 items-center">
-            <div className="flex justify-center">
-              <h1
-                style={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  width: '215px',
-                }}
-                className=""
-              >
-                {notification.title}
-              </h1>
-            </div>
+          <div className="flex flex-col w-full">
+            <h1 className="whitespace-normal break-words">
+              {notification.title}
+            </h1>
           </div>
-          <div>
-            <ChevronRight className={`h-5 w-5 absolute right-2 top-[15px] }`} />
-          </div>
+
+          <ChevronRight className="h-5 w-4 absolute right-1 top-[30px]" />
         </div>
       </button>
     </>

@@ -105,7 +105,7 @@ export const Code = (props: Props) => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 "
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 delay-50"
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -121,9 +121,9 @@ export const Code = (props: Props) => {
         type="submit"
         disabled={isSubmitting}
         whileTap={{ scale: 0.99 }}
-        className={` w-full p-2 mt-5 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128]  transition-all duration-300 ease-in-out    `}
+        className={` w-full p-2 mt-5 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128]  transition-all duration-300 ease-in-out  delay-50   `}
       >
-        <motion.span className="  text-[#fff] font-bold  duration-300 transition-colors ease-in-out group-hover:text-white  ">
+        <motion.span className="  text-[#fff] font-bold  duration-300 transition-colors ease-in-out  delay-50">
           {isSubmitting ? 'Verification...' : 'Verify'}
         </motion.span>
       </motion.button>

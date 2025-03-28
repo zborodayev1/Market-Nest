@@ -35,7 +35,7 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
     notification: null,
   });
   const buttonStyles =
-    'px-4 py-1 text-md rounded-xl bg-gray-200 hover:bg-[#1f5e1c] hover:text-white transition-colors duration-200 ease-linear cursor-pointer';
+    'px-4 py-1 text-md rounded-xl bg-gray-200 hover:bg-[#1f5e1c] hover:text-white delay-50  transition-colors duration-200 ease-linear cursor-pointer';
 
   useEffect(() => {
     dispatch(fetchNotificationReq({ page, limit, filter }));
@@ -56,50 +56,52 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
   }, [dispatch, page, limit, filter]);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-center mt-5">Notifications</h1>
-      <div className="h-[1px] bg-[#E5E7EB] mt-2 w-[340px]" />
-      {status === 'succeeded' &&
-      notifications.length > 0 &&
-      fullNoti.state === 'home' ? (
-        <div className="col-3">
-          {notifications.map((notification: NotificationType) => (
-            <div key={notification._id} className="">
-              <NotiForm
-                notification={notification}
-                onSuccess={(state: FullNoti) => setFullNoti(state)}
-              />
-            </div>
-          ))}
-        </div>
-      ) : status === 'succeeded' && fullNoti.state === 'home' ? (
-        <div className="flex mt-3 p-2">
-          <motion.div
-            initial={{ opacity: 0, filter: 'blur(2px)' }}
-            animate={{ opacity: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, filter: 'blur(2px)' }}
-            transition={{ duration: 0.2 }}
-          >
-            No notifications available for this tag. Try to
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              onClick={refresh}
-              className="z-20 mx-1"
-            >
-              <b className="cursor-pointer">refresh</b>
-            </motion.button>
-            the page.
-          </motion.div>
-        </div>
-      ) : (
-        fullNoti.state === 'home' &&
-        status === 'loading' && (
-          <div className="flex justify-center">
-            <CircularProgress color="inherit" style={{ marginTop: 12 }} />
+    <>
+      <h1 className="text-2xl font-bold text-center mt-3">Notifications</h1>
+      <div className="h-[1px] bg-[#E5E7EB] mt-3 w-[340px]" />
+      <div className="px-2">
+        {status === 'succeeded' &&
+        notifications.length > 0 &&
+        fullNoti.state === 'home' ? (
+          <div className="col-3">
+            {notifications.map((notification: NotificationType) => (
+              <div key={notification._id} className="">
+                <NotiForm
+                  notification={notification}
+                  onSuccess={(state: FullNoti) => setFullNoti(state)}
+                />
+              </div>
+            ))}
           </div>
-        )
-      )}
+        ) : status === 'succeeded' && fullNoti.state === 'home' ? (
+          <div className="flex mt-3 ">
+            <motion.div
+              initial={{ opacity: 0, filter: 'blur(2px)' }}
+              animate={{ opacity: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, filter: 'blur(2px)' }}
+              transition={{ duration: 0.2 }}
+            >
+              No notifications available for this tag. Try to
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                onClick={refresh}
+                className="z-20 mx-1"
+              >
+                <b className="cursor-pointer">refresh</b>
+              </motion.button>
+              the page.
+            </motion.div>
+          </div>
+        ) : (
+          fullNoti.state === 'home' &&
+          status === 'loading' && (
+            <div className="flex justify-center">
+              <CircularProgress color="inherit" style={{ marginTop: 12 }} />
+            </div>
+          )
+        )}
+      </div>
 
       {fullNoti.state === 'full' && (
         <FullNotiForm
@@ -136,20 +138,21 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
 
       {notifications &&
         notifications.length > 0 &&
-        fullNoti.state === 'home' && (
+        fullNoti.state === 'home' &&
+        status !== 'loading' && (
           <div className="flex justify-center gap-2 mt-3 mb-5">
             {[...Array(totalPages).keys()].map((number) => (
               <button
                 key={number}
                 onClick={() => setPage(number + 1)}
-                className="px-3 py-1 rounded-full bg-gray-200 hover:bg-[#1f5e1c] hover:text-white transition-colors duration-200 ease-linear"
+                className="px-3 py-1 rounded-full bg-gray-200 hover:bg-[#1f5e1c] hover:text-white transition-colors duration-200 ease-linear delay-50"
               >
                 {number + 1}
               </button>
             ))}
           </div>
         )}
-    </div>
+    </>
   );
 };
 

@@ -40,13 +40,13 @@ export const ProdileHeader = (props: Props) => {
           style={{ width: 40, height: 40 }}
         >
           {userData?.avatarUrl ? (
-            <div className="rounded-full hover:shadow-xl transition-shadow duration-300 ease-in-out">
+            <div className="rounded-full hover:shadow-xl transition-shadow duration-300 ease-in-out delay-50">
               <Avatar src={userData.avatarUrl} />
             </div>
           ) : (
             <div>
               <CgProfile
-                className="rounded-full  duration-300 ease-in-out"
+                className="rounded-full  duration-300 ease-in-out hover:shadow-xl "
                 style={{ width: 35, height: 40 }}
               />
             </div>

@@ -35,7 +35,7 @@ export const EditProduct = () => {
   );
   const { error } = useSelector((state: RootState) => state.products.error);
   const [message, setMessage] = useState<string>('');
-  const { register, handleSubmit, setValue } = useForm<FormData>({
+  const { register, handleSubmit, setValue, reset } = useForm<FormData>({
     defaultValues: {
       name: product?.name || '',
       price: product?.price || 0,
@@ -43,6 +43,18 @@ export const EditProduct = () => {
       image: null,
     },
   });
+
+  useEffect(() => {
+    if (product) {
+      reset({
+        name: product.name || '',
+        price: product.price || 0,
+        tags: product.tags || [],
+        image: null,
+      });
+    }
+  }, [product, reset]);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -204,7 +216,7 @@ export const EditProduct = () => {
                     type="button"
                     key={tag}
                     onClick={() => handleTagClick(tag)}
-                    className={`w-1/3 sm:w-1/3 md:w-1/3 lg:w-1/3 px-4 py-2 rounded-lg transition-colors ease-in-out duration-300 
+                    className={`w-1/3 sm:w-1/3 md:w-1/3 lg:w-1/3 px-4 py-2 rounded-lg transition-colors ease-in-out duration-300 delay-50
                     ${
                       selectedTags.includes(tag)
                         ? 'bg-[#2B6128] text-white hover:bg-[#3C8737]'
@@ -239,7 +251,7 @@ export const EditProduct = () => {
                     transition={{ duration: 0.3 }}
                     type="button"
                     onClick={() => inputRef.current?.click()}
-                    className="w-[430px] h-[200px] border-dashed border-2 border-[#212121] flex justify-center items-center hover:bg-[#e4e4e4] transition-colors ease-in-out duration-300"
+                    className="w-[430px] h-[200px] border-dashed border-2 border-[#212121] flex justify-center items-center hover:bg-[#e4e4e4] transition-colors ease-in-out duration-300 delay-50"
                   >
                     <ImagePlus size={50} />
                   </motion.button>
@@ -261,7 +273,7 @@ export const EditProduct = () => {
                       size={40}
                       type="button"
                       onClick={handleImageRemove}
-                      className="absolute top-0 bg-red-500 right-0 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
+                      className="absolute top-0 bg-red-500 right-0 text-white rounded-full p-2 hover:bg-red-600 transition-colors delay-50"
                     />
                   </motion.div>
                 )}
@@ -271,7 +283,7 @@ export const EditProduct = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`mt-5 w-full p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128] hover:-translate-y-1 transition-all duration-300 ease-in-out`}
+              className={`mt-5 w-full p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128] delay-50 transition-all duration-300  ease-in-out`}
             >
               <span className="text-[#fff] font-bold">
                 {isSubmitting ? 'Creating...' : 'Create'}

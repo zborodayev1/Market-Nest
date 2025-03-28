@@ -73,7 +73,7 @@ export const RegisterPage = (props: Props) => {
               <h1>Already have an account?</h1>
               <Link to="/signIn">
                 <div className="w-full">
-                  <h1 className="ml-2 text-blue-500 hover:underline rounded-lg duration-300">
+                  <h1 className="ml-2 text-blue-500 hover:underline rounded-lg duration-300 delay-50">
                     Sign in
                   </h1>
                 </div>

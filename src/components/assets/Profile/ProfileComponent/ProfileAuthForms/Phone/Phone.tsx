@@ -1,17 +1,17 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
-import { DefForm } from './forms/DefForm'
-import { ForgotPassForm } from './forms/ForgotPassForm'
-import { Code } from './forms/Code'
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { Code } from './forms/Code';
+import { DefForm } from './forms/DefForm';
+import { ForgotPassForm } from './forms/ForgotPassForm';
 
 interface Props {
-  onSuccess: () => void
+  onSuccess: () => void;
 }
 export const Phone = (props: Props) => {
   const [phonePageState, setPhonePageState] = useState<
     'default' | 'forgotPass' | 'code'
-  >('default')
-  const { onSuccess } = props
+  >('default');
+  const { onSuccess } = props;
   return (
     <AnimatePresence>
       <motion.div
@@ -31,11 +31,14 @@ export const Phone = (props: Props) => {
           />
         )}
         {phonePageState === 'default' && (
-          <button onClick={() => setPhonePageState('forgotPass')}>
+          <button
+            className="p-1 px-3 rounded-lg text-[#000] bg-[#E5E7EB] hover:text-[#fff] hover:bg-[#2b6128] transition-colors duration-200 ease-linear delay-50"
+            onClick={() => setPhonePageState('forgotPass')}
+          >
             Forgot password
           </button>
         )}
       </motion.div>
     </AnimatePresence>
-  )
-}
+  );
+};

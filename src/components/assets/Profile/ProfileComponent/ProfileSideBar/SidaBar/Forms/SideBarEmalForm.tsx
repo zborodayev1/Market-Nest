@@ -46,7 +46,7 @@ export const SideBarEmalForm: React.FC<Props> = (props) => {
               ChangePhone: false,
             }))
           }
-          className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex justify-between items-center gap-1 w-full transition-colors duration-300 ease-in-out"
+          className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex justify-between items-center gap-1 w-full transition-colors duration-300 ease-in-out delay-50"
         >
           <div className="">
             {userData?.email ? (

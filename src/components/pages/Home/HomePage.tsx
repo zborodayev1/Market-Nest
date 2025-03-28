@@ -55,7 +55,7 @@ export const HomePage = () => {
                 <button
                   key={index}
                   onClick={() => handleSelectTag(tag)}
-                  className={`px-5 py-1 rounded-lg transition-colors ease-in-out duration-300 bg-gray-200 text-gray-800 hover:bg-[#1f5e1c] hover:text-white`}
+                  className={`px-5 py-1 rounded-lg transition-colors ease-in-out duration-300 bg-gray-200 text-gray-800 hover:bg-[#1f5e1c] hover:text-white delay-50`}
                 >
                   {tag}
                 </button>

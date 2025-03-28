@@ -50,11 +50,7 @@ export const createProduct = createAsyncThunk(
   'products/createProduct',
   async (productData: FormData, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post('/products', productData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const { data } = await axios.post('/products', productData);
 
       return data;
     } catch (error: unknown) {
@@ -76,11 +72,7 @@ export const editProduct = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const { data } = await axios.patch(`/products/${id}`, productData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const { data } = await axios.patch(`/products/${id}`, productData);
 
       return data;
     } catch (error: unknown) {
