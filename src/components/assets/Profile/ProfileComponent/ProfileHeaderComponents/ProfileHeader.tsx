@@ -30,10 +30,10 @@ export const ProdileHeader = (props: Props) => {
   };
 
   return (
-    <div className="group px-3">
+    <div className="group pr-3">
       <button
         onClick={handleCLick}
-        className="mx-2 flex gap-2 items-center right-0 rounded-full duration-300 ease-in-out group mt-1"
+        className="flex gap-2 items-center right-0 rounded-full duration-300 ease-in-out group"
       >
         <div
           className="shadow-lg rounded-full  relative flex items-center justify-center"

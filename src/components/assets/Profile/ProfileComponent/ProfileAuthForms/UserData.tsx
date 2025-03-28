@@ -118,7 +118,7 @@ export const UserData = ({ onSuccess }: Props) => {
           whileTap={{ scale: 0.99 }}
           className={` w-full p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128]  transition-all duration-300 ease-in-out   delay-50  `}
         >
-          <motion.span className="  text-[#fff] font-bold  duration-300 transition-colors ease-in-out   delay-50 ">
+          <motion.span className="  text-[#fff] font-bold  duration-300 transition-colors ease-in-out  delay-50 ">
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </motion.span>
         </motion.button>

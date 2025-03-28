@@ -1,9 +1,10 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 
 export const HomePage = () => {
   const nav = useNavigate();
+
   const availableTags = [
     'Clothes',
     'Electronics',
@@ -15,7 +16,7 @@ export const HomePage = () => {
     'Decorations and luxury',
   ];
 
-  const handleSelectTag = (tag: any) => {
+  const handleSelectTag = (tag: string) => {
     nav(`/products/${tag}`);
   };
 
@@ -29,16 +30,16 @@ export const HomePage = () => {
           content="market, shop, market nest, market nests"
         />
       </Helmet>
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
         className="bg-[#FFFFFF]"
       >
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: { duration: 0.5 } }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
           className="text-xl"
         >
           <div className="flex justify-center mt-7 relative overflow-hidden">
@@ -55,7 +56,7 @@ export const HomePage = () => {
                 <button
                   key={index}
                   onClick={() => handleSelectTag(tag)}
-                  className={`px-5 py-1 rounded-lg transition-colors ease-in-out duration-300 bg-gray-200 text-gray-800 hover:bg-[#1f5e1c] hover:text-white delay-50`}
+                  className={`px-5 py-1 rounded-xl transition-colors ease-in-out duration-300 bg-gray-200 text-gray-800 hover:bg-[#1f5e1c] hover:text-white delay-50`}
                 >
                   {tag}
                 </button>

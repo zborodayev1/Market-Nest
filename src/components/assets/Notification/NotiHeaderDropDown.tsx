@@ -28,7 +28,7 @@ export const NotiHeaderDropDown: React.FC<Props> = ({
 
   return (
     <div>
-      <div style={{ right: -position.position }} className={`absolute z-30`}>
+      <div style={{ right: -position.position }} className={`absolute z-30 `}>
         <AnimatePresence>
           {isNotiOpen && (
             <motion.div
