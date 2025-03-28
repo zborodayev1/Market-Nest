@@ -10,9 +10,6 @@ import {
   fetchNotificationFail,
   fetchNotificationReq,
   fetchNotificationSuc,
-  getOneNotificationFail,
-  getOneNotificationReq,
-  getOneNotificationSuc,
   markAllNotificationsAsReadFail,
   markAllNotificationsAsReadReq,
   markAllNotificationsAsReadSuc,
@@ -20,7 +17,7 @@ import {
   markNotificationAsReadReq,
   markNotificationAsReadSuc,
 } from '../slices/notificationSlice';
-import { Notification } from '../types/notification.type';
+import { NotificationType } from '../types/notification.type';
 
 function* fetchNotificationsSaga(action: {
   payload: { page: number; limit: number; filter: string };
@@ -28,7 +25,7 @@ function* fetchNotificationsSaga(action: {
   try {
     const { page, limit, filter } = action.payload;
     const { data } = yield call(() =>
-      axios.get<{ notifications: Notification[] }>(
+      axios.get<{ notifications: NotificationType[] }>(
         `/noti?page=${page}&limit=${limit}&filter=${filter}`
       )
     );
@@ -82,20 +79,6 @@ function* deleteAllNotificationsSaga() {
   }
 }
 
-function* getOneNotificationSaga(action: { payload: { id: string } }) {
-  try {
-    const { id } = action.payload;
-    const { data } = yield call(() => axios.get(`/noti/${id}`));
-    yield put(getOneNotificationSuc(data));
-  } catch (error: any) {
-    yield put(
-      getOneNotificationFail(
-        error.response?.data || 'Failed to getOneNotification'
-      )
-    );
-  }
-}
-
 function* markAllNotificationsAsReadSaga() {
   try {
     const { data } = yield call(() => axios.patch(`/noti/mark-all-read`));
@@ -114,7 +97,6 @@ export function* watchNotificationSaga() {
   yield takeLatest(markNotificationAsReadReq, markNotificationAsReadSaga);
   yield takeLatest(fetchNotificationCountReq.type, fetchNotificationCountSaga);
   yield takeLatest(deleteAllNotificationsReq.type, deleteAllNotificationsSaga);
-  yield takeLatest(getOneNotificationReq, getOneNotificationSaga);
   yield takeLatest(
     markAllNotificationsAsReadReq,
     markAllNotificationsAsReadSaga

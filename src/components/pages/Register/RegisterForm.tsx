@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/auth/useAuth';
 import { temporaryRegisterReq } from '../../../redux/slices/authSlice';
 import { AppDispatch } from '../../../redux/store';
-import { AddressPicker } from '../../assets/functons/address/AddressPicker';
+import { AddressPicker } from '../../assets/functons/Address/AddressPicker';
 
 interface Props {
   setLoading: (loading: boolean) => void;
@@ -148,7 +148,7 @@ export const RegisterForm = (props: Props) => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 "
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 delay-50 duration-300 "
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
@@ -193,9 +193,9 @@ export const RegisterForm = (props: Props) => {
             type="submit"
             disabled={!isValid || loading}
             whileTap={{ scale: 0.99 }}
-            className={`w-150  p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128] transition-all duration-300 ease-in-out`}
+            className={`w-150  p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128] delay-50 transition-all duration-300 ease-in-out`}
           >
-            <span className="text-[#fff] font-bold duration-300 transition-colors ease-in-out group-hover:text-white">
+            <span className="text-[#fff] font-bold duration-300 transition-colors ease-in-out ">
               {loading ? 'Creating account...' : 'Create account'}
             </span>
           </motion.button>

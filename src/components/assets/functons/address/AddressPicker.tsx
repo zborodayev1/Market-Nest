@@ -36,7 +36,7 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
       }),
     []
   );
-
+  console.log({ address });
   useEffect(() => {
     setTimeout(() => {
       mapRef.current?.invalidateSize();

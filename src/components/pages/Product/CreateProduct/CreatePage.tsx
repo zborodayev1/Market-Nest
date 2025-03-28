@@ -6,11 +6,8 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import {
-  createProduct,
-  selectProducts,
-} from '../../../../redux/slices/productSlice';
-import { AppDispatch } from '../../../../redux/store';
+import { createProduct } from '../../../../redux/slices/productSlice';
+import { AppDispatch, RootState } from '../../../../redux/store';
 
 interface FormData {
   name: string;
@@ -23,13 +20,13 @@ export const CreatePage = () => {
   const dispatch: AppDispatch = useDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const { error } = useSelector(selectProducts);
+  const [selectedTags, setSelectedTags] = useState<string[]>(['Sport']);
+  const error = useSelector((state: RootState) => state.products.error);
   const [message, setMessage] = useState<string>('');
   const { register, handleSubmit, setValue } = useForm<FormData>({
     defaultValues: {
-      name: '',
-      price: 0,
+      name: 'testtest',
+      price: 11110,
       tags: [],
       image: null,
     },
@@ -68,9 +65,8 @@ export const CreatePage = () => {
 
       if (values.image instanceof File) {
         formData.append('image', values.image);
-      } else {
-        formData.append('image', '');
       }
+
       await dispatch(createProduct(formData)).unwrap();
 
       toast('Successfully created!', {
@@ -122,19 +118,20 @@ export const CreatePage = () => {
         />
       </Helmet>
       <motion.div
-        initial={{ opacity: 0, filter: 'blur(5px)' }}
+        initial={{ opacity: 0, filter: 'blur(10px)' }}
         animate={{ opacity: 1, filter: 'blur(0px)' }}
-        exit={{ opacity: 0, filter: 'blur(5px)' }}
-        transition={{ duration: 0.3, delay: 0.2 }}
+        exit={{ opacity: 0, filter: 'blur(10px)' }}
+        transition={{ duration: 0.2, delay: 0.3 }}
         className="flex justify-center items-center mt-5"
       >
-        <div>
-          <h1 className="flex justify-center mb-5 font-bold text-2xl">
+        <div className="h-[1000px]">
+          <h1 className="flex justify-center mb-5 font-bold  text-2xl">
             Create Product
           </h1>
+
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="gap-2 bg-[#f5f5f5] p-5 px-6 rounded-2xl shadow-xl"
+            className="gap-2 bg-[#f5f5f5] p-5 px-6 rounded-2xl border-2 "
           >
             <div>
               <label className="flex items-center gap-2 text-xl font-bold text-black  mb-1">
@@ -173,7 +170,7 @@ export const CreatePage = () => {
                     type="button"
                     key={tag}
                     onClick={() => handleTagClick(tag)}
-                    className={`w-1/3 sm:w-1/3 md:w-1/3 lg:w-1/3 px-4 py-2 rounded-lg transition-colors ease-in-out duration-300 
+                    className={`w-1/3 sm:w-1/3 md:w-1/3 lg:w-1/3 px-4 py-2 rounded-lg transition-colors ease-in-out duration-300 delay-50
                     ${
                       selectedTags.includes(tag)
                         ? 'bg-[#2B6128] text-white hover:bg-[#3C8737]'
@@ -208,7 +205,7 @@ export const CreatePage = () => {
                     transition={{ duration: 0.3 }}
                     type="button"
                     onClick={() => inputRef.current?.click()}
-                    className="w-[430px] h-[200px] border-dashed border-2 border-[#212121] flex justify-center items-center hover:bg-[#e4e4e4] transition-colors ease-in-out duration-300"
+                    className="w-[430px] h-[200px] border-dashed border-2 border-[#212121] flex justify-center items-center hover:bg-[#e4e4e4] transition-colors ease-in-out duration-300 delay-50"
                   >
                     <ImagePlus size={50} />
                   </motion.button>
@@ -230,7 +227,7 @@ export const CreatePage = () => {
                       size={40}
                       type="button"
                       onClick={handleImageRemove}
-                      className="absolute top-0 bg-red-500 right-0 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
+                      className="absolute top-0 bg-red-500 right-0 text-white rounded-full p-2 hover:bg-red-600 transition-colors delay-50"
                     />
                   </motion.div>
                 )}
@@ -240,7 +237,7 @@ export const CreatePage = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`mt-5 w-full p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128] hover:-translate-y-1 transition-all duration-300 ease-in-out`}
+              className={`mt-5 w-full p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128]  transition-all duration-300 ease-in-out delay-50`}
             >
               <span className="text-[#fff] font-bold">
                 {isSubmitting ? 'Creating...' : 'Create'}

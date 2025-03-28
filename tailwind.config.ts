@@ -3,13 +3,10 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
-      strokeWidth: {
-        2: '2.5px',
-        3: '3px',
-        4: '4px',
-        6: '6px',
+      colors: {
+        g: '#3C8737',
       },
     },
   },
   plugins: [],
-}
+};

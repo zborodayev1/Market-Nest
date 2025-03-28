@@ -1,17 +1,17 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { DefForm } from './forms/DefForm'
-import { useState } from 'react'
-import { ForgotPassForm } from './forms/ForgotPassForm'
-import { Code } from './forms/Code'
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { Code } from './forms/Code';
+import { DefForm } from './forms/DefForm';
+import { ForgotPassForm } from './forms/ForgotPassForm';
 
 interface Props {
-  onSuccess: () => void
+  onSuccess: () => void;
 }
 export const Password = (props: Props) => {
   const [passwordPageState, setPasswordPageState] = useState<
     'default' | 'forgotPass' | 'code'
-  >('default')
-  const { onSuccess } = props
+  >('default');
+  const { onSuccess } = props;
 
   return (
     <AnimatePresence>
@@ -32,11 +32,14 @@ export const Password = (props: Props) => {
           />
         )}
         {passwordPageState === 'default' && (
-          <button onClick={() => setPasswordPageState('forgotPass')}>
+          <button
+            className="p-1 px-3 rounded-lg text-[#000] bg-[#E5E7EB] hover:text-[#fff] hover:bg-[#2b6128] transition-colors duration-200 ease-linear"
+            onClick={() => setPasswordPageState('forgotPass')}
+          >
             Forgot password
           </button>
         )}
       </motion.div>
     </AnimatePresence>
-  )
-}
+  );
+};

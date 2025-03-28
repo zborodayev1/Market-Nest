@@ -1,6 +1,6 @@
 import { Avatar } from '@mui/material';
-import { UserProfile } from '../../../../../redux/slices/authSlice';
-import { formatPhoneNumber } from '../../../../assets/functons/format/phone/PhoneFormat';
+import { UserProfile } from '../../../../../redux/types/auth.type';
+import { formatPhoneNumber } from '../../../../assets/functons/format/Phone/PhoneFormat';
 
 interface Props {
   user: UserProfile | null;

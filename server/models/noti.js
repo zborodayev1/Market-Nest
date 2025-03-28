@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 const NotiSchema = new mongoose.Schema(
   {
@@ -11,7 +11,7 @@ const NotiSchema = new mongoose.Schema(
     },
     actionType: {
       type: String,
-      enum: ['created', 'approved', 'rejected', 'info'],
+      enum: ['created', 'approved', 'info', 'error', 'deleted'],
       required: true,
     },
     userId: {
@@ -23,6 +23,6 @@ const NotiSchema = new mongoose.Schema(
     updatedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
-)
+);
 
-export default mongoose.model('Noti', NotiSchema)
+export default mongoose.model('Noti', NotiSchema);

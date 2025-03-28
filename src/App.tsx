@@ -12,6 +12,7 @@ import { EditProduct } from './components/pages/Product/EditProduct/EditProduct'
 import { FavoritesPage } from './components/pages/Product/FavoritesProducts/FavoritesPage';
 import { PendingProducts } from './components/pages/Product/ForAdmins/PendingProducts';
 import { FullProduct } from './components/pages/Product/FullProduct/FullProduct';
+import { ProductsByTags } from './components/pages/Product/ProductByTags/ProductsByTags/ProductsByTags';
 import { RegisterPage } from './components/pages/Register/RegisterPage';
 import { VerifyMail } from './components/pages/Register/VerifyMail';
 import { selectIsAuth, selectUserProfile } from './redux/slices/authSlice';
@@ -73,6 +74,7 @@ export const App = () => {
             element={<VerifyMail code={code} onSuccess={() => setCode(true)} />}
             path="/verify-email"
           />
+          <Route element={<ProductsByTags />} path="/products/:selectedTag" />
         </Routes>
       </div>
     </div>

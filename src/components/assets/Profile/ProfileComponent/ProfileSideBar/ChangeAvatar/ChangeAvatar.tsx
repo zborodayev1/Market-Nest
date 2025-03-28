@@ -86,7 +86,7 @@ export const ChangeAvatar = () => {
           <Avatar style={{ width: 45, height: 45 }} src={userData?.avatarUrl} />
         </motion.div>
 
-        <div className="absolute inset-0 flex justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-linear">
+        <div className="absolute inset-0 flex justify-center rounded-full opacity-0 group-hover:opacity-100 delay-50 transition-opacity duration-200 ease-linear">
           <div className="bg-[#fafafa] bg-opacity-90 rounded-full flex items-center justify-center ">
             <span className="text-[#212121] text-xs font-medium">
               Change Avatar
@@ -114,21 +114,21 @@ export const ChangeAvatar = () => {
       <AnimatePresence>
         {preview && (
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, filter: 'blur(10px)' }}
             transition={{ duration: 0.3 }}
-            className="relative"
+            className=""
           >
             <img
               src={preview}
               alt="Avatar Preview"
-              className="w-[50px] h-[50px] object-cover rounded-full border border-[#212121]"
+              className="w-[45px] h-[45px] object-cover rounded-full border border-[#212121]"
             />
             <X
-              size={20}
+              size={18}
               onClick={handleRemovePreview}
-              className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 cursor-pointer hover:bg-red-600 transition-colors"
+              className="z-30 absolute top-[-4px] left-[50px] bg-[#e4e4e4] text-black rounded-md p-[2px] cursor-pointer"
             />
           </motion.div>
         )}
@@ -136,16 +136,13 @@ export const ChangeAvatar = () => {
 
       {preview && (
         <>
-          <motion.button
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             onClick={handleUpload}
-            className="px-3 py-1 bg-blue-50 h-[30px] text-[#212121] border border-[#212121] rounded-md"
+            className="ml-5 bg-blue-50 py-1 px-4 text-[#212121] border-2 border-gray-500/50 hover:border-[#212121] duration-300 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] delay-100  rounded-md transition-all 
+            "
           >
             Change
-          </motion.button>
+          </button>
         </>
       )}
     </div>

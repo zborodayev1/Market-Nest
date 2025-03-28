@@ -97,7 +97,7 @@ export const SideBar = (props: Props) => {
               />
               <motion.div variants={contentVariants} className="text-sm mt-1">
                 <motion.button
-                  className="w-full bg-[#fcdede] hover:bg-[#f5b3b3] transition-colors hover:bg ease-in-out duration-300  text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2"
+                  className="w-full bg-[#fcdede] hover:bg-[#f5b3b3] transition-colors hover:bg ease-in-out duration-300  text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2 delay-50 "
                   onClick={onClickLogout}
                 >
                   <LogOut />

@@ -84,7 +84,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="p-[2px] text-base  border border-gray-950 rounded-lg shadow-[5px_5px_10px_rgba(0,0,0,0.5)] duration-300 bg-transparent"
+      className="p-[2px] text-base  border border-gray-950 rounded-lg shadow-[4px_4px_5px_rgba(0,0,0,0.5)] duration-300 bg-transparent"
     >
       <div className="shadow-sm p-2 rounded-md min-w-[260px] max-w-[264px] min-h-[100px] max-h-[450px] bg-[#f5f5f5] bg-clip-padding">
         <div className="ml-1 min-h-[200px]">
@@ -196,7 +196,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             <div className="mt-1 justify-center flex">
               <motion.button
                 onClick={toggleBag}
-                className="w-[240px] flex gap-1 bg-[#3C8737] rounded-md p-1 text-white text-base hover:bg-[#2b6128] transition-colors duration-150 ease-in-out justify-center"
+                className="w-[240px] flex justify-center gap-1 rounded-xl p-1 text-base text-white bg-[#3C8737] hover:bg-[#2b6128]  transition-colors duration-150 ease-in-out delay-50"
                 style={{ overflow: 'hidden' }}
               >
                 <motion.span
@@ -232,13 +232,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           ) : (
             <div className="flex justify-between mt-2">
               <button
-                className="bg-[#3C8737] text-white w-[120px] rounded-lg py-1 px-4 hover:bg-[#33722e] transition-colors ease-linear duration-150"
+                className="bg-[#3C8737] text-white w-[120px] rounded-lg py-1 px-4 hover:bg-[#33722e] delay-50 transition-colors ease-linear duration-150"
                 onClick={onSubmit}
               >
                 Approve
               </button>
               <button
-                className="  bg-[#932525] text-white w-[120px] rounded-lg py-1 px-4 hover:bg-[#7e2525] transition-colors ease-linear duration-150"
+                className="  bg-[#932525] text-white w-[120px] rounded-lg py-1 px-4 hover:bg-[#7e2525] delay-50 transition-colors ease-linear duration-150"
                 onClick={() => handleDelete(product._id)}
               >
                 Reject

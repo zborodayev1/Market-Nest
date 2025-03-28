@@ -1,35 +1,36 @@
-import express from 'express'
-import { ProductController } from '../controllers/index.js'
-import { checkAuth } from '../utils/checkAuth.js'
-import { checkAdmin } from '../utils/checkIsAdmin.js'
+import express from 'express';
+import upload from '../config/cloudinaryConfig.js';
+import { ProductController } from '../controllers/index.js';
+import { checkAuth } from '../utils/checkAuth.js';
+import { checkAdmin } from '../utils/checkIsAdmin.js';
 
-const router = express.Router()
+const router = express.Router();
 
 router.post(
   '/',
   checkAuth,
-  ProductController.handleUploadImage,
+  upload.single('image'),
   ProductController.createProduct
-)
+);
 
-router.get('/products-pending', ProductController.getPendingProducts)
+router.get('/products-pending', ProductController.getPendingProducts);
 
-router.get('/', ProductController.getAllProducts)
+router.get('/', ProductController.getAllProducts);
 
-router.post('/products-by-search', ProductController.getProductsBySearch)
+router.post('/products-by-search', ProductController.getProductsBySearch);
 
-router.delete('/delete/all', ProductController.deleteAllProducts)
+router.delete('/delete/all', ProductController.deleteAllProducts);
 
-router.patch('/:id', checkAuth, ProductController.patchProduct)
+router.patch('/:id', checkAuth, ProductController.patchProduct);
 
 router.patch(
   '/:id/status',
   checkAuth,
   checkAdmin,
   ProductController.approveProduct
-)
-router.get('/:id', ProductController.getOneProduct)
+);
+router.get('/:id', ProductController.getOneProduct);
 
-router.delete('/:id', checkAuth, ProductController.deleteProduct)
+router.delete('/:id', checkAuth, ProductController.deleteProduct);
 
-export default router
+export default router;

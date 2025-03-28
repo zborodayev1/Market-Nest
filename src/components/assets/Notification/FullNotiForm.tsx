@@ -1,13 +1,12 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-  clearFullNotifi,
-  Notification,
-} from '../../../redux/slices/notificationSlice';
+import { NotificationType } from '../../../redux/types/notification.type';
 interface Props {
-  notification?: Notification | null;
-  setFullNoti: (noti: { state: string; id: string }) => void;
+  notification?: { state: string; notification: NotificationType | null };
+  setFullNoti: (noti: {
+    state: string;
+    notification: NotificationType | null;
+  }) => void;
   onSuccess: () => void;
 }
 
@@ -17,45 +16,48 @@ export const FullNotiForm: React.FC<Props> = ({
   setFullNoti,
 }) => {
   const nav = useNavigate();
-  const dispatch = useDispatch();
+  const buttonStyle =
+    'py-1 px-4 rounded-xl bg-gray-200 hover:bg-[#1f5e1c] hover:text-white text-black transition-colors duration-200 ease-linear delay-50 ';
 
   const handleBack = () => {
-    dispatch(clearFullNotifi());
-    setFullNoti({ state: 'home', id: '' });
+    setFullNoti({ state: 'home', notification: null });
   };
 
   const handleGTP = () => {
     onSuccess();
-    nav(`/product/${notification?.productId}`);
+    nav(`/product/${notification?.notification?.productId}`);
   };
 
   return (
-    <div className="mt-5">
-      <div className="flex gap-2 items-center">
-        <img
-          className="w-8 h-8 p-1 pt-[6px] bg-gradient-to-r from-gray-500 to-[#fafafa] rounded-full"
-          src={'http://localhost:5173/icon.svg'}
-        />
-      </div>
-      <div className="flex  items-center">
-        <div className="flex justify-center">
-          <h1 className="">{notification?.title}</h1>
+    <div className="mt-5 p-3">
+      <div className="flex items-center">
+        <div className="flex justify-center items-center gap-3">
+          <div>
+            <div className="w-2 h-2 bg-blue-500 rounded-full z-10"></div>
+          </div>
+          <div className="flex flex-col w-full">
+            <h1 className="whitespace-normal text-base break-words">
+              {notification?.notification?.title}
+            </h1>
+          </div>
         </div>
       </div>
-      <div className="flex justify-center relative top-5 gap-4">
-        <button
-          onClick={handleGTP}
-          className="py-1 px-4 rounded-xl bg-gray-200 hover:bg-gray-300 text-black transition-colors duration-200 ease-linear"
-        >
-          Product
-        </button>
-        <button
-          onClick={handleBack}
-          className="py-1 px-4 rounded-xl bg-gray-200 hover:bg-gray-300 text-black transition-colors duration-200 ease-linear"
-        >
-          Back
-        </button>
-      </div>
+      {notification?.notification?.actionType !== 'deleted' ? (
+        <div className="flex justify-center relative top-5 gap-4">
+          <button onClick={handleGTP} className={`${buttonStyle}`}>
+            Product
+          </button>
+          <button onClick={handleBack} className={`${buttonStyle}`}>
+            Back
+          </button>
+        </div>
+      ) : (
+        <div className="flex justify-center mt-2">
+          <button onClick={handleBack} className={`${buttonStyle} `}>
+            Back
+          </button>
+        </div>
+      )}
     </div>
   );
 };

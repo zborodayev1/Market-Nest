@@ -124,9 +124,9 @@ export const VerifyMail = (props: Props) => {
                 type="submit"
                 disabled={!isValid || loading}
                 whileTap={{ scale: 0.99 }}
-                className={`w-[320px] p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128]  transition-all duration-300 ease-in-out`}
+                className={`w-[320px] p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128] delay-50  transition-all duration-300 ease-in-out`}
               >
-                <span className="text-[#fff] font-bold duration-300 transition-colors ease-in-out group-hover:text-white">
+                <span className="text-[#fff] font-bold duration-300 transition-colors ease-in-out group-hover:text-white delay-50">
                   {loading ? 'Verifying...' : 'Verify'}
                 </span>
               </motion.button>
