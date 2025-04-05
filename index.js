@@ -2,7 +2,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import http from 'http';
-import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { WebSocketServer } from 'ws';
@@ -41,7 +40,6 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '15mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(multer().none());
 app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);

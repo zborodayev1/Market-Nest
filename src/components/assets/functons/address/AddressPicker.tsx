@@ -3,6 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import { MapPin } from 'lucide-react';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import Input from '../../../ui/input/Input';
 
 interface AddressPickerProps {
   address: string;
@@ -20,12 +21,8 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
   isUserProfileOpen,
 }) => {
   const mapRef = useRef<L.Map | null>(null);
-  const inputClasses =
-    'px-5 py-2 w-[300px] h-[50px] bg-[#fff] border border-[#212121] rounded-lg focus:outline-none';
   const labelClasses =
     'flex items-center gap-2 text-sm font-medium text-[#212121] mb-1';
-  const inputProfileClasses =
-    'w-[342px] px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none ';
   const customIcon = useMemo(
     () =>
       new L.Icon({
@@ -86,18 +83,26 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
   }, []);
 
   return (
-    <div className="flex justify-center items-center flex-col gap-3">
-      <div className="">
+    <div className="flex justify-center items-center flex-col gap-3 ">
+      <div className="cursor-default">
         <div>
           <label className={labelClasses}>
             <MapPin size={18} /> Address
           </label>
-          <div className="flex relative">
-            <input
-              readOnly
-              value={address}
-              placeholder="Selected location will be displayed here"
-              className={`${isUserProfileOpen ? inputProfileClasses : inputClasses}`}
+          <div className="flex relative ">
+            <Input
+              icon={<MapPin size={18} />}
+              inputStyle={`${isUserProfileOpen ? 'w-[342px]' : 'w-75'} pl-5 py-2`}
+              placeholder="Address"
+              sircleWidth={36}
+              sircleHeight={36}
+              sircleTop={2}
+              sircleRight={2}
+              sircleHeightActive={40}
+              sircleWidthActive={40}
+              iconRight={10}
+              iconTop={10}
+              isAddress={true}
             />
           </div>
         </div>

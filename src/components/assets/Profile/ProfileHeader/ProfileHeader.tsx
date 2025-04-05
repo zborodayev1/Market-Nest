@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchProfileDataReq,
   selectUserProfile,
-} from '../../../../../redux/slices/authSlice';
-import { AppDispatch } from '../../../../../redux/store';
+} from '../../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../../redux/store';
 
 interface Props {
   onSuccess: () => void;
@@ -36,11 +36,11 @@ export const ProdileHeader = (props: Props) => {
         className="flex gap-2 items-center right-0 rounded-full duration-300 ease-in-out group"
       >
         <div
-          className="shadow-lg rounded-full  relative flex items-center justify-center"
+          className="shadow-lg rounded-full cursor-pointer  relative flex items-center justify-center"
           style={{ width: 40, height: 40 }}
         >
           {userData?.avatarUrl ? (
-            <div className="rounded-full hover:shadow-xl transition-shadow duration-300 ease-in-out delay-50">
+            <div className="rounded-full hover:shadow-xl  transition-shadow duration-300 ease-in-out delay-50">
               <Avatar src={userData.avatarUrl} />
             </div>
           ) : (

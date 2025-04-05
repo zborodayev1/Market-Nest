@@ -42,14 +42,14 @@ export const Seacrh = () => {
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           tabIndex={0}
-          className={`relative bg-[#fff] border-2  ${focused ? 'border-[#3C8737]' : 'border-[#D1D5DB]'} rounded-[20px] transition-all group duration-300 overflow-hidden`}
+          className={`relative bg-[#fff] border-2  ${focused ? 'border-[#3C8737]' : 'border-[#D1D5DB]'} rounded-full transition-all group duration-300 overflow-hidden`}
         >
           <input
             type="text"
             onChange={(e) => setSearchItem(e.target.value)}
             value={searchItem}
             placeholder="Find your next favorite item..."
-            className="w-[320px] px-5 py-3 rounded-full focus:outline-none"
+            className="w-[320px] px-5 py-3 focus:outline-none"
             maxLength={30}
           />
           <motion.div

@@ -7,8 +7,8 @@ import {
   deleteAvatarReq,
   fetchProfileDataReq,
   selectUserProfile,
-} from '../../../../../../redux/slices/authSlice';
-import { AppDispatch } from '../../../../../../redux/store';
+} from '../../../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../../../redux/store';
 
 export const ChangeAvatar = () => {
   const [isHovered, setIsHovered] = useState(false);

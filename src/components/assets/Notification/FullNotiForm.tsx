@@ -29,16 +29,18 @@ export const FullNotiForm: React.FC<Props> = ({
   };
 
   return (
-    <div className="mt-5 p-3">
-      <div className="flex items-center">
+    <div className=" p-3">
+      <div className="flex bg-gray-200 p-3 rounded-lg min-h-[100px] items-center">
         <div className="flex justify-center items-center gap-3">
           <div>
             <div className="w-2 h-2 bg-blue-500 rounded-full z-10"></div>
           </div>
-          <div className="flex flex-col w-full">
-            <h1 className="whitespace-normal text-base break-words">
-              {notification?.notification?.title}
+          <div className="flex whitespace-normal text-base w-full gap-1">
+            <h1>{notification?.notification?.title}</h1>
+            <h1 className="font-bold">
+              {notification?.notification?.productName}
             </h1>
+            <h1>{notification?.notification?.title2}</h1>
           </div>
         </div>
       </div>

@@ -7,8 +7,8 @@ import { toast } from 'react-toastify';
 import {
   requestPasswordChangeReq,
   selectUserProfile,
-} from '../../../../../../../redux/slices/authSlice';
-import { AppDispatch, RootState } from '../../../../../../../redux/store';
+} from '../../../../../../redux/slices/authSlice';
+import { AppDispatch, RootState } from '../../../../../../redux/store';
 
 interface Formdata {
   newPassword?: string;

@@ -45,7 +45,9 @@ export const createProduct = async (req, res) => {
     await NotiModel.create({
       userId: req.userId,
       actionType: 'created',
-      title: `Your product ${product.name} was created successfully`,
+      title: `Your product`,
+      productName: product.name,
+      title2: `has been created`,
       productId: product._id,
     });
 
@@ -187,7 +189,9 @@ export const patchProduct = async (req, res) => {
       [
         {
           userId: updatedProduct.user,
-          title: `Your product has been updated`,
+          title: `Your product`,
+          productName: updatedProduct.name,
+          title2: `has been updated`,
           actionType: `approved`,
           productId: productId,
         },
@@ -247,7 +251,9 @@ export const deleteProduct = async (req, res) => {
 
       await NotiModel.create({
         userId: product.user,
-        title: `Your product "${product.name}" has been deleted`,
+        title: `Your product`,
+        productName: product.name,
+        title2: `has been deleted`,
         actionType: `deleted`,
         productId: productId,
       });
@@ -399,7 +405,9 @@ export const approveProduct = async (req, res) => {
       [
         {
           userId: product.user,
-          title: 'Your product has been approved',
+          title: 'Your product',
+          productName: product.name,
+          title2: 'has been approved',
           actionType: 'approved',
           productId: product._id,
         },

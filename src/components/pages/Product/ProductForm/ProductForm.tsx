@@ -94,39 +94,41 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute  transition-all  duration-300 ease-in-out"
+                transition={{ duration: 0.2 }}
+                className="absolute transition-all duration-300 ease-in-out"
               >
-                <IconButton
-                  onClick={toggleFavorite}
-                  className="absolute top-0 left-[200px] ease-in-out duration-300"
-                  color="error"
-                >
-                  {isFavorite ? (
-                    <FavoriteOutlinedIcon />
-                  ) : (
-                    <FavoriteBorderOutlinedIcon />
-                  )}
-                </IconButton>
-
+                <div className="absolute top-0 rounded-full left-[200px] ease-in-out duration-300">
+                  <IconButton onClick={toggleFavorite} color="error">
+                    {isFavorite ? (
+                      <FavoriteOutlinedIcon />
+                    ) : (
+                      <FavoriteBorderOutlinedIcon />
+                    )}
+                  </IconButton>
+                </div>
                 {(userData?.role === 'admin' ||
                   userData?._id === product.user?._id) && (
-                  <IconButton
-                    className="absolute top-0 left-[120px] ease-in-out duration-300"
-                    color="error"
-                    onClick={() => handleDelete(product._id)}
-                  >
-                    <X />
-                  </IconButton>
+                  <div className="absolute top-0 left-[160px] ease-in-out duration-300">
+                    <IconButton
+                      className=""
+                      color="error"
+                      onClick={() => handleDelete(product._id)}
+                    >
+                      <X />
+                    </IconButton>
+                  </div>
                 )}
 
                 {userData?.role === 'admin' && (
-                  <Link to={`/edit/${product._id}`}>
-                    <IconButton
-                      className="absolute top-0 left-[40px] ease-in-out duration-300"
-                      color="inherit"
-                    >
-                      <Pencil />
-                    </IconButton>
+                  <Link
+                    className="absolute left-30 ease-in-out duration-300"
+                    to={`/edit/${product._id}`}
+                  >
+                    <div>
+                      <IconButton color="inherit">
+                        <Pencil />
+                      </IconButton>
+                    </div>
                   </Link>
                 )}
               </motion.div>
@@ -196,14 +198,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             <div className="mt-1 justify-center flex">
               <motion.button
                 onClick={toggleBag}
-                className="w-[240px] flex justify-center gap-1 rounded-xl p-1 text-base text-white bg-[#3C8737] hover:bg-[#2b6128]  transition-colors duration-150 ease-in-out delay-50"
+                className={`w-[240px] cursor-pointer flex justify-center gap-1 rounded-xl p-1 text-base text-white  ${isBag ? 'bg-[#873737] active:bg-gradient-to-r active:from-[#873737] active:via-transparent active:to-[#3C8737]' : 'bg-[#3C8737] active:bg-gradient-to-r active:from-[#3C8737] active:via-transparent active:to-[#873737] '} transition-colors duration-200 ease- delay-50`}
                 style={{ overflow: 'hidden' }}
               >
                 <motion.span
                   key={isBag ? 'add' : 'remove'}
-                  initial={{ opacity: 0, x: -30 }}
+                  initial={{ opacity: 0, x: 30 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 30 }}
+                  exit={{ opacity: 0, x: -30 }}
                   transition={{
                     type: 'spring',
                     stiffness: 400,
@@ -213,20 +215,36 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 >
                   {isBag ? 'Remove from bag' : 'Add to bag'}
                 </motion.span>
+                {!isBag ? (
+                  <motion.div
+                    className="absolute"
+                    initial={{ x: 80 }}
+                    animate={{ x: 55 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 400,
+                      damping: 30,
+                      delay: 0,
+                    }}
+                  >
+                    <IoBag style={{ marginTop: '5px' }} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    className="absolute"
+                    initial={{ x: 55 }}
+                    animate={{ x: 80 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 400,
+                      damping: 30,
 
-                <motion.div
-                  className="absolute"
-                  initial={{ x: 55 }}
-                  animate={{ x: isBag ? 80 : 55 }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 400,
-                    damping: 30,
-                    delay: 0,
-                  }}
-                >
-                  <IoBag style={{ marginTop: '5px' }} />
-                </motion.div>
+                      delay: 0,
+                    }}
+                  >
+                    <X size={20} className="mt-[3px]" />
+                  </motion.div>
+                )}
               </motion.button>
             </div>
           ) : (

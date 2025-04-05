@@ -21,7 +21,7 @@ export const NotiHeaderDropDown: React.FC<Props> = ({
     if (buttonRef?.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setPosition({
-        position: (350 - rect.width) / 2,
+        position: (380 - rect.width) / 2,
       });
     }
   }, [isNotiOpen]);
@@ -50,7 +50,7 @@ export const NotiHeaderDropDown: React.FC<Props> = ({
                   opacity: { duration: 0.2, delay: 0.01, ease: 'easeInOut' },
                 },
               }}
-              className="flex justify-center bg-[#fafafa] mt-3 border-slate-500 border-2 rounded-xl z-20 w-[350px] px-[50px] min-h-[340px] max-h-[1440px]"
+              className="flex justify-center bg-[#fafafa] mt-3 border-slate-500 border-2 rounded-xl z-20 w-[380px] px-[50px] min-h-[340px] max-h-[1440px]"
             >
               <motion.div
                 initial={{ opacity: 0, filter: 'blur(10px)' }}

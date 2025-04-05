@@ -2,14 +2,14 @@ import { motion } from 'framer-motion';
 import { LogOut, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { logoutReq } from '../../../../../../redux/slices/authSlice';
-import { AppDispatch } from '../../../../../../redux/store';
-import { ChangeAvatar } from '../ChangeAvatar/ChangeAvatar';
-import { SideBarEmalForm } from './Forms/SideBarEmalForm';
-import { SideBarPasswordForm } from './Forms/SideBarPasswordForm';
-import { SideBarPemdingProductsForm } from './Forms/SideBarPemdingProductsForm';
-import { SideBarPhoneForm } from './Forms/SideBarPhoneForm';
-import { SideBarUserDataForm } from './Forms/SideBarUserDataForm';
+import { logoutReq } from '../../../../redux/slices/authSlice';
+import { AppDispatch } from '../../../../redux/store';
+import { ChangeAvatar } from './ChangeAvatar/ChangeAvatar';
+import { SideBarEmailForm } from './Forms/Email/SideBarEmailForm';
+import { SideBarPemdingProductsForm } from './Forms/ForAdmin/SideBarPemdingProductsForm';
+import { SideBarPasswordForm } from './Forms/Password/SideBarPasswordForm';
+import { SideBarPhoneForm } from './Forms/Phone/SideBarPhoneForm';
+import { SideBarUserDataForm } from './Forms/UserData/SideBarUserDataForm';
 
 interface Props {
   setIsDropdownOpen: (value: boolean) => void;
@@ -62,7 +62,7 @@ export const SideBar = (props: Props) => {
         <div className="fixed top-0 right-0 bg-[#fff] border-l-[2px] border-slate-300 shadow-md min-w-[420px] h-screen p-3 overflow-hidden">
           <div className="fixed right-8 top-8">
             <button
-              className="hover:bg-[#E4E4E4] duration-300 flex justify-center items-center w-[36px] h-[36px] rounded-lg"
+              className="hover:bg-[#E4E4E4] duration-300 flex justify-center items-center w-[36px] h-[36px] cursor-pointer  rounded-lg"
               onClick={() => setIsDropdownOpen(false)}
             >
               <X style={{ width: 20, height: 20 }} />
@@ -78,7 +78,7 @@ export const SideBar = (props: Props) => {
                 changeProfileState={changeProfileState}
                 setChangeProfileState={setChangeProfileState}
               />
-              <SideBarEmalForm
+              <SideBarEmailForm
                 changeProfileState={changeProfileState}
                 setChangeProfileState={setChangeProfileState}
               />

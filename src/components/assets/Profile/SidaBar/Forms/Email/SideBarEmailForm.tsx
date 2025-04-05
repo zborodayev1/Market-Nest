@@ -1,6 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import { Phone } from '../../../ProfileAuthForms/Phone/Phone';
+import { useSelector } from 'react-redux';
+import { selectUserProfile } from '../../../../../../redux/slices/authSlice';
+import { Email } from '../../../ProfileAuthForms/Email/Email';
 
 interface Props {
   changeProfileState: {
@@ -19,7 +21,7 @@ interface Props {
   >;
 }
 
-export const SideBarPhoneForm: React.FC<Props> = (props) => {
+export const SideBarEmailForm: React.FC<Props> = (props) => {
   const contentVariants = {
     initial: { opacity: 0, x: 20 },
     animate: { opacity: 1, x: 0 },
@@ -29,7 +31,7 @@ export const SideBarPhoneForm: React.FC<Props> = (props) => {
       transition: { duration: 0.2 },
     },
   };
-
+  const userData = useSelector(selectUserProfile);
   const { changeProfileState, setChangeProfileState } = props;
   return (
     <div className="">
@@ -38,21 +40,25 @@ export const SideBarPhoneForm: React.FC<Props> = (props) => {
           onClick={() =>
             setChangeProfileState((prev) => ({
               ...prev,
-              ChangeEmail: false,
+              ChangeEmail: !prev.ChangeEmail,
               ChangeName: false,
               ChangePassword: false,
-              ChangePhone: !prev.ChangePhone,
+              ChangePhone: false,
             }))
           }
-          className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex justify-between items-center gap-1 w-full transition-colors duration-300 ease-in-out delay-50"
+          className="hover:bg-gray-200 p-2 py-3 rounded-lg flex justify-between items-center gap-1 w-full transition-colors duration-300 ease-in-out"
         >
           <div className="">
-            <span>Change phone:</span>
+            {userData?.email ? (
+              <span>{userData.email}</span>
+            ) : (
+              <div>Email:</div>
+            )}
           </div>
 
           <motion.div
             animate={{
-              rotate: changeProfileState.ChangePhone ? 180 : 0,
+              rotate: changeProfileState.ChangeEmail ? 180 : 0,
             }}
             transition={{ duration: 0.3 }}
           >
@@ -60,8 +66,9 @@ export const SideBarPhoneForm: React.FC<Props> = (props) => {
           </motion.div>
         </button>
       </motion.div>
+
       <AnimatePresence mode="wait">
-        {changeProfileState.ChangePhone && (
+        {changeProfileState.ChangeEmail && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -72,11 +79,11 @@ export const SideBarPhoneForm: React.FC<Props> = (props) => {
             }}
             className="mt-2"
           >
-            <Phone
+            <Email
               onSuccess={() =>
                 setChangeProfileState((prev) => ({
                   ...prev,
-                  ChangePhone: !prev.ChangePhone,
+                  ChangeEmail: !prev.ChangeEmail,
                 }))
               }
             />

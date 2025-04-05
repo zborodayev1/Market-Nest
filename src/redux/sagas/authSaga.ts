@@ -172,6 +172,7 @@ function* loginSaga(action: ReturnType<typeof loginReq>) {
     const { data } = yield call(() =>
       axios.post(`/auth/login`, action.payload)
     );
+
     yield put(loginSuc(data));
   } catch (error: any) {
     yield put(loginFail(error.response?.data || 'Failed to login'));

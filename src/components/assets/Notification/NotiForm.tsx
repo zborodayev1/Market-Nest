@@ -1,4 +1,3 @@
-import { ChevronRight } from 'lucide-react';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { markNotificationAsReadReq } from '../../../redux/slices/notificationSlice';
@@ -32,27 +31,14 @@ const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
     <>
       <button
         onClick={onClick}
-        className="w-[340px] min-h-[80px] relative flex items-start text-sm p-3 pt-[30px] px-5 bg-[#fafafa] hover:bg-[#e4e4e4] duration-300 delay-50"
+        className="w-[370px] min-h-[80px] relative flex text-sm items-center rounded-lg my-2 bg-gray-200 hover:bg-[#285E1C]/80 hover:text-white transition-colors duration-300 delay-50 group"
       >
         <div className="flex gap-2 w-full">
-          {!notification.isRead ? (
-            <div>
-              <div className="absolute top-[36px] left-3 w-2 h-2 bg-blue-500 rounded-full animate-ping z-10"></div>
-              <div className="absolute top-[36px] left-3 w-2 h-2 bg-blue-500 rounded-full z-10"></div>
-            </div>
-          ) : (
-            <div>
-              <div className="absolute top-[36px] left-3 w-2 h-2 bg-blue-500 rounded-full z-10"></div>
-            </div>
-          )}
-
-          <div className="flex flex-col w-full">
-            <h1 className="whitespace-normal break-words">
-              {notification.title}
-            </h1>
+          <div className="flex justify-center gap-1 w-full whitespace-normal break-words">
+            <h1>{notification.title}</h1>
+            <h1 className="font-bold">{notification.productName}</h1>
+            <h1>{notification.title2}</h1>
           </div>
-
-          <ChevronRight className="h-5 w-4 absolute right-1 top-[30px]" />
         </div>
       </button>
     </>

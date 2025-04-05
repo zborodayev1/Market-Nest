@@ -6,11 +6,11 @@ export const HomePage = () => {
   const nav = useNavigate();
 
   const availableTags = [
+    'All',
     'Clothes',
     'Electronics',
     'House & Garden',
     'Construction and repair',
-    'All',
     'Sport',
     "Children's products",
     'Decorations and luxury',
@@ -56,7 +56,7 @@ export const HomePage = () => {
                 <button
                   key={index}
                   onClick={() => handleSelectTag(tag)}
-                  className={`px-5 py-1 rounded-xl transition-colors ease-in-out duration-300 bg-gray-200 text-gray-800 hover:bg-[#1f5e1c] hover:text-white delay-50`}
+                  className={`px-5 py-1 rounded-full transition-colors ease-in-out duration-200 bg-gray-200 text-gray-800 hover:bg-[#1f5e1c] hover:text-white `}
                 >
                   {tag}
                 </button>
