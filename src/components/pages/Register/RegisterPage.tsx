@@ -1,4 +1,3 @@
-import LinearProgress from '@mui/material/LinearProgress';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -38,9 +37,9 @@ export const RegisterPage = (props: Props) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{
-          opacity: { duration: 0.3, delay: 0.4 },
-          y: { duration: 0.3, delay: 0.5 },
+          opacity: { duration: 0.5, delay: 0.2 },
         }}
+        className="h-[100vh]"
       >
         <motion.div
           initial={{ opacity: 0 }}
@@ -81,17 +80,6 @@ export const RegisterPage = (props: Props) => {
             </div>
           </div>
         </motion.div>
-        {loading && (
-          <LinearProgress
-            style={{
-              position: 'fixed',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              zIndex: 1000,
-            }}
-          />
-        )}
       </motion.div>
     </>
   );

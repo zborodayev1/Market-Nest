@@ -1,8 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import { useSelector } from 'react-redux';
-import { selectUserProfile } from '../../../../../../../redux/slices/authSlice';
-import { UserData } from '../../../ProfileAuthForms/UserData';
+import { Password } from '../../../ProfileAuthForms/Password/Password';
 
 interface Props {
   changeProfileState: {
@@ -21,7 +19,7 @@ interface Props {
   >;
 }
 
-export const SideBarUserDataForm: React.FC<Props> = (props) => {
+export const SideBarPasswordForm: React.FC<Props> = (props) => {
   const contentVariants = {
     initial: { opacity: 0, x: 20 },
     animate: { opacity: 1, x: 0 },
@@ -31,37 +29,28 @@ export const SideBarUserDataForm: React.FC<Props> = (props) => {
       transition: { duration: 0.2 },
     },
   };
-  const userData = useSelector(selectUserProfile);
+
   const { changeProfileState, setChangeProfileState } = props;
   return (
     <div className="">
-      <motion.div
-        variants={contentVariants}
-        className="text-sm font-bold flex items-center gap-2"
-      >
+      <motion.div variants={contentVariants} className="text-sm font-bold">
         <button
           onClick={() =>
             setChangeProfileState((prev) => ({
               ...prev,
-              ChangeName: !prev.ChangeName,
               ChangeEmail: false,
-              ChangePassword: false,
+              ChangeName: false,
+              ChangePassword: !prev.ChangePassword,
               ChangePhone: false,
             }))
           }
-          className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg w-full flex justify-between items-center gap-1 transition-colors duration-300 ease-in-out"
+          className="hover:bg-gray-200 p-2 py-3 rounded-lg flex justify-between items-center gap-1 w-full transition-colors duration-300 ease-in-out"
         >
-          <div className="">
-            {userData?.fullName ? (
-              <span>{userData?.fullName}</span>
-            ) : (
-              <div>User Data:</div>
-            )}
-          </div>
+          <div>Change password</div>
 
           <motion.div
             animate={{
-              rotate: changeProfileState.ChangeName ? 180 : 0,
+              rotate: changeProfileState.ChangePassword ? 180 : 0,
             }}
             transition={{ duration: 0.3 }}
           >
@@ -70,7 +59,7 @@ export const SideBarUserDataForm: React.FC<Props> = (props) => {
         </button>
       </motion.div>
       <AnimatePresence mode="wait">
-        {changeProfileState.ChangeName && (
+        {changeProfileState.ChangePassword && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -81,11 +70,11 @@ export const SideBarUserDataForm: React.FC<Props> = (props) => {
             }}
             className="mt-2"
           >
-            <UserData
+            <Password
               onSuccess={() =>
                 setChangeProfileState((prev) => ({
                   ...prev,
-                  ChangeName: !prev.ChangeName,
+                  ChangePassword: !prev.ChangePassword,
                 }))
               }
             />

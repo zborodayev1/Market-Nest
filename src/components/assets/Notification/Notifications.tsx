@@ -58,8 +58,21 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
   return (
     <>
       <h1 className="text-2xl font-bold text-center mt-3">Notifications</h1>
-      <div className="h-[1px] bg-[#E5E7EB] mt-3 w-[340px]" />
-      <div className="px-2">
+      <div className="h-[1px] bg-[#E5E7EB] mt-3 w-[370px]" />
+      {filter === 'unread' && fullNoti.state === 'home' ? (
+        <div className="flex justify-center text-2xl mt-3 font-bold">
+          <h1>Unread</h1>
+        </div>
+      ) : fullNoti.state === 'home' ? (
+        <div className="flex justify-center text-2xl mt-3 font-bold">
+          <h1>Read</h1>
+        </div>
+      ) : (
+        <div className="flex justify-center text-2xl mt-3 font-bold">
+          <h1>Full Notification</h1>
+        </div>
+      )}
+      <div className="">
         {status === 'succeeded' &&
         notifications.length > 0 &&
         fullNoti.state === 'home' ? (

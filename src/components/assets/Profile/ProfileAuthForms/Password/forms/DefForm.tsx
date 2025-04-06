@@ -1,25 +1,26 @@
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Phone, RectangleEllipsis } from 'lucide-react';
+import { Eye, EyeOff, RectangleEllipsis } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import {
   selectUserProfile,
-  updateProfilePhoneReq,
-} from '../../../../../../../redux/slices/authSlice';
-import { AppDispatch } from '../../../../../../../redux/store';
+  updateProfilePasswordReq,
+} from '../../../../../../redux/slices/authSlice';
+import { AppDispatch, RootState } from '../../../../../../redux/store';
 
 interface Formdata {
   password?: string;
-  newPhone?: string;
+  newPassword?: string;
 }
 interface Props {
   onSuccess: () => void;
 }
 export const DefForm = (props: Props) => {
   const userData = useSelector(selectUserProfile);
-
-  const [formValues, setFormValues] = useState<Formdata>({});
+  const err = useSelector((state: RootState) => state.auth.error);
+  const status = useSelector((state: RootState) => state.auth.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { onSuccess } = props;
   const dispatch: AppDispatch = useDispatch();
@@ -27,30 +28,31 @@ export const DefForm = (props: Props) => {
     mode: 'onSubmit',
   });
 
-  const onSubmit = (values: Formdata) => {
+  const onSubmit = async (values: Formdata) => {
     try {
       setIsSubmitting(true);
-      setFormValues(values);
+
       const payload = {
-        password: values.password || '',
-        phone: values.newPhone || '',
+        oldPassword: values.password || '',
+        password: values.newPassword || '',
       };
 
-      dispatch(updateProfilePhoneReq(payload));
+      dispatch(updateProfilePasswordReq(payload));
 
-      reset({ ...userData, ...formValues });
+      reset({ ...userData, ...values });
       onSuccess();
-    } catch (err) {
-      console.error('Error:', err);
+      if (status === 'failed') {
+        toast(err, {
+          type: 'error',
+          position: 'bottom-right',
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  // useEffect(() => {
-  //   if (reqStatus === 'succeeded') {
-  //   }
-  // }, [reqStatus]);
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -64,13 +66,14 @@ export const DefForm = (props: Props) => {
         <div className="">
           <label className={labelClasses} htmlFor="password">
             <RectangleEllipsis size={23} />
-            <h1 className="mt-[2px] ml-1">Password</h1>
+            <h1 className="mt-[2px] ml-1">Old Password</h1>
           </label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
               spellCheck="false"
-              placeholder="12345678"
+              placeholder="12345678Test"
+              id="password"
               {...register('password', {
                 required: 'Password is required',
                 minLength: {
@@ -84,7 +87,7 @@ export const DefForm = (props: Props) => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700  delay-50 duration-300"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 duration-300 delay-50"
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -97,15 +100,16 @@ export const DefForm = (props: Props) => {
 
         <div className="">
           <label className={labelClasses} htmlFor="password">
-            <Phone size={18} />
-            <h1 className="mt-[2px] ml-1">New Phone Number</h1>
+            <RectangleEllipsis size={23} />
+            <h1 className="mt-[2px] ml-1">New Password</h1>
           </label>
           <div className="relative">
             <input
-              type={'text'}
+              type={showPassword ? 'text' : 'password'}
               spellCheck="false"
-              placeholder="77777777777"
-              {...register('newPhone', {
+              placeholder="12345678Abc"
+              id="password"
+              {...register('newPassword', {
                 required: 'Password is required',
                 minLength: {
                   value: 8,
@@ -114,6 +118,18 @@ export const DefForm = (props: Props) => {
               })}
               className={inputClasses}
             />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 duration-300 delay-50"
+            >
+              {showPassword ? (
+                <EyeOff className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -122,9 +138,9 @@ export const DefForm = (props: Props) => {
         type="submit"
         disabled={isSubmitting}
         whileTap={{ scale: 0.99 }}
-        className={` w-full p-2 mt-5 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128]  transition-all duration-300 ease-in-out  delay-50  `}
+        className={` w-full p-2 mt-5 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128] transition-colors duration-300 ease-in-out delay-50    `}
       >
-        <motion.span className="  text-[#fff] font-bold  duration-300 transition-colors ease-in-out  ">
+        <motion.span className="  text-[#fff] font-bold  duration-300 transition-colors ease-in-out  delay-50 ">
           {isSubmitting ? 'Saving...' : 'Save Changes'}
         </motion.span>
       </motion.button>

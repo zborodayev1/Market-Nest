@@ -2,7 +2,7 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined';
 import { CircularProgress, IconButton } from '@mui/material';
 import { motion } from 'framer-motion';
-import { Eye } from 'lucide-react';
+import { Eye, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { BiSolidMessageSquare } from 'react-icons/bi';
@@ -184,39 +184,56 @@ export const FullProduct = (props: Props) => {
                 <DeliveryComponent />
                 <div className="flex mt-5">
                   <div>
-                    <button
+                    <motion.button
                       onClick={toggleBag}
-                      className="font-bold flex gap-2 w-[450px] bg-[#3C8737] rounded-xl py-3 text-white text-lg hover:bg-[#2b6128] transition-colors duration-150 ease-in-out justify-center delay-50"
+                      className={`w-[450px] py-3 font-bold text-white text-lg cursor-pointer flex justify-center items-center gap-2 rounded-xl   ${isBag ? 'bg-[#873737] active:bg-gradient-to-r active:from-[#873737] active:via-transparent active:to-[#3C8737]' : 'bg-[#3C8737] active:bg-gradient-to-r active:from-[#3C8737] active:via-transparent active:to-[#873737] '} transition-colors duration-200 ease- delay-50`}
+                      style={{ overflow: 'hidden' }}
                     >
                       <motion.span
                         key={isBag ? 'add' : 'remove'}
-                        initial={{ opacity: 0, x: -30 }}
+                        initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 30 }}
+                        exit={{ opacity: 0, x: -30 }}
                         transition={{
                           type: 'spring',
-                          stiffness: 300,
-                          damping: 20,
+                          stiffness: 400,
+                          damping: 30,
                           delay: 0.2,
                         }}
                       >
                         {isBag ? 'Remove from bag' : 'Add to bag'}
                       </motion.span>
+                      {!isBag ? (
+                        <motion.div
+                          className="absolute"
+                          initial={{ x: 95 }}
+                          animate={{ x: 65 }}
+                          transition={{
+                            type: 'spring',
+                            stiffness: 400,
+                            damping: 30,
+                            delay: 0,
+                          }}
+                        >
+                          <IoBag />
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          className="absolute"
+                          initial={{ x: 65 }}
+                          animate={{ x: 95 }}
+                          transition={{
+                            type: 'spring',
+                            stiffness: 400,
+                            damping: 30,
 
-                      <motion.div
-                        className="absolute ml-1"
-                        initial={{ x: 70 }}
-                        animate={{ x: isBag ? 90 : 60 }}
-                        transition={{
-                          type: 'spring',
-                          stiffness: 300,
-                          damping: 15,
-                          delay: 0,
-                        }}
-                      >
-                        <IoBag style={{ marginTop: '5px' }} />
-                      </motion.div>
-                    </button>
+                            delay: 0,
+                          }}
+                        >
+                          <X size={23} />
+                        </motion.div>
+                      )}
+                    </motion.button>
                   </div>
                   <div className="ml-1">
                     <IconButton

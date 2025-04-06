@@ -157,6 +157,7 @@ export const login = async (req, res) => {
     });
 
     const { passwordHash, ...userData } = user._doc;
+    console.log(userData);
     res.json({
       ...userData,
     });

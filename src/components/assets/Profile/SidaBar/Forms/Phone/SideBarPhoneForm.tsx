@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import { Password } from '../../../ProfileAuthForms/Password/Password';
+import { Phone } from '../../../ProfileAuthForms/Phone/Phone';
 
 interface Props {
   changeProfileState: {
@@ -19,7 +19,7 @@ interface Props {
   >;
 }
 
-export const SideBarPasswordForm: React.FC<Props> = (props) => {
+export const SideBarPhoneForm: React.FC<Props> = (props) => {
   const contentVariants = {
     initial: { opacity: 0, x: 20 },
     animate: { opacity: 1, x: 0 },
@@ -40,17 +40,19 @@ export const SideBarPasswordForm: React.FC<Props> = (props) => {
               ...prev,
               ChangeEmail: false,
               ChangeName: false,
-              ChangePassword: !prev.ChangePassword,
-              ChangePhone: false,
+              ChangePassword: false,
+              ChangePhone: !prev.ChangePhone,
             }))
           }
-          className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex justify-between items-center gap-1 w-full transition-colors duration-300 ease-in-out delay-50"
+          className="hover:bg-gray-200 p-2 py-3 rounded-lg flex justify-between items-center gap-1 w-full transition-colors duration-300 ease-in-out"
         >
-          <div>Change password</div>
+          <div className="">
+            <span>Change phone:</span>
+          </div>
 
           <motion.div
             animate={{
-              rotate: changeProfileState.ChangePassword ? 180 : 0,
+              rotate: changeProfileState.ChangePhone ? 180 : 0,
             }}
             transition={{ duration: 0.3 }}
           >
@@ -59,7 +61,7 @@ export const SideBarPasswordForm: React.FC<Props> = (props) => {
         </button>
       </motion.div>
       <AnimatePresence mode="wait">
-        {changeProfileState.ChangePassword && (
+        {changeProfileState.ChangePhone && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -70,11 +72,11 @@ export const SideBarPasswordForm: React.FC<Props> = (props) => {
             }}
             className="mt-2"
           >
-            <Password
+            <Phone
               onSuccess={() =>
                 setChangeProfileState((prev) => ({
                   ...prev,
-                  ChangePassword: !prev.ChangePassword,
+                  ChangePhone: !prev.ChangePhone,
                 }))
               }
             />

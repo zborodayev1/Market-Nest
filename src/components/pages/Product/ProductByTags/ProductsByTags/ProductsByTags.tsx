@@ -1,7 +1,7 @@
 import { CircularProgress } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MoveLeft } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import {
@@ -10,29 +10,20 @@ import {
 } from '../../../../../redux/slices/productSlice';
 import { AppDispatch, RootState } from '../../../../../redux/store';
 import { Product } from '../../../../../redux/types/product.type';
-import { PageSettingsForm } from '../../../../assets/forms/pageSettingsForm';
 import { ProductForm } from '../../ProductForm/ProductForm';
-import { AllProducts } from '../AllProducts/AllProducts';
 
 export const ProductsByTags = () => {
   const { selectedTag } = useParams();
-  const [PGState, setPGState] = useState<{ limit: number; page: number }>({
-    limit: 10,
-    page: 1,
-  });
-  const [limitError, setLimitError] = useState<boolean>(false);
-  const [focusLimit, setFocusLimit] = useState<boolean>(false);
-  const [focusPage, setFocusPage] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
-  const { totalPages, products } = useSelector(selectProducts);
+
+  const { products } = useSelector(selectProducts);
   const { status } = useSelector((state: RootState) => state.products);
   const dispatch: AppDispatch = useDispatch();
 
   const handleRefresh = () => {
     dispatch(
       fetchProducts({
-        limit: PGState.limit,
-        page: PGState.page,
+        limit: 10,
+        page: 1,
       })
     );
   };
@@ -40,11 +31,11 @@ export const ProductsByTags = () => {
   useEffect(() => {
     dispatch(
       fetchProducts({
-        limit: PGState.limit,
-        page: PGState.page,
+        limit: 10,
+        page: 1,
       })
     );
-  }, [dispatch, PGState.limit, PGState.page]);
+  }, [dispatch]);
 
   const getFilteredProducts = () => {
     if (!Array.isArray(products) || products.length === 0) return [];
@@ -69,20 +60,16 @@ export const ProductsByTags = () => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
     >
-      {selectedTag === 'All' ? (
-        <AllProducts />
-      ) : (
-        <div className="mt-5 flex justify-start ml-10 text-2xl font-bold">
-          <Link
-            className="flex items-center gap-2 mx-2 underline text-[#1266CD] hover:text-[#1266CD]/75 transition-colors duration-150 ease-linear delay-50"
-            to="/products/All"
-          >
-            <MoveLeft />
-            Products
-          </Link>
-          /<h1 className="cursor-pointer mx-2">{selectedTag}</h1>
-        </div>
-      )}
+      <div className="mt-5 flex justify-start ml-10 text-2xl font-bold">
+        <Link
+          className="flex items-center gap-2 mx-2 underline text-[#1266CD] hover:text-[#1266CD]/75 transition-colors duration-150 ease-linear delay-50"
+          to="/"
+        >
+          <MoveLeft />
+          Home
+        </Link>
+        <h1 className="cursor-default gap-2">/ {selectedTag}</h1>
+      </div>
 
       <div className="">
         {status === 'loading' && (
@@ -153,21 +140,6 @@ export const ProductsByTags = () => {
                 ))}
             </div>
           </AnimatePresence>
-          <div className="absolute left-120 top-165">
-            <PageSettingsForm
-              open={open}
-              setOpen={setOpen}
-              limitError={limitError}
-              setLimitError={setLimitError}
-              PGState={PGState}
-              setPGState={setPGState}
-              totalPages={totalPages}
-              focusLimit={focusLimit}
-              setFocusLimit={setFocusLimit}
-              focusPage={focusPage}
-              setFocusPage={setFocusPage}
-            />
-          </div>
         </div>
       </div>
     </motion.div>

@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import { selectUserProfile } from '../../../../../../../redux/slices/authSlice';
-import { Email } from '../../../ProfileAuthForms/Email';
+import { selectUserProfile } from '../../../../../../redux/slices/authSlice';
+import { UserData } from '../../../ProfileAuthForms/UserData/UserData';
 
 interface Props {
   changeProfileState: {
@@ -21,7 +21,7 @@ interface Props {
   >;
 }
 
-export const SideBarEmalForm: React.FC<Props> = (props) => {
+export const SideBarUserDataForm: React.FC<Props> = (props) => {
   const contentVariants = {
     initial: { opacity: 0, x: 20 },
     animate: { opacity: 1, x: 0 },
@@ -35,30 +35,33 @@ export const SideBarEmalForm: React.FC<Props> = (props) => {
   const { changeProfileState, setChangeProfileState } = props;
   return (
     <div className="">
-      <motion.div variants={contentVariants} className="text-sm font-bold">
+      <motion.div
+        variants={contentVariants}
+        className="text-sm font-bold flex items-center gap-2"
+      >
         <button
           onClick={() =>
             setChangeProfileState((prev) => ({
               ...prev,
-              ChangeEmail: !prev.ChangeEmail,
-              ChangeName: false,
+              ChangeName: !prev.ChangeName,
+              ChangeEmail: false,
               ChangePassword: false,
               ChangePhone: false,
             }))
           }
-          className="hover:bg-[#E4E4E4] p-2 py-3 rounded-lg flex justify-between items-center gap-1 w-full transition-colors duration-300 ease-in-out delay-50"
+          className="hover:bg-gray-200 p-2 py-3 rounded-lg w-full flex justify-between items-center gap-1 transition-colors duration-300 ease-in-out"
         >
           <div className="">
-            {userData?.email ? (
-              <span>{userData.email}</span>
+            {userData?.fullName ? (
+              <span>{userData?.fullName}</span>
             ) : (
-              <div>Email:</div>
+              <div>User Data:</div>
             )}
           </div>
 
           <motion.div
             animate={{
-              rotate: changeProfileState.ChangeEmail ? 180 : 0,
+              rotate: changeProfileState.ChangeName ? 180 : 0,
             }}
             transition={{ duration: 0.3 }}
           >
@@ -66,9 +69,8 @@ export const SideBarEmalForm: React.FC<Props> = (props) => {
           </motion.div>
         </button>
       </motion.div>
-
       <AnimatePresence mode="wait">
-        {changeProfileState.ChangeEmail && (
+        {changeProfileState.ChangeName && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -79,11 +81,11 @@ export const SideBarEmalForm: React.FC<Props> = (props) => {
             }}
             className="mt-2"
           >
-            <Email
+            <UserData
               onSuccess={() =>
                 setChangeProfileState((prev) => ({
                   ...prev,
-                  ChangeEmail: !prev.ChangeEmail,
+                  ChangeName: !prev.ChangeName,
                 }))
               }
             />

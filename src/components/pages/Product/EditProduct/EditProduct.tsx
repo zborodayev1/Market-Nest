@@ -33,7 +33,9 @@ export const EditProduct = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>(
     product?.tags || []
   );
-  const { error } = useSelector((state: RootState) => state.products.error);
+  const { error } = useSelector(
+    (state: RootState) => state.products?.error || {}
+  );
   const [message, setMessage] = useState<string>('');
   const { register, handleSubmit, setValue, reset } = useForm<FormData>({
     defaultValues: {

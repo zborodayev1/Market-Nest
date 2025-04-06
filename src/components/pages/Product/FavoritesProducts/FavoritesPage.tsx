@@ -9,14 +9,11 @@ import {
 } from '../../../../redux/slices/productSlice';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { Product } from '../../../../redux/types/product.type';
-import { PageSettingsForm } from '../../../assets/forms/pageSettingsForm';
 import { ProductForm } from '../ProductForm/ProductForm';
 
 export const FavoritesPage = () => {
   const { products } = useSelector(selectProducts);
-  const { totalPages, status } = useSelector(
-    (state: RootState) => state.products
-  );
+  const { status } = useSelector((state: RootState) => state.products);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
   const dispatch: AppDispatch = useDispatch();
@@ -24,10 +21,6 @@ export const FavoritesPage = () => {
     limit: 10,
     page: 1,
   });
-  const [limitError, setLimitError] = useState<boolean>(false);
-  const [focusLimit, setFocusLimit] = useState<boolean>(false);
-  const [focusPage, setFocusPage] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const storedFavorites = JSON.parse(
@@ -187,21 +180,6 @@ export const FavoritesPage = () => {
               )}
             </div>
           </motion.div>
-          <div className="absolute left-120 top-165">
-            <PageSettingsForm
-              open={open}
-              setOpen={setOpen}
-              limitError={limitError}
-              setLimitError={setLimitError}
-              PGState={PGState}
-              setPGState={setPGState}
-              totalPages={totalPages}
-              focusLimit={focusLimit}
-              setFocusLimit={setFocusLimit}
-              focusPage={focusPage}
-              setFocusPage={setFocusPage}
-            />
-          </div>
         </AnimatePresence>
       </motion.div>
     </>

@@ -8,8 +8,8 @@ import {
   selectUserProfile,
 } from '../../../../redux/slices/authSlice';
 import { NotiHeaderDropDown } from '../../Notification/NotiHeaderDropDown';
-import { ProdileHeader } from '../../Profile/ProfileComponent/ProfileHeaderComponents/ProfileHeader';
-import { SideBar } from '../../Profile/ProfileComponent/ProfileSideBar/SidaBar/SideBar';
+import { ProdileHeader } from '../../Profile/ProfileHeader/ProfileHeader';
+import { SideBar } from '../../Profile/SidaBar/SideBar';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { useWebSocket } from '../../hooks/useWebSocket';
 
@@ -30,18 +30,8 @@ export const HeaderForm: React.FC<Props> = ({
   const { unreadCount } = useWebSocket({ userId: userData?._id });
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const notificationRef = useRef<HTMLDivElement | null>(null);
-  const headerButtonStyles = 'mx-4 flex items-center ';
-  const [hovered, setHovered] = useState<{
-    noti: boolean;
-    create: boolean;
-    bag: boolean;
-    fav: boolean;
-  }>({
-    noti: false,
-    create: false,
-    bag: false,
-    fav: false,
-  });
+  const headerButtonStyles =
+    'mx-2 flex gap-2 items-center hover:bg-gray-200 p-2 px-5 rounded-full duration-200 ease-in-out group mt-1 ';
 
   useClickOutside(
     [notificationRef, buttonRef],
@@ -64,38 +54,9 @@ export const HeaderForm: React.FC<Props> = ({
             <div className="relative">
               <button
                 ref={buttonRef}
-                className="relative flex gap-2 items-center mx-4 rounded-full cursor-pointer group"
+                className="relative z-10 mx-2 flex items-center hover:bg-[#E5E7EB] p-3 cursor-pointer rounded-full duration-200 ease-in-out "
                 onClick={() => setIsNotiOpen(!isNotiOpen)}
-                onMouseEnter={() =>
-                  setHovered({
-                    noti: true,
-                    create: false,
-                    bag: false,
-                    fav: false,
-                  })
-                }
-                onMouseLeave={() =>
-                  setHovered({
-                    noti: false,
-                    create: false,
-                    bag: false,
-                    fav: false,
-                  })
-                }
               >
-                <motion.div
-                  className="absolute inset-0 bg-gray-200 rounded-full  -z-1"
-                  initial={{ scale: 0.1 }}
-                  animate={{
-                    scale: hovered.noti ? 1.8 : 0,
-                  }}
-                  transition={{
-                    duration: hovered.noti ? 0.1 : 0.2,
-                    delay: hovered.noti ? 0 : 0.1,
-                    ease: 'easeInOut',
-                  }}
-                />
-
                 <Bell
                   style={{ strokeWidth: 2 }}
                   className="w-8 h-8 text-[#212121]"
@@ -113,115 +74,26 @@ export const HeaderForm: React.FC<Props> = ({
                 buttonRef={buttonRef}
               />
             </div>
-            <Link
-              className={`${headerButtonStyles} relative w-9 h-9`}
-              to="/create-product"
-              onMouseEnter={() =>
-                setHovered({
-                  noti: false,
-                  create: true,
-                  bag: false,
-                  fav: false,
-                })
-              }
-              onMouseLeave={() =>
-                setHovered({
-                  noti: false,
-                  create: false,
-                  bag: false,
-                  fav: false,
-                })
-              }
-            >
-              <motion.div
-                className="absolute inset-0 bg-gray-200 rounded-full -z-1"
-                initial={{ scale: 0.1 }}
-                animate={{
-                  scale: hovered.create ? 1.6 : 0.1,
-                }}
-                transition={{
-                  duration: hovered.create ? 0.1 : 0.2,
-                  delay: hovered.create ? 0 : 0.1,
-                  ease: 'easeInOut',
-                }}
-              />
+
+            <Link className={headerButtonStyles} to="/create-product">
+              <h1 className="text-base  font-bold text-[#212121]">Create</h1>
               <PackagePlus
                 style={{ strokeWidth: 1.8 }}
                 className="w-9 h-9 text-[#212121]"
               />
             </Link>
 
-            <Link
-              className={`${headerButtonStyles} relative w-8 h-8`}
-              to="/bag"
-              onMouseEnter={() =>
-                setHovered({
-                  noti: false,
-                  create: false,
-                  bag: true,
-                  fav: false,
-                })
-              }
-              onMouseLeave={() =>
-                setHovered({
-                  noti: false,
-                  create: false,
-                  bag: false,
-                  fav: false,
-                })
-              }
-            >
-              <motion.div
-                className="absolute inset-0 bg-gray-200 rounded-full -z-1"
-                initial={{ scale: 0.1 }}
-                animate={{
-                  scale: hovered.bag ? 1.6 : 0.1,
-                }}
-                transition={{
-                  duration: hovered.bag ? 0.1 : 0.2,
-                  delay: hovered.bag ? 0 : 0.1,
-                  ease: 'easeInOut',
-                }}
-              />
+            <Link className={headerButtonStyles} to="/bag">
+              <h1 className="text-base font-bold text-[#212121]">Bag</h1>
               <ShoppingCart
                 style={{ strokeWidth: 2 }}
-                className="w-8 h-8 text-[#212121] "
+                className="w-8 h-9 text-[#212121] stroke-1 "
               />
             </Link>
-            <Link
-              className={`${headerButtonStyles} relative w-8 h-8`}
-              to="/favorites"
-              onMouseEnter={() =>
-                setHovered({
-                  noti: false,
-                  create: false,
-                  bag: false,
-                  fav: true,
-                })
-              }
-              onMouseLeave={() =>
-                setHovered({
-                  noti: false,
-                  create: false,
-                  bag: false,
-                  fav: false,
-                })
-              }
-            >
-              <motion.div
-                className="absolute inset-0 bg-gray-200 rounded-full -z-1"
-                initial={{ scale: 0.1 }}
-                animate={{
-                  scale: hovered.fav ? 1.6 : 0.1,
-                }}
-                transition={{
-                  duration: hovered.fav ? 0.1 : 0.2,
-                  delay: hovered.fav ? 0 : 0.1,
-                  ease: 'easeInOut',
-                }}
-              />
+            <Link className={headerButtonStyles} to="/favorites">
+              <h1 className="text-base font-bold text-[#212121]">Favorite</h1>
               <Heart
-                className="w-8 h-8 text-[#212121]"
+                className="w-7 h-9 text-[#212121]"
                 style={{ strokeWidth: 2 }}
               />
             </Link>
@@ -235,18 +107,24 @@ export const HeaderForm: React.FC<Props> = ({
       ) : (
         <div className="flex">
           <Link className={headerButtonStyles} to="/bag">
+            <h1 className="text-base font-bold text-[#212121]">Bag</h1>
             <ShoppingCart
-              style={{ strokeWidth: 1.8 }}
-              className="w-8 h-8 text-[#212121] "
+              style={{ strokeWidth: 2 }}
+              className="w-8 h-9 text-[#212121] "
             />
           </Link>
           <Link className={headerButtonStyles} to="/favorites">
-            <Heart className="w-8 h-8 text-[#212121]" />
+            <h1 className="text-base font-bold text-[#212121]">Favorite</h1>
+            <Heart
+              className="w-7 h-9 text-[#212121]"
+              style={{ strokeWidth: 2 }}
+            />
           </Link>
           <Link to="/signIn" className={headerButtonStyles}>
+            <h1 className="text-base font-bold text-[#212121]">Sign in</h1>
             <IdCard
               style={{ strokeWidth: 1.8 }}
-              className="w-[44px] h-9 text-[#212121] transition-colors duration-300"
+              className="w-[44px] h-9 text-[#212121]"
             />
           </Link>
         </div>
@@ -259,17 +137,16 @@ export const HeaderForm: React.FC<Props> = ({
               initial={{ x: 250, opacity: 0 }}
               animate={{
                 x: isDropdownOpen ? 0 : 250,
-                y: -3,
+
                 opacity: isDropdownOpen ? 1 : 0,
               }}
               exit={{
                 x: 250,
-                y: -3,
+
                 opacity: 0,
               }}
               transition={{
                 duration: 0.2,
-                opacity: { duration: 0.2, delay: 0.05 },
               }}
             >
               <SideBar
