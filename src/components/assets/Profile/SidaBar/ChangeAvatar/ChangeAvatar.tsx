@@ -99,7 +99,7 @@ export const ChangeAvatar = () => {
         <X
           size={18}
           onClick={handleRemovePreview}
-          className="absolute top-6 left-[60px] bg-[#e4e4e4] text-black rounded-md p-[2px] cursor-pointer"
+          className="absolute top-6 left-[60px] bg-gray-200 text-black rounded-md p-[2px] cursor-pointer"
         />
       </button>
 

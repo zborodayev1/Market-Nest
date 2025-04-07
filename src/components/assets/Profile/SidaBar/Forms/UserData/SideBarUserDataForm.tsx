@@ -49,7 +49,7 @@ export const SideBarUserDataForm: React.FC<Props> = (props) => {
               ChangePhone: false,
             }))
           }
-          className="hover:bg-gray-200 p-2 py-3 rounded-lg w-full flex justify-between items-center gap-1 transition-colors duration-300 ease-in-out"
+          className="hover:bg-gray-200 p-2 py-3 rounded-xl w-full flex justify-between items-center gap-1 transition-colors duration-300 ease-in-out"
         >
           <div className="">
             {userData?.fullName ? (

@@ -50,10 +50,6 @@ export const SideBar = (props: Props) => {
     initial: { opacity: 0, x: 20 },
     animate: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: 20 },
-    whileHover: {
-      scale: 1.2,
-      transition: { duration: 0.2 },
-    },
   };
 
   return (
@@ -62,7 +58,7 @@ export const SideBar = (props: Props) => {
         <div className="fixed top-0 right-0 bg-[#fff] border-l-[2px] border-slate-300 shadow-md min-w-[420px] h-screen p-3 overflow-hidden">
           <div className="fixed right-8 top-8">
             <button
-              className="hover:bg-[#E4E4E4] duration-300 flex justify-center items-center w-[36px] h-[36px] cursor-pointer  rounded-lg"
+              className="hover:bg-gray-200 duration-300 flex justify-center items-center w-[36px] h-[36px] cursor-pointer  rounded-lg"
               onClick={() => setIsDropdownOpen(false)}
             >
               <X style={{ width: 20, height: 20 }} />

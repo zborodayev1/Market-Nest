@@ -3,12 +3,12 @@ import { Binary, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import {
   confirmPasswordChangeReq,
   selectUserProfile,
 } from '../../../../../../redux/slices/authSlice';
-import { AppDispatch, RootState } from '../../../../../../redux/store';
+import { AppDispatch } from '../../../../../../redux/store';
+import Input from '../../../../../ui/input/Input';
 
 interface Formdata {
   verificationCode?: string;
@@ -23,12 +23,14 @@ export const Code = (props: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { onSuccess, setPPS } = props;
   const dispatch: AppDispatch = useDispatch();
-  const { reset, register, handleSubmit } = useForm<Formdata>({
+  const {
+    reset,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Formdata>({
     mode: 'onSubmit',
   });
-  const { status, message, error } = useSelector(
-    (state: RootState) => state.auth
-  );
 
   const onSubmit = async (values: Formdata) => {
     try {
@@ -40,24 +42,11 @@ export const Code = (props: Props) => {
 
       reset({ ...userData, ...values });
       onSuccess();
-      toast(message, {
-        type: 'success',
-        position: 'bottom-right',
-      });
-      setPPS('default');
 
-      if (status === 'failed') {
-        toast(error, {
-          type: 'error',
-          position: 'bottom-right',
-        });
-      }
+      setPPS('default');
     } catch (error) {
       console.error(error);
-      toast(String(error), {
-        type: 'error',
-        position: 'bottom-right',
-      });
+
       if (
         error === 'Password change code already sent' ||
         error === 'Invalid verification code'
@@ -73,8 +62,8 @@ export const Code = (props: Props) => {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const inputClasses =
-    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 ';
+  const isCodeError = errors.verificationCode ? true : false;
+
   const labelClasses =
     'flex items-center gap-2 text-sm font-medium text-black mb-1';
   return (
@@ -85,35 +74,36 @@ export const Code = (props: Props) => {
             <Binary size={23} />
             <h1 className="mt-[2px] ml-1">Code</h1>
           </label>
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              spellCheck="false"
-              placeholder="123456"
-              maxLength={6}
-              id="password"
-              {...register('verificationCode', {
-                required: 'Password is required',
-                minLength: {
-                  value: 6,
-                  message: 'Password must be at least 8 characters',
-                },
-              })}
-              className={inputClasses}
-            />
-
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 delay-50"
-            >
-              {showPassword ? (
+          <Input
+            type={showPassword ? 'text' : 'password'}
+            icon={
+              showPassword ? (
                 <EyeOff className="w-5 h-5" />
               ) : (
                 <Eye className="w-5 h-5" />
-              )}
-            </button>
-          </div>
+              )
+            }
+            register={register}
+            isError={isCodeError}
+            inputStyle="w-75 pl-5 py-2"
+            placeholder="Verification Code"
+            sircleWidth={36}
+            sircleHeight={36}
+            sircleTop={2}
+            sircleRight={2}
+            sircleHeightActive={40}
+            sircleWidthActive={40}
+            iconRight={10}
+            iconTop={10}
+            registerName="verificationCode"
+            registerReq="Verification Code is required"
+            isMinLength={true}
+            registerMinLenghtValue={6}
+            registerMaxLenghtValue={6}
+            registerMinLenghtMessage="Verification code must be 6 digits"
+            registerMaxLenghtMessage="Verification code must be 6 digits"
+            iconButtonOnCLick={() => setShowPassword(!showPassword)}
+          />
         </div>
       </div>
 

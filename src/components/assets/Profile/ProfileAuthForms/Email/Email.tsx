@@ -8,6 +8,7 @@ import {
   updateProfileEmailReq,
 } from '../../../../../redux/slices/authSlice';
 import { AppDispatch, RootState } from '../../../../../redux/store';
+import Input from '../../../../ui/input/Input';
 
 interface Formdata {
   email?: string;
@@ -18,33 +19,22 @@ interface Props {
 }
 export const Email = (props: Props) => {
   const userData = useSelector(selectUserProfile);
-  const status = useSelector((state: RootState) => state.auth.status);
   const error = useSelector((state: RootState) => state.auth.error);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState({ email: '' });
   const { onSuccess } = props;
   const dispatch: AppDispatch = useDispatch();
-  const { reset, register, handleSubmit } = useForm<Formdata>({
+  const {
+    reset,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Formdata>({
     mode: 'onSubmit',
   });
-
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
 
   const onSubmit = async (values: Formdata) => {
     try {
       setIsSubmitting(true);
-      // Validate before dispatching
-      const emailError = !validateEmail(values.email || '')
-        ? 'Invalid email format'
-        : '';
-
-      if (emailError) {
-        setErrors({ email: emailError });
-        return;
-      }
 
       dispatch(
         updateProfileEmailReq({
@@ -53,10 +43,8 @@ export const Email = (props: Props) => {
         })
       );
 
-      if (status === 'succeeded') {
-        reset({ ...userData, ...values });
-        onSuccess();
-      }
+      reset({ ...userData, ...values });
+      onSuccess();
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -65,9 +53,9 @@ export const Email = (props: Props) => {
   };
 
   const [showPassword, setShowPassword] = useState(false);
+  const isEmailError = errors.email ? true : false;
+  const isPasswordError = errors.password ? true : false;
 
-  const inputClasses =
-    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 ';
   const labelClasses =
     'flex items-center gap-2 text-sm font-medium text-black mb-1';
 
@@ -85,14 +73,32 @@ export const Email = (props: Props) => {
             <label className={labelClasses}>
               <Mail size={18} /> New E-mail
             </label>
-            <input
-              {...register('email')}
-              className={inputClasses}
-              placeholder="test@gmail.com"
-              spellCheck="false"
+            <Input
+              type="email"
+              icon={<Mail size={18} />}
+              register={register}
+              isError={isEmailError}
+              inputStyle="w-75 pl-5 py-2"
+              placeholder="Email"
+              sircleWidth={36}
+              sircleHeight={36}
+              sircleTop={2}
+              sircleRight={2}
+              sircleHeightActive={40}
+              sircleWidthActive={40}
+              iconRight={10}
+              iconTop={10}
+              registerName="email"
+              registerReq="Email is required"
+              registerMaxLenghtValue={40}
+              registerMaxLenghtMessage="Email must be at max 40 characters"
+              isPattern={true}
+              registerPatternMessage="Invalid email address"
             />
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              <p className="text-sm text-red-500 mt-1 ml-2">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -101,34 +107,41 @@ export const Email = (props: Props) => {
               <RectangleEllipsis size={23} />
               <h1 className="mt-[2px] ml-1">Password</h1>
             </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                spellCheck="false"
-                placeholder="12345678Test"
-                id="password"
-                {...register('password', {
-                  required: 'Password is required',
-                  minLength: {
-                    value: 8,
-                    message: 'Password must be at least 8 characters',
-                  },
-                })}
-                className={inputClasses}
-              />
-
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 duration-300 delay-50"
-              >
-                {showPassword ? (
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              icon={
+                showPassword ? (
                   <EyeOff className="w-5 h-5" />
                 ) : (
                   <Eye className="w-5 h-5" />
-                )}
-              </button>
-            </div>
+                )
+              }
+              register={register}
+              isError={isPasswordError}
+              inputStyle="w-75 pl-5 py-2"
+              placeholder="Password"
+              sircleWidth={36}
+              sircleHeight={36}
+              sircleTop={2}
+              sircleRight={2}
+              sircleHeightActive={40}
+              sircleWidthActive={40}
+              iconRight={10}
+              iconTop={10}
+              registerName="password"
+              registerReq="Password is required"
+              isMinLength={true}
+              registerMinLenghtValue={8}
+              registerMinLenghtMessage="Password must be at least 8 characters"
+              registerMaxLenghtValue={40}
+              registerMaxLenghtMessage="Password must be at max 40 characters"
+              iconButtonOnCLick={() => setShowPassword(!showPassword)}
+            />
+            {errors.password && (
+              <p className="text-sm text-red-500 mt-1 ml-2">
+                {errors.password.message}
+              </p>
+            )}
           </div>
         </div>
 

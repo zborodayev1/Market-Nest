@@ -119,9 +119,6 @@ export const patchProduct = async (req, res) => {
 
     session.startTransaction();
 
-    console.log('req.body:', req.body);
-    console.log('req.file:', req.file);
-
     const { name } = req.body;
 
     const price = Number(req.body.price);
@@ -136,9 +133,17 @@ export const patchProduct = async (req, res) => {
         return res.status(400).json({ message: 'Invalid tags format' });
       }
     }
+
     const imageFile = req.file;
 
-    if (!name || !tags || price === undefined || price === null || price < 0) {
+    if (
+      !name ||
+      !Array.isArray(tags) ||
+      tags.length === 0 ||
+      price === undefined ||
+      price === null ||
+      Number(price) < 0
+    ) {
       await session.abortTransaction();
       return res.status(400).json({ message: 'Missing required fields' });
     }

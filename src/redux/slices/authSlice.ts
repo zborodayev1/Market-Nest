@@ -67,7 +67,7 @@ export const updateProfilePhoneReq = createAction(
 );
 
 export const requestPhoneChangeReq = createAction<{
-  newPhone: string;
+  phone: string;
 }>('auth/requestPhoneChangeReq');
 
 export const confirmPhoneChangeReq = createAction<{

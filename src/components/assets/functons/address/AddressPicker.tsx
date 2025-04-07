@@ -33,7 +33,6 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
       }),
     []
   );
-  console.log({ address });
   useEffect(() => {
     setTimeout(() => {
       mapRef.current?.invalidateSize();
@@ -92,7 +91,7 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
           <div className="flex relative ">
             <Input
               icon={<MapPin size={18} />}
-              inputStyle={`${isUserProfileOpen ? 'w-[342px]' : 'w-75'} pl-5 py-2`}
+              inputStyle={`${isUserProfileOpen ? 'w-[335px]' : 'w-75'} pl-5 py-2`}
               placeholder="Address"
               sircleWidth={36}
               sircleHeight={36}
@@ -103,6 +102,7 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
               iconRight={10}
               iconTop={10}
               isAddress={true}
+              address={address}
             />
           </div>
         </div>

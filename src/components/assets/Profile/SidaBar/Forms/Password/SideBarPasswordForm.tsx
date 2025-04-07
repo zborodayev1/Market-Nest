@@ -44,7 +44,7 @@ export const SideBarPasswordForm: React.FC<Props> = (props) => {
               ChangePhone: false,
             }))
           }
-          className="hover:bg-gray-200 p-2 py-3 rounded-lg flex justify-between items-center gap-1 w-full transition-colors duration-300 ease-in-out"
+          className="hover:bg-gray-200 p-2 py-3 rounded-xl flex justify-between items-center gap-1 w-full transition-colors duration-300 ease-in-out"
         >
           <div>Change password</div>
 
