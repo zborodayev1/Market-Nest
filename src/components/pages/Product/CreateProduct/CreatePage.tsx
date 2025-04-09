@@ -31,8 +31,8 @@ export const CreatePage = () => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      name: 'testtest',
-      price: 11110,
+      name: '',
+      price: 0,
       tags: [],
       image: null,
     },
@@ -129,7 +129,7 @@ export const CreatePage = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.2, delay: 0.3 }}
+        transition={{ duration: 0.2 }}
         className="flex justify-center items-center "
       >
         <div className="h-[1000px]">
@@ -185,7 +185,7 @@ export const CreatePage = () => {
                 register={register}
                 isError={isPriceError}
                 inputStyle="w-[430px] pl-5 py-2"
-                placeholder="Product price"
+                placeholder="Product Price"
                 sircleWidth={36}
                 sircleHeight={36}
                 sircleTop={2}
@@ -247,7 +247,7 @@ export const CreatePage = () => {
               <AnimatePresence>
                 {!imagePreview && (
                   <motion.button
-                    initial={{ opacity: 0, x: -40 }}
+                    initial={{ opacity: 0 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -40 }}
                     transition={{ duration: 0.3 }}

@@ -2,11 +2,9 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined';
 import { CircularProgress, IconButton } from '@mui/material';
 import { motion } from 'framer-motion';
-import { Eye, X } from 'lucide-react';
+import { Check, Clock, Eye, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { BiSolidMessageSquare } from 'react-icons/bi';
-import { CiCalendarDate } from 'react-icons/ci';
 import { IoBag } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -47,10 +45,10 @@ export const FullProduct = (props: Props) => {
   };
 
   useEffect(() => {
-    if (id && !data) {
+    if (id) {
       dispatch(getOneProduct(id));
     }
-  }, [dispatch, id, data]);
+  }, [dispatch, id]);
 
   useEffect(() => {
     dispatch(fetchDeliveryReq());
@@ -112,38 +110,43 @@ export const FullProduct = (props: Props) => {
       </Helmet>
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1, transition: { duration: 0.5 } }}
+        animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="ml-[200px] mt-5"
       >
         <div className="flex">
           <div className="text-2xl flex flex-col text-start">
-            <div className="font-bold flex gap-2">
-              <h1 className={`text-3xl ${data.saveAmount && 'text-[#ff3535]'}`}>
-                {data.price}$
-              </h1>
-              {data.saveAmount && (
-                <div className="text-xl flex gap-2 items-center">
-                  <h1 className="bg-[#3C8737] text-white px-3 rounded-md p-1">
-                    save {data.saveAmount}$
+            <div className="ml-2">
+              <h1 className="text-3xl">{data.name}</h1>
+              <div className="flex justify-start items-center gap-14">
+                <div className="font-bold flex gap-2 my-1">
+                  <h1
+                    className={`text-2xl ${data.saveAmount ? 'text-[#ff3535]' : 'text-[#1f5e1c]'}`}
+                  >
+                    {data.price}$
                   </h1>
-                  <h1 className="text-gray-400 text-sm">
-                    was {data.oldPrice}$
-                  </h1>
+                  {data.saveAmount && (
+                    <div className="text-lg flex gap-2 items-center">
+                      <h1 className="bg-[#3C8737] text-white px-3 rounded-md p-1">
+                        save {data.saveAmount}$
+                      </h1>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className=" ml-2">
-              <div className="flex justify-between items-center gap-1">
-                <h1 className="mr-2">{data.name}</h1>
                 {noti && (
                   <div className="relative right-[50px]">
                     {data.status === 'approved' ? (
-                      <h1 className="text-[#3C8737] font-bold">Approved</h1>
+                      <h1 className="text-[#3C8737] gap-1 flex items-center font-bold">
+                        Approved <Check className="w-7 h-7" />
+                      </h1>
                     ) : data.status === 'rejected' ? (
-                      <h1 className="text-red-600 font-bold">Rejected</h1>
+                      <h1 className="text-red-600 gap-1 flex items-center font-bold">
+                        Rejected <X />
+                      </h1>
                     ) : (
-                      <h1 className="text-blue-600 font-bold">Pending</h1>
+                      <h1 className="text-blue-600 gap-1 flex items-center font-bold">
+                        Pending <Clock />
+                      </h1>
                     )}
                   </div>
                 )}
@@ -152,20 +155,8 @@ export const FullProduct = (props: Props) => {
                 <div className="flex gap-1">
                   {data.viewsCount} <Eye className="w-5 h-5 " />
                 </div>
-                <div className="flex gap-1">
-                  {data.commentsCount}{' '}
-                  <BiSolidMessageSquare className="w-5 h-5" />
-                </div>
-                <div className="flex gap-1">
-                  {data.createdAt} <CiCalendarDate className="w-5 h-5 " />
-                </div>
-                <div className="flex gap-1">
-                  {data.tags && (
-                    <h1 className="text-base text-[#a7a7a7]">
-                      {data.tags.join(', ')}
-                    </h1>
-                  )}
-                </div>
+
+                <div className="flex gap-1">{data.createdAt}</div>
               </div>
             </div>
 

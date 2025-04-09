@@ -21,6 +21,8 @@ router.post('/products-by-search', ProductController.getProductsBySearch);
 
 router.delete('/delete/all', ProductController.deleteAllProducts);
 
+router.patch('/buy/:id/:deliveryId', checkAuth, ProductController.buyProduct);
+
 router.patch(
   '/:id',
   upload.single('image'),

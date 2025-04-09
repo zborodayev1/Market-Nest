@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 const NotiSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
-    productName: { type: String, required: true },
-    title2: { type: String, required: true },
+    productName: { type: String, required: false },
+    title2: { type: String, required: false },
     isRead: { type: Boolean, default: false },
     productId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -13,7 +13,7 @@ const NotiSchema = new mongoose.Schema(
     },
     actionType: {
       type: String,
-      enum: ['created', 'approved', 'info', 'error', 'deleted'],
+      enum: ['created', 'approved', 'info', 'error', 'deleted', 'order'],
       required: true,
     },
     userId: {

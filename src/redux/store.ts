@@ -18,12 +18,14 @@ import { authReducer } from './slices/authSlice';
 import { deliveryReducer } from './slices/deliverySlice';
 import { notificationsReducer } from './slices/notificationSlice';
 import { productReducer } from './slices/productSlice';
+import { walletReducer } from './slices/walletSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   notifications: notificationsReducer,
   delivery: deliveryReducer,
   products: productReducer,
+  wallet: walletReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();

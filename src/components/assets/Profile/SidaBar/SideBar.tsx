@@ -10,6 +10,7 @@ import { SideBarPemdingProductsForm } from './Forms/ForAdmin/SideBarPemdingProdu
 import { SideBarPasswordForm } from './Forms/Password/SideBarPasswordForm';
 import { SideBarPhoneForm } from './Forms/Phone/SideBarPhoneForm';
 import { SideBarUserDataForm } from './Forms/UserData/SideBarUserDataForm';
+import { SideBarWalletForm } from './Forms/Wallet/SideBarWalletForm';
 
 interface Props {
   setIsDropdownOpen: (value: boolean) => void;
@@ -64,6 +65,7 @@ export const SideBar = (props: Props) => {
               <X style={{ width: 20, height: 20 }} />
             </button>
           </div>
+
           <div className="mt-[16px] mb-2.5">
             <ChangeAvatar />
           </div>
@@ -91,9 +93,12 @@ export const SideBar = (props: Props) => {
               <SideBarPemdingProductsForm
                 onSuccess={() => setIsDropdownOpen(!isDropdownOpen)}
               />
+              <SideBarWalletForm
+                onSuccess={() => setIsDropdownOpen(!isDropdownOpen)}
+              />
               <motion.div variants={contentVariants} className="text-sm mt-1">
                 <motion.button
-                  className="w-full bg-[#fcdede] hover:bg-[#f5b3b3] transition-colors hover:bg ease-in-out duration-300  text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2 delay-50 "
+                  className="w-full mt-2 bg-[#fcdede] hover:bg-[#f5b3b3] transition-colors hover:bg ease-in-out duration-300  text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2 delay-50 "
                   onClick={onClickLogout}
                 >
                   <LogOut />

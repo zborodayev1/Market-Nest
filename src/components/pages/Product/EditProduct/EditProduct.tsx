@@ -227,7 +227,7 @@ export const EditProduct = () => {
                 register={register}
                 isError={isPriceError}
                 inputStyle="w-[430px] pl-5 py-2"
-                placeholder="Product price"
+                placeholder="Product Price"
                 sircleWidth={36}
                 sircleHeight={36}
                 sircleTop={2}

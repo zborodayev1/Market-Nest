@@ -6,7 +6,7 @@ export interface NotificationType {
   productName: string;
   isRead: boolean;
   productImageUrl?: string;
-  actionType?: 'created' | 'approved' | 'info' | 'error' | 'deleted';
+  actionType?: 'created' | 'approved' | 'info' | 'error' | 'deleted' | 'order';
   createdAt: string;
   productId: string;
 }

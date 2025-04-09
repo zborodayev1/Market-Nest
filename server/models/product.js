@@ -30,29 +30,6 @@ const ProductSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
-    comment: [
-      {
-        text: {
-          type: String,
-          required: true,
-        },
-        user: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
-          required: true,
-        },
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Product',
-          required: true,
-        },
-      },
-    ],
-    commentsCount: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -64,6 +41,11 @@ const ProductSchema = new mongoose.Schema(
     public_id: {
       type: String,
       sparse: true,
+    },
+    ordersCount: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
     status: {
       type: String,

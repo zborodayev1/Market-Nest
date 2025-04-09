@@ -1,72 +1,72 @@
 import { Avatar } from '@mui/material';
-import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
-  deleteAvatarReq,
-  fetchProfileDataReq,
+  // deleteAvatarReq,
+  // fetchProfileDataReq,
   selectUserProfile,
 } from '../../../../../redux/slices/authSlice';
-import { AppDispatch } from '../../../../../redux/store';
+// import { AppDispatch } from '../../../../../redux/store';
 
 export const ChangeAvatar = () => {
   const [isHovered, setIsHovered] = useState(false);
   const userData = useSelector(selectUserProfile);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const dispatch: AppDispatch = useDispatch();
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0] || null;
-    if (selectedFile) {
-      setFile(selectedFile);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(selectedFile);
-    }
-  };
+  // const [preview, setPreview] = useState<string | null>(null);
+  // const [file, setFile] = useState<File | null>(null);
+  // const dispatch: AppDispatch = useDispatch();
 
-  const handleUpload = async () => {
-    try {
-      if (file) {
-        const formData = new FormData();
-        formData.append('image', file);
+  // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const selectedFile = event.target.files?.[0] || null;
+  //   if (selectedFile) {
+  //     setFile(selectedFile);
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setPreview(reader.result as string);
+  //     };
+  //     reader.readAsDataURL(selectedFile);
+  //   }
+  // };
 
-        dispatch(deleteAvatarReq(formData));
+  // const handleUpload = async () => {
+  //   try {
+  //     if (file) {
+  //       const formData = new FormData();
+  //       formData.append('image', file);
 
-        dispatch(fetchProfileDataReq());
-        setPreview(null);
-        setFile(null);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
+  //       dispatch(deleteAvatarReq(formData));
 
-  const handleRemovePreview = () => {
-    setPreview(null);
-    setFile(null);
-    if (inputFileRef.current) {
-      inputFileRef.current.value = '';
-    }
-  };
+  //       dispatch(fetchProfileDataReq());
+  //       setPreview(null);
+  //       setFile(null);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //   }
+  // };
 
-  const handleDeleteAvatar = async () => {
-    try {
-      if (userData?._id) {
-        const formData = new FormData();
-        formData.append('userId', userData._id);
-        dispatch(deleteAvatarReq(formData));
-      }
+  // const handleRemovePreview = () => {
+  //   setPreview(null);
+  //   setFile(null);
+  //   if (inputFileRef.current) {
+  //     inputFileRef.current.value = '';
+  //   }
+  // };
 
-      dispatch(fetchProfileDataReq());
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
+  // const handleDeleteAvatar = async () => {
+  //   try {
+  //     if (userData?._id) {
+  //       const formData = new FormData();
+  //       formData.append('userId', userData._id);
+  //       dispatch(deleteAvatarReq(formData));
+  //     }
+
+  //     dispatch(fetchProfileDataReq());
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //   }
+  // };
 
   return (
     <div className="flex items-center gap-3">
@@ -95,7 +95,7 @@ export const ChangeAvatar = () => {
         </div>
       </button>
 
-      <button className="z-30 " onClick={handleDeleteAvatar}>
+      {/* <button className="z-30 " onClick={handleDeleteAvatar}>
         <X
           size={18}
           onClick={handleRemovePreview}
@@ -138,13 +138,12 @@ export const ChangeAvatar = () => {
         <>
           <button
             onClick={handleUpload}
-            className="ml-5 bg-blue-50 py-1 px-4 text-[#212121] border-2 border-gray-500/50 hover:border-[#212121] duration-300 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] delay-100  rounded-md transition-all 
-            "
+            className="ml-5 bg-[#3C8737] text-white rounded-xl px-5 py-2 font-bold hover:bg-[#1F6B29] transition duration-300 ease-in-out"
           >
             Change
           </button>
         </>
-      )}
+      )} */}
     </div>
   );
 };

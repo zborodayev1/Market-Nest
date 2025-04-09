@@ -25,7 +25,7 @@ export const FullNotiForm: React.FC<Props> = ({
 
   const handleGTP = () => {
     onSuccess();
-    nav(`/product/${notification?.notification?.productId}`);
+    nav(`/noti/product/${notification?.notification?.productId}`);
   };
 
   return (
@@ -44,7 +44,8 @@ export const FullNotiForm: React.FC<Props> = ({
           </div>
         </div>
       </div>
-      {notification?.notification?.actionType !== 'deleted' ? (
+      {notification?.notification?.actionType !== 'deleted' &&
+      notification?.notification?.actionType !== 'order' ? (
         <div className="flex justify-center relative top-5 gap-4">
           <button onClick={handleGTP} className={`${buttonStyle}`}>
             Product

@@ -34,7 +34,6 @@ export const LogInPage: React.FC = (): JSX.Element => {
   const onSubmit = async (values: { email: string; password: string }) => {
     setLoading(true);
     try {
-      console.log('values', values);
       dispatch(loginReq(values));
     } catch (error) {
       console.error(error);

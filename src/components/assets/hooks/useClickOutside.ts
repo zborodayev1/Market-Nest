@@ -3,7 +3,7 @@ import { RefObject, useEffect } from 'react';
 type RefType = RefObject<HTMLElement>;
 
 export const useClickOutside = (
-  refs: (RefType | undefined)[], // Разрешаем undefined
+  refs: (RefType | undefined)[],
   callback: () => void,
   enabled = true
 ) => {

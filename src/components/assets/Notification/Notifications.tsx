@@ -21,7 +21,7 @@ interface Props {
   onSuccess: () => void;
 }
 
-const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
+export const Notifications: React.FC<Props> = ({ onSuccess }) => {
   const dispatch: AppDispatch = useDispatch();
 
   const [page, setPage] = useState(1);
@@ -39,7 +39,7 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
 
   useEffect(() => {
     dispatch(fetchNotificationReq({ page, limit, filter }));
-  }, [dispatch, page, filter]);
+  }, [dispatch, page, filter, limit]);
 
   const markAsRead = () => {
     dispatch(markAllNotificationsAsReadReq());
@@ -86,13 +86,16 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
               </div>
             ))}
           </div>
-        ) : status === 'succeeded' && fullNoti.state === 'home' ? (
-          <div className="flex mt-3 ">
+        ) : status === 'succeeded' &&
+          fullNoti.state === 'home' &&
+          notifications.length === 0 ? (
+          <div className="flex justify-center">
             <motion.div
               initial={{ opacity: 0, filter: 'blur(2px)' }}
               animate={{ opacity: 1, filter: 'blur(0px)' }}
               exit={{ opacity: 0, filter: 'blur(2px)' }}
               transition={{ duration: 0.2 }}
+              className="p-3"
             >
               No notifications available for this tag. Try to
               <motion.button
@@ -168,5 +171,3 @@ const NotificationsComponent: React.FC<Props> = ({ onSuccess }) => {
     </>
   );
 };
-
-export const Notifications = React.memo(NotificationsComponent);
