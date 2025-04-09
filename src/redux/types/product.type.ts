@@ -14,7 +14,6 @@ export interface Product {
   createdAt: string;
   image: null | string;
   user: UserProfile | null;
-  commentsCount: number;
   favorite: boolean;
   status: string;
 }

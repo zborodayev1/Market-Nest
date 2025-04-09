@@ -33,7 +33,7 @@ export const NotiHeaderDropDown: React.FC<Props> = ({
           {isNotiOpen && (
             <motion.div
               ref={notificationRef}
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: -30 }}
               animate={{
                 opacity: 1,
                 y: 0,
@@ -44,7 +44,7 @@ export const NotiHeaderDropDown: React.FC<Props> = ({
               }}
               exit={{
                 opacity: 0,
-                y: -20,
+                y: -30,
                 transition: {
                   y: { duration: 0.2, ease: 'easeInOut' },
                   opacity: { duration: 0.2, delay: 0.01, ease: 'easeInOut' },
@@ -52,14 +52,9 @@ export const NotiHeaderDropDown: React.FC<Props> = ({
               }}
               className="flex justify-center bg-[#fafafa] mt-3 border-slate-500 border-2 rounded-xl z-20 w-[380px] px-[50px] min-h-[340px] max-h-[1440px]"
             >
-              <motion.div
-                initial={{ opacity: 0, filter: 'blur(10px)' }}
-                animate={{ opacity: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, filter: 'blur(10px)' }}
-                transition={{ duration: 0.2, delay: 0.3 }}
-              >
+              <div>
                 <Notifications onSuccess={onSuccess} />
-              </motion.div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

@@ -13,7 +13,7 @@ interface Props {
   onSuccess: (state: FullNoti) => void;
 }
 
-const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
+export const NotiForm: React.FC<Props> = ({ notification, onSuccess }) => {
   const dispatch: AppDispatch = useDispatch();
 
   const onClick = () => {
@@ -44,5 +44,3 @@ const NotiFormMemo: React.FC<Props> = ({ notification, onSuccess }) => {
     </>
   );
 };
-
-export const NotiForm = React.memo(NotiFormMemo);

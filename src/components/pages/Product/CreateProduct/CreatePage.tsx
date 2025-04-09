@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { createProduct } from '../../../../redux/slices/productSlice';
 import { AppDispatch, RootState } from '../../../../redux/store';
+import Input from '../../../ui/input/Input';
 
 interface FormData {
   name: string;
@@ -23,16 +24,23 @@ export const CreatePage = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>(['Sport']);
   const error = useSelector((state: RootState) => state.products.error);
   const [message, setMessage] = useState<string>('');
-  const { register, handleSubmit, setValue } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<FormData>({
     defaultValues: {
-      name: 'testtest',
-      price: 11110,
+      name: '',
+      price: 0,
       tags: [],
       image: null,
     },
   });
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const isNameError = errors.name ? true : false;
+  const isPriceError = errors.price ? true : false;
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
@@ -118,50 +126,90 @@ export const CreatePage = () => {
         />
       </Helmet>
       <motion.div
-        initial={{ opacity: 0, filter: 'blur(10px)' }}
-        animate={{ opacity: 1, filter: 'blur(0px)' }}
-        exit={{ opacity: 0, filter: 'blur(10px)' }}
-        transition={{ duration: 0.2, delay: 0.3 }}
-        className="flex justify-center items-center mt-5"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="flex justify-center items-center "
       >
         <div className="h-[1000px]">
-          <h1 className="flex justify-center mb-5 font-bold  text-2xl">
+          <h1 className="flex justify-center my-5 font-bold  text-2xl">
             Create Product
           </h1>
 
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="gap-2 bg-[#f5f5f5] p-5 px-6 rounded-2xl border-2 "
+            className="gap-2 px-15 py-7 rounded-2xl border-2 "
           >
             <div>
-              <label className="flex items-center gap-2 text-xl font-bold text-black  mb-1">
-                <Package size={24} />
+              <label className="flex items-center gap-2 text-base font-bold text-black  mb-1">
+                <Package size={20} />
                 Product Name
               </label>
-              <input
-                {...register('name')}
-                className="w-[430px] px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200"
-                placeholder="Product name"
-                spellCheck="false"
+              <Input
+                type="text"
+                icon={<Package size={18} />}
+                register={register}
+                isError={isNameError}
+                inputStyle="w-[430px] pl-5 py-2"
+                placeholder="Product Name"
+                sircleWidth={36}
+                sircleHeight={36}
+                sircleTop={2}
+                sircleRight={2}
+                sircleHeightActive={40}
+                sircleWidthActive={40}
+                iconRight={10}
+                iconTop={10}
+                isDef={true}
+                registerMaxLenghtValue={40}
+                registerMaxLenghtMessage="Product Name must be at max 40 characters"
+                registerName="name"
+                registerReq="Product Name is required"
               />
+              {errors.name && (
+                <p className="text-sm text-red-500 mt-1 ml-2">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
             <div className="mt-5">
-              <label className="flex items-center gap-2 text-xl font-bold text-black  mb-1">
-                <Coins size={24} />
+              <label className="flex items-center gap-2 text-base  font-bold text-black  mb-1">
+                <Coins size={20} />
                 Price
               </label>
-              <input
+              <Input
                 type="number"
-                {...register('price')}
-                className="w-[430px] px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200"
-                placeholder="Price"
+                icon={<Coins size={18} />}
+                register={register}
+                isError={isPriceError}
+                inputStyle="w-[430px] pl-5 py-2"
+                placeholder="Product Price"
+                sircleWidth={36}
+                sircleHeight={36}
+                sircleTop={2}
+                sircleRight={2}
+                sircleHeightActive={40}
+                sircleWidthActive={40}
+                iconRight={10}
+                iconTop={10}
+                isDef={true}
+                registerMaxLenghtValue={40}
+                registerMaxLenghtMessage="Product price must be at max 40 characters"
+                registerName="price"
+                registerReq="Product price is required"
               />
+              {errors.price && (
+                <p className="text-sm text-red-500 mt-1 ml-2">
+                  {errors.price.message}
+                </p>
+              )}
             </div>
 
             <div className="mt-5">
-              <label className="flex items-center gap-2 text-xl font-bold text-black  mb-1">
-                <Tags size={24} />
+              <label className="flex items-center gap-2 text-base font-bold text-black  mb-1">
+                <Tags size={20} />
                 Tags
               </label>
               <div className="flex flex-wrap gap-2 max-w-[440px]">
@@ -170,11 +218,11 @@ export const CreatePage = () => {
                     type="button"
                     key={tag}
                     onClick={() => handleTagClick(tag)}
-                    className={`w-1/3 sm:w-1/3 md:w-1/3 lg:w-1/3 px-4 py-2 rounded-lg transition-colors ease-in-out duration-300 delay-50
+                    className={`px-4 py-2 rounded-full transition-colors ease-in-out duration-300 delay-50
                     ${
                       selectedTags.includes(tag)
                         ? 'bg-[#2B6128] text-white hover:bg-[#3C8737]'
-                        : 'bg-gray-200 text-gray-800 hover:bg-[#1f5e1c'
+                        : 'bg-gray-200 text-gray-800 hover:bg-[#1f5e1c]'
                     } 
                     hover:bg-[#2B6128] hover:text-white`}
                   >
@@ -185,8 +233,8 @@ export const CreatePage = () => {
             </div>
 
             <div className="mt-5 flex-col ">
-              <label className="flex  items-center gap-2 text-xl font-bold text-black  mb-1">
-                <ImagePlus size={24} />
+              <label className="flex  items-center gap-2 text-base font-bold text-black  mb-1">
+                <ImagePlus size={20} />
                 Image
               </label>
               <input
@@ -199,13 +247,13 @@ export const CreatePage = () => {
               <AnimatePresence>
                 {!imagePreview && (
                   <motion.button
-                    initial={{ opacity: 0, x: -40 }}
+                    initial={{ opacity: 0 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -40 }}
                     transition={{ duration: 0.3 }}
                     type="button"
                     onClick={() => inputRef.current?.click()}
-                    className="w-[430px] h-[200px] border-dashed border-2 border-[#212121] flex justify-center items-center hover:bg-[#e4e4e4] transition-colors ease-in-out duration-300 delay-50"
+                    className="w-[430px] h-[200px] border-dashed border-2 border-[#212121] flex justify-center items-center hover:bg-gray-200 transition-colors ease-in-out duration-300 delay-50"
                   >
                     <ImagePlus size={50} />
                   </motion.button>

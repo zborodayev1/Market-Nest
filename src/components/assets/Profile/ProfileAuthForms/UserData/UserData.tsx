@@ -8,6 +8,7 @@ import {
   updateProfileDataReq,
 } from '../../../../../redux/slices/authSlice';
 import { AppDispatch, RootState } from '../../../../../redux/store';
+import Input from '../../../../ui/input/Input';
 import { AddressPicker } from '../../../functons/Address/AddressPicker';
 
 interface FormData {
@@ -34,7 +35,12 @@ export const UserData = ({ onSuccess }: Props) => {
     userData?.coordinates ? userData.coordinates.lat : 45.02626419993138,
     userData?.coordinates ? userData.coordinates.lng : 78.38643193244936,
   ]);
-  const { register, handleSubmit, reset } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
     defaultValues: {
       fullName: userData?.fullName || '',
       address: userData?.address || '',
@@ -76,8 +82,8 @@ export const UserData = ({ onSuccess }: Props) => {
     }
   };
 
-  const inputClasses =
-    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 ';
+  const isFullNameError = errors.fullName ? true : false;
+
   const labelClasses =
     'flex items-center gap-2 text-sm font-medium text-black  mb-1';
 
@@ -95,12 +101,32 @@ export const UserData = ({ onSuccess }: Props) => {
             <label className={labelClasses}>
               <User size={18} /> Full Name
             </label>
-            <input
-              {...register('fullName')}
-              className={inputClasses}
-              placeholder="John Doe"
-              spellCheck="false"
+            <Input
+              type="text"
+              icon={<User size={18} />}
+              register={register}
+              isError={isFullNameError}
+              inputStyle="w-75 pl-5 py-2"
+              placeholder="Full Name"
+              sircleWidth={36}
+              sircleHeight={36}
+              sircleTop={2}
+              sircleRight={2}
+              sircleHeightActive={40}
+              sircleWidthActive={40}
+              iconRight={10}
+              iconTop={10}
+              isDef={true}
+              registerMaxLenghtValue={40}
+              registerMaxLenghtMessage="Full Name must be at max 40 characters"
+              registerName="fullName"
+              registerReq="Full Name is required"
             />
+            {errors.fullName && (
+              <p className="text-sm text-red-500 ml-2">
+                {errors.fullName.message}
+              </p>
+            )}
           </div>
 
           <AddressPicker

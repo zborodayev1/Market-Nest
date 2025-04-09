@@ -66,7 +66,6 @@ export const PendingProducts = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
         className="h-screen bg-[#FFFFFF] pt-3"
       >
         <h1 className="flex justify-center text-3xl font-bold">

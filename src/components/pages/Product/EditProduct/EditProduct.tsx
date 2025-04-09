@@ -1,11 +1,10 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { Coins, ImagePlus, Package, Tags, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { selectUserProfile } from '../../../../redux/slices/authSlice';
 import {
   editProduct,
@@ -13,6 +12,7 @@ import {
   selectFullProduct,
 } from '../../../../redux/slices/productSlice';
 import { AppDispatch, RootState } from '../../../../redux/store';
+import Input from '../../../ui/input/Input';
 
 interface FormData {
   name: string;
@@ -27,6 +27,9 @@ export const EditProduct = () => {
   const product = useSelector(selectFullProduct);
   const userData = useSelector(selectUserProfile);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   const [imagePreview, setImagePreview] = useState<string | null>(
     product?.image || null
   );
@@ -36,14 +39,21 @@ export const EditProduct = () => {
   const { error } = useSelector(
     (state: RootState) => state.products?.error || {}
   );
-  const [message, setMessage] = useState<string>('');
-  const { register, handleSubmit, setValue, reset } = useForm<FormData>({
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
     defaultValues: {
       name: product?.name || '',
       price: product?.price || 0,
       tags: product?.tags || [],
       image: null,
     },
+    mode: 'all',
   });
 
   useEffect(() => {
@@ -56,9 +66,6 @@ export const EditProduct = () => {
       });
     }
   }, [product, reset]);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (id && (!product || product?._id !== id)) {
@@ -114,22 +121,14 @@ export const EditProduct = () => {
 
     try {
       setIsSubmitting(true);
-      console.log('FormData:', Object.fromEntries(formData.entries()));
 
-      await dispatch(editProduct({ productData: formData, id: id })).unwrap();
-
-      toast('Successfully created!', {
-        type: 'success',
-        onClose: () => {
-          navigate('/');
-          setIsSubmitting(false);
-        },
-      });
+      await dispatch(editProduct({ productData: formData, id: id }));
     } catch (error) {
-      const errorMessage =
-        (error as { message?: string }).message || 'An unknown error occurred';
-      setMessage(errorMessage);
       setIsSubmitting(false);
+      console.error('Error editing product:', error);
+    } finally {
+      setIsSubmitting(false);
+      navigate('/');
     }
   };
 
@@ -153,6 +152,9 @@ export const EditProduct = () => {
     'Decorations and luxury',
   ];
 
+  const isNameError = errors.name ? true : false;
+  const isPriceError = errors.price ? true : false;
+
   return (
     <>
       <Helmet>
@@ -167,31 +169,51 @@ export const EditProduct = () => {
         />
       </Helmet>
       <motion.div
-        initial={{ opacity: 0, filter: 'blur(5px)' }}
-        animate={{ opacity: 1, filter: 'blur(0px)' }}
-        exit={{ opacity: 0, filter: 'blur(5px)' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
-        className="flex justify-center items-center mt-5"
+        className="flex justify-center items-center "
       >
-        <div>
-          <h1 className="flex justify-center mb-5 font-bold text-2xl">
+        <div className="h-[1000px]">
+          <h1 className="flex justify-center my-5 font-bold text-2xl">
             Edit Product
           </h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="gap-2 bg-[#f5f5f5] p-5 px-6 rounded-2xl shadow-xl"
+            className="gap-2 px-15 py-7 rounded-2xl border-2"
           >
             <div>
               <label className="flex items-center gap-2 text-xl font-bold text-black  mb-1">
                 <Package size={24} />
                 Product Name
               </label>
-              <input
-                {...register('name')}
-                className="w-[430px] px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200"
-                placeholder="Product name"
-                spellCheck="false"
+              <Input
+                type="text"
+                icon={<Package size={18} />}
+                register={register}
+                isError={isNameError}
+                inputStyle="w-[430px] pl-5 py-2"
+                placeholder="Product Name"
+                sircleWidth={36}
+                sircleHeight={36}
+                sircleTop={2}
+                sircleRight={2}
+                sircleHeightActive={40}
+                sircleWidthActive={40}
+                iconRight={10}
+                iconTop={10}
+                isDef={true}
+                registerMaxLenghtValue={40}
+                registerMaxLenghtMessage="Product Name must be at max 40 characters"
+                registerName="name"
+                registerReq="Product Name is required"
               />
+              {errors.name && (
+                <p className="text-sm text-red-500 mt-1 ml-2">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
             <div className="mt-5">
@@ -199,17 +221,37 @@ export const EditProduct = () => {
                 <Coins size={24} />
                 Price
               </label>
-              <input
+              <Input
                 type="number"
-                {...register('price')}
-                className="w-[430px] px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200"
-                placeholder="Price"
+                icon={<Coins size={18} />}
+                register={register}
+                isError={isPriceError}
+                inputStyle="w-[430px] pl-5 py-2"
+                placeholder="Product Price"
+                sircleWidth={36}
+                sircleHeight={36}
+                sircleTop={2}
+                sircleRight={2}
+                sircleHeightActive={40}
+                sircleWidthActive={40}
+                iconRight={10}
+                iconTop={10}
+                isDef={true}
+                registerMaxLenghtValue={40}
+                registerMaxLenghtMessage="Product price must be at max 40 characters"
+                registerName="price"
+                registerReq="Product price is required"
               />
+              {errors.price && (
+                <p className="text-sm text-red-500 mt-1 ml-2">
+                  {errors.price.message}
+                </p>
+              )}
             </div>
 
             <div className="mt-5">
-              <label className="flex items-center gap-2 text-xl font-bold text-black  mb-1">
-                <Tags size={24} />
+              <label className="flex items-center gap-2 text-base font-bold text-black  mb-1">
+                <Tags size={20} />
                 Tags
               </label>
               <div className="flex flex-wrap gap-2 max-w-[440px]">
@@ -218,7 +260,7 @@ export const EditProduct = () => {
                     type="button"
                     key={tag}
                     onClick={() => handleTagClick(tag)}
-                    className={`w-1/3 sm:w-1/3 md:w-1/3 lg:w-1/3 px-4 py-2 rounded-lg transition-colors ease-in-out duration-300 delay-50
+                    className={`px-4 py-2 rounded-full transition-colors ease-in-out duration-300 delay-50
                     ${
                       selectedTags.includes(tag)
                         ? 'bg-[#2B6128] text-white hover:bg-[#3C8737]'
@@ -231,7 +273,6 @@ export const EditProduct = () => {
                 ))}
               </div>
             </div>
-
             <div className="mt-5 flex-col ">
               <label className="flex  items-center gap-2 text-xl font-bold text-black  mb-1">
                 <ImagePlus size={24} />
@@ -264,18 +305,18 @@ export const EditProduct = () => {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 40 }}
                     transition={{ duration: 0.3 }}
-                    className="mt-3 flex justify-center relative"
+                    className="mt-3 flex justify-center relative "
                   >
                     <img
                       src={imagePreview}
                       alt="Image Preview"
-                      className="w-[350px] h-[200px] object-cover rounded-lg"
+                      className="w-[350px] h-[200px] object-cover rounded-lg shadow-xl"
                     />
                     <X
-                      size={40}
+                      size={35}
                       type="button"
                       onClick={handleImageRemove}
-                      className="absolute top-0 bg-red-500 right-0 text-white rounded-full p-2 hover:bg-red-600 transition-colors delay-50"
+                      className="absolute top-0 bg-gray-200 right-0 text-black rounded-xl p-2 hover:bg-[#3C8737] hover:text-white transition-colors ease-in-out duration-300 delay-50"
                     />
                   </motion.div>
                 )}
@@ -288,7 +329,7 @@ export const EditProduct = () => {
               className={`mt-5 w-full p-2 rounded-xl flex justify-center items-center text-[#fff] bg-[#3C8737] hover:bg-[#2b6128] delay-50 transition-all duration-300  ease-in-out`}
             >
               <span className="text-[#fff] font-bold">
-                {isSubmitting ? 'Creating...' : 'Create'}
+                {isSubmitting ? 'Editing...' : 'Edit Product'}
               </span>
             </button>
 
@@ -298,7 +339,7 @@ export const EditProduct = () => {
                 animate={{ opacity: 1 }}
                 className="text-red-500 text-sm text-center mt-2"
               >
-                {message}
+                {error}
               </motion.p>
             )}
           </form>

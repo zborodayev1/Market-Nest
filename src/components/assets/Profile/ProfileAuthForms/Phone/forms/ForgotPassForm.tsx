@@ -3,15 +3,15 @@ import { Phone } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import {
   requestPhoneChangeReq,
   selectUserProfile,
 } from '../../../../../../redux/slices/authSlice';
-import { AppDispatch, RootState } from '../../../../../../redux/store';
+import { AppDispatch } from '../../../../../../redux/store';
+import Input from '../../../../../ui/input/Input';
 
 interface Formdata {
-  newPhone?: string;
+  phone?: string;
 }
 interface Props {
   setPPS: (state: 'default' | 'forgotPass' | 'code') => void;
@@ -21,40 +21,32 @@ export const ForgotPassForm = (props: Props) => {
   const userData = useSelector(selectUserProfile);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setPPS } = props;
-  const { error, message, status } = useSelector(
-    (state: RootState) => state.auth
-  );
+
   const dispatch: AppDispatch = useDispatch();
-  const { reset, register, handleSubmit } = useForm<Formdata>({
+  const {
+    reset,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Formdata>({
     mode: 'onSubmit',
   });
+  const isPhoneError = errors.phone ? true : false;
 
   const onSubmit = async (values: Formdata) => {
     try {
       setIsSubmitting(true);
       const payload = {
-        newPhone: values.newPhone || '',
+        phone: values.phone || '',
       };
       dispatch(requestPhoneChangeReq(payload));
 
       reset({ ...userData, ...values });
-      toast(message, {
-        type: 'success',
-        position: 'bottom-right',
-      });
+
       setPPS('code');
-      if (status === 'failed') {
-        toast(error, {
-          type: 'error',
-          position: 'bottom-right',
-        });
-      }
     } catch (error) {
       console.error(error);
-      toast(String(error), {
-        type: 'error',
-        position: 'bottom-right',
-      });
+
       if (error === 'Phone change code already sent') {
         setPPS('code');
       } else {
@@ -65,8 +57,6 @@ export const ForgotPassForm = (props: Props) => {
     }
   };
 
-  const inputClasses =
-    'w-full px-4 py-2 bg-[#fff] border border-[#212121] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#212121] focus:bg-[#e4e4e4] focus:border-transparent transition-all duration-200 ';
   const labelClasses =
     'flex items-center gap-2 text-sm font-medium text-black mb-1';
   return (
@@ -77,22 +67,32 @@ export const ForgotPassForm = (props: Props) => {
             <Phone size={18} />
             <h1 className="mt-[2px] ml-1">New Phone Number</h1>
           </label>
-          <div className="relative">
-            <input
-              type={'text'}
-              spellCheck="false"
-              placeholder="77777777777"
-              id="password"
-              {...register('newPhone', {
-                required: 'Password is required',
-                minLength: {
-                  value: 8,
-                  message: 'Password must be at least 8 characters',
-                },
-              })}
-              className={inputClasses}
-            />
-          </div>
+          <Input
+            type="text"
+            icon={<Phone size={18} />}
+            register={register}
+            isError={isPhoneError}
+            inputStyle="w-75 pl-5 py-2"
+            placeholder="Phone"
+            sircleWidth={36}
+            sircleHeight={36}
+            sircleTop={2}
+            sircleRight={2}
+            sircleHeightActive={40}
+            sircleWidthActive={40}
+            iconRight={10}
+            iconTop={10}
+            isMinLength={true}
+            registerMinLenghtValue={8}
+            registerMinLenghtMessage="Phone must be at least 8 characters"
+            registerMaxLenghtValue={40}
+            registerMaxLenghtMessage="Phone must be at max 40 characters"
+            registerName="phone"
+            registerReq="Phone is required"
+          />
+          {errors.phone && (
+            <p className="text-sm text-red-500 ml-2">{errors.phone.message}</p>
+          )}
         </div>
       </div>
 

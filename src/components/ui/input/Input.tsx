@@ -6,7 +6,7 @@ interface EmailInputProps {
   register?: UseFormRegister<any>;
   isError?: boolean;
   icon?: React.ReactNode;
-  type?: 'email' | 'password' | 'text';
+  type?: 'email' | 'password' | 'text' | 'number';
   placeholder: string;
   inputStyle?: string;
   sircleWidth: number;
@@ -25,7 +25,10 @@ interface EmailInputProps {
   isMinLength?: boolean;
   isDef?: boolean;
   isAddress?: boolean;
+  address?: string;
   registerMinLenghtMessage?: string;
+  registerMaxLenghtValue?: number;
+  registerMaxLenghtMessage?: string;
   iconButtonOnCLick?: () => void;
 }
 
@@ -52,7 +55,10 @@ const Input = ({
   isMinLength,
   isDef,
   isAddress,
+  address,
   registerMinLenghtMessage,
+  registerMaxLenghtMessage,
+  registerMaxLenghtValue,
   iconButtonOnCLick,
 }: EmailInputProps) => {
   const [focused, setFocused] = useState(false);
@@ -88,6 +94,11 @@ const Input = ({
               value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
               message: registerPatternMessage || 'Invalid email address',
             },
+            maxLength: {
+              value: registerMaxLenghtValue || 40,
+              message:
+                registerMaxLenghtMessage || 'Must be at max 40 characters',
+            },
           })}
         />
       )}
@@ -103,6 +114,11 @@ const Input = ({
               message:
                 registerMinLenghtMessage || 'Must be at least 8 characters',
             },
+            maxLength: {
+              value: registerMaxLenghtValue || 40,
+              message:
+                registerMaxLenghtMessage || 'Must be at max 40 characters',
+            },
           })}
         />
       )}
@@ -113,6 +129,11 @@ const Input = ({
           placeholder={placeholder}
           {...register(registerName, {
             required: registerReq,
+            maxLength: {
+              value: registerMaxLenghtValue || 40,
+              message:
+                registerMaxLenghtMessage || 'Must be at max 40 characters',
+            },
           })}
         />
       )}
@@ -120,6 +141,7 @@ const Input = ({
         <input
           className={`${inputStyle ? inputStyle : ''} bg-[#fafafa] focus:outline-none `}
           readOnly
+          value={address}
           placeholder={placeholder}
         />
       )}
@@ -141,7 +163,11 @@ const Input = ({
           top: isError ? sircleTop : isActive ? 0 : sircleTop,
           right: isError ? sircleRight : isActive ? 0 : sircleRight,
           borderRadius: isError ? '50%' : isActive ? 0 : '50%',
-          border: isError ? '2px solid #EF4444' : 'none',
+          border: isError
+            ? '2px solid #EF4444'
+            : isActive
+              ? '2px solid #3C8737'
+              : 'none',
           backgroundColor: isError
             ? '#E5E7EB'
             : isActive
@@ -154,6 +180,7 @@ const Input = ({
           top: { duration: 0.1, delay: 0.05 },
           right: { duration: 0.1, delay: 0.05 },
           borderRadius: { duration: 0.2, delay: 0.05 },
+          border: { duration: 0.05, delay: 0.2 },
           backgroundColor: { duration: 0.1, delay: 0.1 },
         }}
       />

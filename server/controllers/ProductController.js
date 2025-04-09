@@ -1,9 +1,13 @@
 import cloudinary from 'cloudinary';
 import dayjs from 'dayjs';
 import mongoose from 'mongoose';
+import DeliveryModel from '../models/delivery.js';
 import NotiModel from '../models/noti.js';
+import OrderModel from '../models/order.js';
 import ProductModel from '../models/product.js';
+import TransactionModel from '../models/transaction.js';
 import UserModel from '../models/user.js';
+import WalletModel from '../models/wallet.js';
 import { sendUnreadCountToClients } from '../webSokets/functions/sendUnreadCountToClients/sendUnreadCountToClients.js';
 
 export const createProduct = async (req, res) => {
@@ -119,9 +123,6 @@ export const patchProduct = async (req, res) => {
 
     session.startTransaction();
 
-    console.log('req.body:', req.body);
-    console.log('req.file:', req.file);
-
     const { name } = req.body;
 
     const price = Number(req.body.price);
@@ -136,9 +137,17 @@ export const patchProduct = async (req, res) => {
         return res.status(400).json({ message: 'Invalid tags format' });
       }
     }
+
     const imageFile = req.file;
 
-    if (!name || !tags || price === undefined || price === null || price < 0) {
+    if (
+      !name ||
+      !Array.isArray(tags) ||
+      tags.length === 0 ||
+      price === undefined ||
+      price === null ||
+      Number(price) < 0
+    ) {
       await session.abortTransaction();
       return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -218,6 +227,131 @@ export const patchProduct = async (req, res) => {
   }
 };
 
+export const buyProduct = async (req, res) => {
+  const session = await mongoose.startSession();
+  try {
+    const productId = req.params.id;
+    const count = req.body;
+    const deliveryId = req.params.deliveryId;
+    const buyerId = req.userId;
+
+    if (!count || count <= 0) {
+      return res.status(400).json({
+        message: 'Invalid product count',
+      });
+    }
+
+    session.startTransaction();
+
+    const product = await ProductModel.findById(productId).session(session);
+
+    if (!product || product.status !== 'approved') {
+      await session.abortTransaction();
+      return res.status(404).json({
+        message: 'Product not found or not approved',
+      });
+    }
+
+    const delivery = await DeliveryModel.findById(deliveryId).session(session);
+    if (!delivery) {
+      await session.abortTransaction();
+      return res.status(404).json({ message: 'Delivery not found' });
+    }
+
+    const buyerWallet = await WalletModel.findOne({ user: buyerId }).session(
+      session
+    );
+    if (!buyerWallet) {
+      await session.abortTransaction();
+      return res.status(404).json({ message: 'Buyer wallet not found' });
+    }
+
+    const totalPrice = product.price * count;
+    if (buyerWallet.balance < totalPrice) {
+      await session.abortTransaction();
+      return res.status(400).json({ message: 'Not enough balance' });
+    }
+
+    const sellerWallet = await WalletModel.findOne({
+      user: product.user._id,
+    }).session(session);
+
+    if (!sellerWallet) {
+      await session.abortTransaction();
+      return res.status(404).json({ message: 'Seller wallet not found' });
+    }
+
+    buyerWallet.balance -= totalPrice;
+    buyerWallet.expenses += totalPrice;
+
+    sellerWallet.balance += totalPrice;
+    sellerWallet.income += totalPrice;
+
+    await buyerWallet.save();
+    await sellerWallet.save();
+
+    const buyerTransaction = new TransactionModel({
+      amount: -totalPrice,
+      type: 'expense',
+      description: `Purchase of ${count} ${product.name}`,
+      wallet: buyerWallet._id,
+    });
+
+    const sellerTransaction = new TransactionModel({
+      amount: totalPrice,
+      type: 'income',
+      description: `Sale of ${count} ${product.name}`,
+      wallet: sellerWallet._id,
+    });
+
+    await buyerTransaction.save();
+    await sellerTransaction.save();
+
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+      productId,
+      { $inc: { ordersCount: count } },
+      { new: true, session }
+    );
+
+    timeToDelivery = delivery.time * (1000 * 60 * 60 * 24);
+
+    const order = new OrderModel({
+      type: 'preparing',
+      user: buyerId,
+      product: [productId],
+      delivery: delivery._id,
+      timeToDelivery: timeToDelivery,
+    });
+
+    await NotiModel.create({
+      userId: req.userId,
+      actionType: 'created',
+      title: `Your product`,
+      productName: product.name,
+      title2: `has been bought`,
+      productId: product._id,
+    });
+
+    await order.save();
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({
+      message: 'Product bought successfully',
+      product: updatedProduct,
+      order,
+      buyerWallet,
+      sellerWallet,
+    });
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error(err);
+    res.status(500).json({ message: 'Failed to buy product' });
+  }
+};
+
 export const deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -294,11 +428,40 @@ export const getAllProducts = async (req, res) => {
 
     const totalPages = Math.ceil(total / pageSize);
 
-    const formattedProducts = products.map((product) => ({
-      ...product.toObject(),
-      createdAt: dayjs(product.createdAt).format('YYYY-MM-DD'),
-      updatedAt: dayjs(product.updatedAt).format('YYYY-MM-DD'),
-    }));
+    const formattedProducts = products.map((product) => {
+      let tags = [...product.tags];
+
+      // discount tag
+
+      if (product.saveAmount && product.saveAmount > 0) {
+        if (!tags.includes('Discount')) {
+          tags.push('Discount');
+        }
+      }
+
+      // New tag
+
+      const isNew = dayjs()
+        .subtract(15, 'day')
+        .isBefore(dayjs(product.createdAt));
+      if (isNew && !tags.includes('New')) {
+        tags.push('New');
+      }
+
+      // Popular tag
+
+      // if (product.ordersCount && product.ordersCount > 100) {
+      //   if (!tags.includes('Popular')) {
+      //     tags.push('Popular');
+      //   }
+      // }
+      return {
+        ...product.toObject(),
+        createdAt: dayjs(product.createdAt).format('YYYY-MM-DD'),
+        updatedAt: dayjs(product.updatedAt).format('YYYY-MM-DD'),
+        tags,
+      };
+    });
 
     res.json({
       page: pageNumber,

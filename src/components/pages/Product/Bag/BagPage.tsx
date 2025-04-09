@@ -67,7 +67,6 @@ export const BagPage = () => {
         initial={{ opacity: 0 }}
         animate={{
           opacity: 1,
-          transition: { duration: 0.5 },
         }}
         className="flex justify-center mt-2 text-3xl font-bold text-[#212121] mb-2"
       >

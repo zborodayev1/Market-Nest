@@ -34,7 +34,6 @@ export const LogInPage: React.FC = (): JSX.Element => {
   const onSubmit = async (values: { email: string; password: string }) => {
     setLoading(true);
     try {
-      console.log('values', values);
       dispatch(loginReq(values));
     } catch (error) {
       console.error(error);
@@ -77,7 +76,7 @@ export const LogInPage: React.FC = (): JSX.Element => {
             Sign in
           </h1>
           <form
-            className="rounded-lg border px-15 py-8"
+            className="rounded-lg border-2 px-15 py-8"
             onSubmit={handleSubmit(onSubmit)}
           >
             <div>
@@ -101,6 +100,8 @@ export const LogInPage: React.FC = (): JSX.Element => {
                 iconTop={10}
                 registerName="email"
                 registerReq="Email is required"
+                registerMaxLenghtValue={40}
+                registerMaxLenghtMessage="Email must be at max 40 characters"
                 isPattern={true}
                 registerPatternMessage="Invalid email address"
               />
@@ -142,6 +143,8 @@ export const LogInPage: React.FC = (): JSX.Element => {
                 isMinLength={true}
                 registerMinLenghtValue={8}
                 registerMinLenghtMessage="Password must be at least 8 characters"
+                registerMaxLenghtValue={40}
+                registerMaxLenghtMessage="Password must be at max 40 characters"
                 iconButtonOnCLick={() => setShowPassword(!showPassword)}
               />
               {errors.password && (

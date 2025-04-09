@@ -120,6 +120,8 @@ export const RegisterForm = (props: Props) => {
                   iconRight={10}
                   iconTop={10}
                   isDef={true}
+                  registerMaxLenghtValue={40}
+                  registerMaxLenghtMessage="Full Name must be at max 40 characters"
                   registerName="fullName"
                   registerReq="Full Name is required"
                 />
@@ -152,6 +154,8 @@ export const RegisterForm = (props: Props) => {
                   iconTop={10}
                   registerName="email"
                   registerReq="Email is required"
+                  registerMaxLenghtValue={40}
+                  registerMaxLenghtMessage="Email must be at max 40 characters"
                   isPattern={true}
                   registerPatternMessage="Invalid email address"
                 />
@@ -191,6 +195,8 @@ export const RegisterForm = (props: Props) => {
                   iconTop={10}
                   registerName="password"
                   registerReq="Password is required"
+                  registerMaxLenghtValue={40}
+                  registerMaxLenghtMessage="Password must be at max 40 characters"
                   isMinLength={true}
                   registerMinLenghtValue={8}
                   registerMinLenghtMessage="Password must be at least 8 characters"
@@ -223,7 +229,11 @@ export const RegisterForm = (props: Props) => {
                   sircleWidthActive={40}
                   iconRight={10}
                   iconTop={10}
-                  isDef={true}
+                  isMinLength={true}
+                  registerMinLenghtValue={8}
+                  registerMinLenghtMessage="Phone must be at least 8 characters"
+                  registerMaxLenghtValue={40}
+                  registerMaxLenghtMessage="Phone must be at max 40 characters"
                   registerName="phone"
                   registerReq="Phone is required"
                 />

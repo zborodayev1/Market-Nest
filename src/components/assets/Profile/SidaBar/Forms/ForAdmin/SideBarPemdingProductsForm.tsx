@@ -19,7 +19,7 @@ export const SideBarPemdingProductsForm: React.FC<Props> = (props) => {
     <div>
       {userData?.role === 'admin' && (
         <div>
-          <div className="hover:bg-gray-200 z-10 p-1 py-3 transition-colors duration-300 rounded-lg ease-in-out flex items-center mb-2">
+          <div className="hover:bg-gray-200 z-10 p-1 py-3 transition-colors duration-300 rounded-xl ease-in-out flex items-center">
             <button
               onClick={handleRedirect}
               className="mx-1 flex gap-2 items-center "

@@ -9,12 +9,13 @@ import { LogInPage } from './components/pages/LogIn/LogInPage';
 import { BagPage } from './components/pages/Product/Bag/BagPage';
 import { CreatePage } from './components/pages/Product/CreateProduct/CreatePage';
 import { EditProduct } from './components/pages/Product/EditProduct/EditProduct';
-import { FavoritesPage } from './components/pages/Product/FavoritesProducts/FavoritesPage';
 import { PendingProducts } from './components/pages/Product/ForAdmins/PendingProducts';
 import { FullProduct } from './components/pages/Product/FullProduct/FullProduct';
-import { ProductsByTags } from './components/pages/Product/ProductByTags/ProductsByTags/ProductsByTags';
+import { ProductsByTags } from './components/pages/Product/ProductsByTags/ProductsByTags';
+import { SavedProducts } from './components/pages/Product/SavedProducts/SavedProducts';
 import { RegisterPage } from './components/pages/Register/RegisterPage';
 import { VerifyMail } from './components/pages/Register/VerifyMail';
+import { WalletPage } from './components/pages/Wallet/Wallet';
 import { selectIsAuth, selectUserProfile } from './redux/slices/authSlice';
 
 export const App = () => {
@@ -63,7 +64,7 @@ export const App = () => {
             path="/noti/product/:id"
           />
           <Route element={<BagPage />} path="/bag" />
-          <Route element={<FavoritesPage />} path="/favorites" />
+          <Route element={<SavedProducts />} path="/saved-items" />
           <Route
             element={
               userData?.role === 'admin' ? <PendingProducts /> : <NotFoundErr />
@@ -75,6 +76,10 @@ export const App = () => {
             path="/verify-email"
           />
           <Route element={<ProductsByTags />} path="/products/:selectedTag" />
+          <Route
+            element={!isAuth ? <Navigate to="/" /> : <WalletPage />}
+            path="/wallet"
+          />
         </Routes>
       </div>
     </div>

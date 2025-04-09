@@ -7,10 +7,10 @@ import { Link, useParams } from 'react-router-dom';
 import {
   fetchProducts,
   selectProducts,
-} from '../../../../../redux/slices/productSlice';
-import { AppDispatch, RootState } from '../../../../../redux/store';
-import { Product } from '../../../../../redux/types/product.type';
-import { ProductForm } from '../../ProductForm/ProductForm';
+} from '../../../../redux/slices/productSlice';
+import { AppDispatch, RootState } from '../../../../redux/store';
+import { Product } from '../../../../redux/types/product.type';
+import { ProductForm } from '../ProductForm/ProductForm';
 
 export const ProductsByTags = () => {
   const { selectedTag } = useParams();
@@ -58,7 +58,7 @@ export const ProductsByTags = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
+      transition={{ duration: 0.5 }}
     >
       <div className="mt-5 flex justify-start ml-10 text-2xl font-bold">
         <Link
@@ -113,7 +113,7 @@ export const ProductsByTags = () => {
           >
             No products available, Try to refresh the{' '}
             <button onClick={handleRefresh} className="z-20">
-              <b className="ml-1">page</b>
+              <b className="ml-1 italic cursor-pointer">page</b>
             </button>
           </motion.span>
         )}

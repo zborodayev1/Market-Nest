@@ -10,6 +10,7 @@ import { SideBarPemdingProductsForm } from './Forms/ForAdmin/SideBarPemdingProdu
 import { SideBarPasswordForm } from './Forms/Password/SideBarPasswordForm';
 import { SideBarPhoneForm } from './Forms/Phone/SideBarPhoneForm';
 import { SideBarUserDataForm } from './Forms/UserData/SideBarUserDataForm';
+import { SideBarWalletForm } from './Forms/Wallet/SideBarWalletForm';
 
 interface Props {
   setIsDropdownOpen: (value: boolean) => void;
@@ -50,10 +51,6 @@ export const SideBar = (props: Props) => {
     initial: { opacity: 0, x: 20 },
     animate: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: 20 },
-    whileHover: {
-      scale: 1.2,
-      transition: { duration: 0.2 },
-    },
   };
 
   return (
@@ -62,12 +59,13 @@ export const SideBar = (props: Props) => {
         <div className="fixed top-0 right-0 bg-[#fff] border-l-[2px] border-slate-300 shadow-md min-w-[420px] h-screen p-3 overflow-hidden">
           <div className="fixed right-8 top-8">
             <button
-              className="hover:bg-[#E4E4E4] duration-300 flex justify-center items-center w-[36px] h-[36px] cursor-pointer  rounded-lg"
+              className="hover:bg-gray-200 duration-300 flex justify-center items-center w-[36px] h-[36px] cursor-pointer  rounded-lg"
               onClick={() => setIsDropdownOpen(false)}
             >
               <X style={{ width: 20, height: 20 }} />
             </button>
           </div>
+
           <div className="mt-[16px] mb-2.5">
             <ChangeAvatar />
           </div>
@@ -95,9 +93,12 @@ export const SideBar = (props: Props) => {
               <SideBarPemdingProductsForm
                 onSuccess={() => setIsDropdownOpen(!isDropdownOpen)}
               />
+              <SideBarWalletForm
+                onSuccess={() => setIsDropdownOpen(!isDropdownOpen)}
+              />
               <motion.div variants={contentVariants} className="text-sm mt-1">
                 <motion.button
-                  className="w-full bg-[#fcdede] hover:bg-[#f5b3b3] transition-colors hover:bg ease-in-out duration-300  text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2 delay-50 "
+                  className="w-full mt-2 bg-[#fcdede] hover:bg-[#f5b3b3] transition-colors hover:bg ease-in-out duration-300  text-red-600 font-medium px-4 py-3 rounded-lg flex items-center justify-center gap-2 delay-50 "
                   onClick={onClickLogout}
                 >
                   <LogOut />

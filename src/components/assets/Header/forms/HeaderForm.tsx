@@ -90,8 +90,8 @@ export const HeaderForm: React.FC<Props> = ({
                 className="w-8 h-9 text-[#212121] stroke-1 "
               />
             </Link>
-            <Link className={headerButtonStyles} to="/favorites">
-              <h1 className="text-base font-bold text-[#212121]">Favorite</h1>
+            <Link className={headerButtonStyles} to="/saved-items">
+              <h1 className="text-base font-bold text-[#212121]">Saved</h1>
               <Heart
                 className="w-7 h-9 text-[#212121]"
                 style={{ strokeWidth: 2 }}

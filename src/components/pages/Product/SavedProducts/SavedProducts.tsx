@@ -1,8 +1,10 @@
 import { CircularProgress } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import {
   fetchProducts,
   selectProducts,
@@ -11,16 +13,12 @@ import { AppDispatch, RootState } from '../../../../redux/store';
 import { Product } from '../../../../redux/types/product.type';
 import { ProductForm } from '../ProductForm/ProductForm';
 
-export const FavoritesPage = () => {
+export const SavedProducts = () => {
   const { products } = useSelector(selectProducts);
   const { status } = useSelector((state: RootState) => state.products);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
   const dispatch: AppDispatch = useDispatch();
-  const [PGState, setPGState] = useState<{ limit: number; page: number }>({
-    limit: 10,
-    page: 1,
-  });
 
   useEffect(() => {
     const storedFavorites = JSON.parse(
@@ -32,19 +30,19 @@ export const FavoritesPage = () => {
   useEffect(() => {
     dispatch(
       fetchProducts({
-        limit: PGState.limit,
-        page: PGState.page,
+        limit: 10,
+        page: 1,
       })
     );
-  }, [dispatch, PGState]);
+  }, [dispatch]);
 
   useEffect(() => {
-    if (status === 'succeeded') {
+    if (products) {
       setFavoriteProducts(
         products.filter((product: Product) => favorites.includes(product._id))
       );
     }
-  }, [status, products, favorites]);
+  }, [products]);
 
   const handleRemoveFromFavorites = (id: string) => {
     const updatedFavorites = favorites.filter(
@@ -62,13 +60,8 @@ export const FavoritesPage = () => {
 
   const totalCount = favoriteProducts.length;
 
-  const totalPrice = favoriteProducts.reduce(
-    (total, product) => total + product.price,
-    0
-  );
   return (
     <>
-      {' '}
       <Helmet>
         <title>Market Nest - Favorites</title>
         <meta
@@ -84,54 +77,22 @@ export const FavoritesPage = () => {
         initial={{ opacity: 0 }}
         animate={{
           opacity: 1,
-          transition: { duration: 0.5, delay: 0.5 },
         }}
         className="w-screen"
       >
-        <div className="flex w-full text-center items-center justify-center mt-5">
-          <motion.span
-            layout
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: 1,
-              transition: { duration: 0.5 },
-            }}
-            className="text-3xl font-bold text-[#212121]"
-          >
-            Favorites
-          </motion.span>
-        </div>
+        <div className="flex w-full text-center  justify-center mt-5">
+          <span className=" flex gap-1 items-center text-[#212121]">
+            <h1 className="text-3xl font-bold">Saved items</h1>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: 1,
-          }}
-          className="flex flex-col w-full text-center items-center justify-center mt-2"
-        >
-          <AnimatePresence>
             {favoriteProducts.length !== 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col"
-              >
-                <span className="text-2xl text-[#212121]">
-                  <span className="font-bold">Total Price: </span>
-                  <span className="bg-[#3C8737] text-white px-2 p-1 rounded-md">
-                    {totalPrice}$
-                  </span>
+              <div className="flex flex-col">
+                <span className="text-xl mt-1 text-gray-600">
+                  <span>({totalCount} item)</span>
                 </span>
-
-                <span className="text-xl mt-1 text-[#212121]">
-                  <span className="font-bold">Product Count: </span>
-                  <span>{totalCount} products</span>
-                </span>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
-        </motion.div>
+          </span>
+        </div>
 
         {status === 'loading' && (
           <div className="flex justify-center m-5">
@@ -146,9 +107,9 @@ export const FavoritesPage = () => {
 
               transition: { delay: 0.1, duration: 0.5 },
             }}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0, transition: { delay: 0.1, duration: 0.5 } }}
           >
-            <div className="flex flex-wrap justify-center mt-5 gap-4 ">
+            <div className="flex flex-wrap justify-center gap-4">
               {status === 'succeeded' && favoriteProducts.length > 0 ? (
                 <AnimatePresence>
                   {favoriteProducts.map((product: Product, index: number) => (
@@ -162,7 +123,7 @@ export const FavoritesPage = () => {
                         transition: { duration: 0.5 },
                       }}
                       transition={{ delay: index * 0.1, duration: 0.5 }}
-                      className="flex justify-between"
+                      className="flex justify-between mt-5"
                     >
                       <ProductForm
                         product={product}
@@ -173,8 +134,23 @@ export const FavoritesPage = () => {
                 </AnimatePresence>
               ) : (
                 status !== 'loading' && (
-                  <div className="text-center font-bold text-xl">
-                    <p>You have no favorite products</p>
+                  <div className="">
+                    <div className="flex justify-center my-3 items-center">
+                      <div className="bg-[#e4e4e4] rounded-full p-4">
+                        <Heart className="w-6 h-6" />
+                      </div>
+                    </div>
+                    <div className="text-center font-bold text-xl">
+                      <p>You have no favorite products</p>
+                    </div>
+                    <div className="flex justify-center mt-5">
+                      <Link
+                        to="/"
+                        className="px-4 py-2 w-35 bg-[#3C8737] font-bold text-white text-center rounded-full hover:bg-[#33722e]  transition-colors ease-linear duration-150 delay-50"
+                      >
+                        Shop Now
+                      </Link>
+                    </div>
                   </div>
                 )
               )}
