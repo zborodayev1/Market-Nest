@@ -1,47 +1,60 @@
+import { Dialog, Transition } from '@headlessui/react';
 import { CircularProgress } from '@mui/material';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
+  AlertCircle,
   ArrowDownCircle,
   ArrowUpCircle,
-  Clock,
   CreditCard,
+  Trash2,
   TrendingDown,
   TrendingUp,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useInView } from 'react-intersection-observer';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchWallet } from '../../../redux/slices/walletSlice';
+import {
+  clearTransactions,
+  fetchTransactions,
+  fetchWallet,
+} from '../../../redux/slices/walletSlice';
 import { AppDispatch, RootState } from '../../../redux/store';
-import { Transaction } from '../../../redux/types/transactions.type';
 import { DepositForm } from './DepositForm';
-import { SendMoneyFrom } from './SendMoneyFrom';
+import { SendMoneyForm } from './SendMoneyForm';
+import { Transactions } from './Transactions';
 
 export const WalletPage = () => {
   const dispatch: AppDispatch = useDispatch();
   const wallet = useSelector((state: RootState) => state.wallet);
-  const status = useSelector((state: RootState) => state.wallet.status);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const { status, error } = useSelector((state: RootState) => state.wallet);
+  const hasMore = useSelector((state: RootState) => state.wallet.hasMore);
+  const [page, setPage] = useState(1);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const [dropdown, setDropdown] = useState<{ state: string; open: boolean }>({
-    state: '',
-    open: false,
-  });
+  const { ref, inView } = useInView();
+  const [openDeposit, setOpenDeposit] = useState(false);
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
+  const [openSendMoney, setOpenSendMoney] = useState(false);
 
   useEffect(() => {
     dispatch(fetchWallet());
-  }, [dispatch]);
+  }, []);
 
-  const handleDeposit = () => {
-    setDropdown({
-      state: 'Deposit',
-      open: !dropdown.open,
-    });
-  };
-  const handleSendMoney = () => {
-    setDropdown({
-      state: 'SendMoney',
-      open: !dropdown.open,
-    });
+  useEffect(() => {
+    if (status !== 'loading') {
+      dispatch(fetchTransactions({ page, limit: 10 }));
+    }
+  }, [dispatch, page]);
+
+  useEffect(() => {
+    if (inView && hasMore && status !== 'loading') {
+      setPage((prev) => prev + 1);
+    }
+  }, [inView, hasMore, status]);
+
+  const handleClearTransactions = () => {
+    dispatch(clearTransactions());
+    setIsClearConfirmOpen(false);
   };
 
   return (
@@ -54,7 +67,13 @@ export const WalletPage = () => {
           content="market, shop, market nest, market nests"
         />
       </Helmet>
-      <div className="min-h-screen bg-white text-black p-6">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.4 }}
+        className="min-h-screen bg-white text-black p-6"
+      >
         {status === 'loading' && (
           <div className="flex justify-center m-5">
             <CircularProgress color="inherit" />
@@ -62,16 +81,19 @@ export const WalletPage = () => {
         )}
         {status === 'failed' && (
           <>
-            <div className="flex justify-center gap-1 m-5">
-              <p className="text-red-500">Failed to load wallet data</p>
-            </div>
-            <div className="flex justify-center">
-              <button
-                className="font-bold cursor-pointer text-lg"
-                onClick={() => dispatch(fetchWallet())}
-              >
-                Retry
-              </button>
+            <div className="flex justify-center mt-10">
+              <div className="w-100 bg-red-50 border-2 border-red-100 rounded-xl p-8 text-center">
+                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                <h2 className="text-xl font-semibold text-red-700 mb-2">
+                  {error}
+                </h2>
+                <button
+                  onClick={() => dispatch(fetchWallet())}
+                  className="bg-red-100 text-red-700 px-6 py-3 rounded-lg font-medium hover:bg-red-200 transition-colors"
+                >
+                  Retry
+                </button>
+              </div>
             </div>
           </>
         )}
@@ -86,30 +108,29 @@ export const WalletPage = () => {
 
           {status === 'succeeded' && (
             <>
-              <div className="bg-gray-50 rounded-xl p-6 mb-6 shadow-sm">
-                <p className="text-gray-600 mb-2">Total Balance</p>
-                <h2 className="text-4xl font-bold">${wallet.wallet.balance}</h2>
-                <div className="flex gap-2 mt-2">
-                  <button ref={buttonRef} onClick={handleDeposit}>
+              <div className="flex justify-between bg-gray-50 rounded-xl p-6 mb-6 shadow-sm">
+                <div className="">
+                  <p className="text-gray-600 mb-2">Total Balance</p>
+                  <h2 className="text-4xl font-bold">
+                    ${wallet.wallet.balance}
+                  </h2>
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <button ref={buttonRef} onClick={() => setOpenDeposit(true)}>
                     <div className="text-white bg-[#3C8737] hover:bg-[#2B6128] rounded-full gap-2 flex py-2 px-4 transition-colors duration-200 ease-in-out">
                       Deposit
                       <ArrowDownCircle />
                     </div>
                   </button>
-                  <button ref={buttonRef} onClick={handleSendMoney}>
+                  <button
+                    ref={buttonRef}
+                    onClick={() => setOpenSendMoney(true)}
+                  >
                     <div className="text-black bg-gray-200 hover:bg-gray-300 rounded-full gap-2 flex py-2 px-4 transition-colors duration-200 ease-in-out">
                       Send Money
                       <ArrowUpCircle />
                     </div>
                   </button>
-                </div>
-                <div ref={dropdownRef}>
-                  {dropdown.open && dropdown.state === 'Deposit' ? (
-                    <DepositForm />
-                  ) : (
-                    dropdown.state === 'SendMoney' &&
-                    dropdown.open && <SendMoneyFrom />
-                  )}
                 </div>
               </div>
 
@@ -169,48 +190,94 @@ export const WalletPage = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-gray-200">
-                <div className="flex items-center gap-2 p-6 border-b border-gray-200">
-                  <Clock className="w-5 h-5" />
-                  <h3 className="font-semibold">Recent Transactions</h3>
-                </div>
-
-                <div className="divide-y divide-gray-200">
-                  {wallet.wallet.transactions &&
-                    wallet.wallet.transactions.length > 0 &&
-                    wallet.wallet.transactions.map(
-                      (transaction: Transaction, index: number) => (
-                        <div
-                          key={index}
-                          className="p-6 flex items-center justify-between"
-                        >
-                          <div>
-                            <p className="font-medium">
-                              {transaction.description}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {transaction.date}
-                            </p>
-                          </div>
-                          <p
-                            className={`font-medium ${
-                              transaction.type === 'income'
-                                ? 'text-green-600'
-                                : 'text-red-600'
-                            }`}
-                          >
-                            {transaction.type === 'income' ? '+' : '-'}$
-                            {transaction.amount}
-                          </p>
-                        </div>
-                      )
-                    )}
-                </div>
-              </div>
+              <Transactions
+                onClearTransactions={() => setIsClearConfirmOpen(true)}
+              />
             </>
           )}
         </div>
-      </div>
+      </motion.div>
+      <AnimatePresence>
+        {openDeposit && (
+          <Dialog
+            open={openDeposit}
+            onClose={() => setOpenDeposit(false)}
+            className="relative z-50"
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/30"
+              aria-hidden="true"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -10 }}
+              transition={{ duration: 0.1 }}
+              className="fixed inset-0 flex items-center justify-center p-4"
+            >
+              <div className="bg-white rounded-xl p-6 max-w-md w-full">
+                <h1 className="text-xl font-bold mb-4">Deposit Funds</h1>
+                <DepositForm onCancel={() => setOpenDeposit(false)} />
+              </div>
+            </motion.div>
+          </Dialog>
+        )}
+      </AnimatePresence>
+
+      <Transition show={openSendMoney} as={React.Fragment}>
+        <Dialog
+          onClose={() => setOpenSendMoney(false)}
+          className="relative z-50"
+        >
+          <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl p-6 max-w-md w-full">
+              <h1 className="text-xl font-bold mb-4">Send Money</h1>
+              <SendMoneyForm onCancel={() => setOpenSendMoney(false)} />
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
+      <Transition show={isClearConfirmOpen} as={React.Fragment}>
+        <Dialog
+          onClose={() => setIsClearConfirmOpen(false)}
+          className="relative z-50"
+        >
+          <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl p-6 max-w-md w-full">
+              <h1 className="text-xl font-bold mb-4">Clear All Transactions</h1>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to clear all transactions? This action
+                cannot be undone.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsClearConfirmOpen(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-black"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleClearTransactions}
+                  className="text-white items-center bg-red-600 hover:bg-red-700 rounded-full gap-2 flex py-2 px-4 transition-colors duration-200 ease-in-out"
+                >
+                  Clear All
+                  <Trash2 size={20} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
+      <div ref={ref} className="h-10" />
     </>
   );
 };
