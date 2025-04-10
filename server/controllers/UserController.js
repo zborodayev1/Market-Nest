@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import UnverifiedUserModel from '../models/unverified_user.js';
 import UserModel from '../models/user.js';
+import WalletModel from '../models/wallet.js';
 import { generateVerificationCode } from '../utils/functions/generateVerificationCode.js';
 // import { sendVerificationCode } from '../utils/functions/sendMailToClient.js'
 import cloudinary from 'cloudinary';
@@ -100,6 +101,13 @@ export const completeRegistration = async (req, res) => {
     const user = await userDoc.save();
 
     await UnverifiedUserModel.deleteOne({ _id: tempUser._id });
+    await WalletModel.create({
+      user: user._id,
+      balance: 0,
+      transactions: [],
+      income: 0,
+      expenses: 0,
+    });
 
     const token = jwt.sign({ _id: user._id, role: user.role }, JWT_SECRET, {
       expiresIn: '14d',
