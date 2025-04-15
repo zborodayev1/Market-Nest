@@ -3,7 +3,7 @@ import storage from 'redux-persist/lib/storage'; // or 'localforage' or 'session
 const persistConfig = {
   key: 'store',
   storage,
-  blacklist: ['products'],
+  blacklist: ['products', 'wallet'],
 };
 
 export { persistConfig };

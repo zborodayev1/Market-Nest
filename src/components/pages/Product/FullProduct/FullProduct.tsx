@@ -14,7 +14,6 @@ import {
   selectFullProduct,
 } from '../../../../redux/slices/productSlice';
 import { AppDispatch } from '../../../../redux/store';
-import { DeliveryComponent } from './Delivery/DeliveryComponent';
 import { SellerInfo } from './Seller/SellerInfo';
 
 interface Props {
@@ -172,7 +171,13 @@ export const FullProduct = (props: Props) => {
                 className="max-w-[500px] bg-[#f5f5f5] rounded-md border"
               />
               <div className="">
-                <DeliveryComponent />
+                <motion.button
+                  onClick={toggleBag}
+                  className={`w-[450px] py-3 font-bold text-white text-lg cursor-pointer flex justify-center items-center gap-2 rounded-xl   ${isBag ? 'bg-[#873737] active:bg-gradient-to-r active:from-[#873737] active:via-transparent active:to-[#3C8737]' : 'bg-[#3C8737] active:bg-gradient-to-r active:from-[#3C8737] active:via-transparent active:to-[#873737] '} transition-colors duration-200 ease- delay-50`}
+                  style={{ overflow: 'hidden' }}
+                >
+                  Buy now
+                </motion.button>
                 <div className="flex mt-5">
                   <div>
                     <motion.button
